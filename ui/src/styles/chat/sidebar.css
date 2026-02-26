@@ -56,6 +56,7 @@
   top: 0;
   z-index: 10;
   background: var(--panel);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Smaller close button for sidebar */
@@ -83,8 +84,9 @@
 }
 
 .sidebar-markdown pre {
-  background: rgba(0, 0, 0, 0.12);
-  border-radius: 4px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   padding: 12px;
   overflow-x: auto;
 }
