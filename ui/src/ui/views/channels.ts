@@ -67,14 +67,16 @@ export function renderChannels(props: ChannelsProps) {
       )}
     </section>
 
-    <section class="card" style="margin-top: 18px;">
-      <div class="row" style="justify-content: space-between;">
-        <div>
-          <div class="card-title">Channel health</div>
-          <div class="card-sub">Channel status snapshots from the gateway.</div>
+    <details class="card" style="margin-top: 18px;">
+      <summary style="cursor: pointer; list-style: none; outline: none;">
+        <div class="row" style="justify-content: space-between;">
+          <div>
+            <div class="card-title">Channel health</div>
+            <div class="card-sub">Channel status snapshots from the gateway.</div>
+          </div>
+          <div class="muted">${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a"}</div>
         </div>
-        <div class="muted">${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a"}</div>
-      </div>
+      </summary>
       ${
         props.lastError
           ? html`<div class="callout danger" style="margin-top: 12px;">
@@ -85,7 +87,7 @@ export function renderChannels(props: ChannelsProps) {
       <pre class="code-block" style="margin-top: 12px;">
 ${props.snapshot ? JSON.stringify(props.snapshot, null, 2) : "No snapshot yet."}
       </pre>
-    </section>
+    </details>
   `;
 }
 

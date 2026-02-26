@@ -91,49 +91,44 @@ export function renderNostrProfileForm(params: {
 
     if (type === "textarea") {
       return html`
-        <div class="form-field" style="margin-bottom: 12px;">
-          <label for="${inputId}" style="display: block; margin-bottom: 4px; font-weight: 500;">
-            ${label}
-          </label>
+        <div class="field" style="margin-bottom: 12px;">
+          <label for="${inputId}"><span>${label}</span></label>
           <textarea
             id="${inputId}"
             .value=${value}
             placeholder=${placeholder ?? ""}
             maxlength=${maxLength ?? 2000}
             rows="3"
-            style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; resize: vertical; font-family: inherit;"
+            style="font-family: var(--font-body); white-space: normal; min-height: auto;"
             @input=${(e: InputEvent) => {
               const target = e.target as HTMLTextAreaElement;
               callbacks.onFieldChange(field, target.value);
             }}
             ?disabled=${state.saving}
           ></textarea>
-          ${help ? html`<div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${help}</div>` : nothing}
-          ${error ? html`<div style="font-size: 12px; color: var(--danger-color); margin-top: 2px;">${error}</div>` : nothing}
+          ${help ? html`<div class="muted" style="font-size: 12px;">${help}</div>` : nothing}
+          ${error ? html`<div style="font-size: 12px; color: var(--danger); margin-top: 2px;">${error}</div>` : nothing}
         </div>
       `;
     }
 
     return html`
-      <div class="form-field" style="margin-bottom: 12px;">
-        <label for="${inputId}" style="display: block; margin-bottom: 4px; font-weight: 500;">
-          ${label}
-        </label>
+      <div class="field" style="margin-bottom: 12px;">
+        <label for="${inputId}"><span>${label}</span></label>
         <input
           id="${inputId}"
           type=${type}
           .value=${value}
           placeholder=${placeholder ?? ""}
           maxlength=${maxLength ?? 256}
-          style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;"
           @input=${(e: InputEvent) => {
             const target = e.target as HTMLInputElement;
             callbacks.onFieldChange(field, target.value);
           }}
           ?disabled=${state.saving}
         />
-        ${help ? html`<div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${help}</div>` : nothing}
-        ${error ? html`<div style="font-size: 12px; color: var(--danger-color); margin-top: 2px;">${error}</div>` : nothing}
+        ${help ? html`<div class="muted" style="font-size: 12px;">${help}</div>` : nothing}
+        ${error ? html`<div style="font-size: 12px; color: var(--danger); margin-top: 2px;">${error}</div>` : nothing}
       </div>
     `;
   };
@@ -149,7 +144,7 @@ export function renderNostrProfileForm(params: {
         <img
           src=${picture}
           alt="Profile picture preview"
-          style="max-width: 80px; max-height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color);"
+          style="max-width: 80px; max-height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border);"
           @error=${(e: Event) => {
             const img = e.target as HTMLImageElement;
             img.style.display = "none";
@@ -164,10 +159,10 @@ export function renderNostrProfileForm(params: {
   };
 
   return html`
-    <div class="nostr-profile-form" style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; margin-top: 12px;">
+    <div class="nostr-profile-form" style="padding: 16px; background: var(--bg-elevated); border-radius: var(--radius-md); margin-top: 12px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <div style="font-weight: 600; font-size: 16px;">Edit Profile</div>
-        <div style="font-size: 12px; color: var(--text-muted);">Account: ${accountId}</div>
+        <div class="muted" style="font-size: 12px;">Account: ${accountId}</div>
       </div>
 
       ${
@@ -212,8 +207,8 @@ export function renderNostrProfileForm(params: {
       ${
         state.showAdvanced
           ? html`
-            <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px;">
-              <div style="font-weight: 500; margin-bottom: 12px; color: var(--text-muted);">Advanced</div>
+            <div style="border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
+              <div class="muted" style="font-weight: 500; margin-bottom: 12px;">Advanced</div>
 
               ${renderField("banner", "Banner URL", {
                 type: "url",
@@ -277,7 +272,7 @@ export function renderNostrProfileForm(params: {
       ${
         isDirty
           ? html`
-              <div style="font-size: 12px; color: var(--warning-color); margin-top: 8px">
+              <div style="font-size: 12px; color: var(--warn); margin-top: 8px">
                 You have unsaved changes
               </div>
             `
