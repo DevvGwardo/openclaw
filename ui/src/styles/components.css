@@ -766,6 +766,7 @@
 
 .cron-form-status {
   margin-top: 4px;
+  margin-bottom: 8px;
   border: 1px solid rgba(248 81 73 / 0.15);
   background: rgba(248 81 73 / 0.15);
   border-radius: var(--radius-md);
@@ -1481,6 +1482,27 @@
   gap: 4px;
 }
 
+/* Status-based left-border accent on the job state panel */
+.cron-job-state--ok {
+  border-left: 3px solid var(--color-success, #3fb950);
+  padding-left: 8px;
+}
+
+.cron-job-state--error {
+  border-left: 3px solid var(--color-error, #f85149);
+  padding-left: 8px;
+}
+
+.cron-job-state--skipped {
+  border-left: 3px solid var(--warn);
+  padding-left: 8px;
+}
+
+.cron-job-state--na {
+  border-left: 3px solid var(--color-border, rgba(255 255 255 / 0.08));
+  padding-left: 8px;
+}
+
 .cron-job-state-row {
   display: flex;
   justify-content: space-between;
@@ -1622,6 +1644,12 @@
   color: var(--color-error, #f85149);
   border-color: rgba(248 81 73 / 0.3);
   background: rgba(248 81 73 / 0.15);
+}
+
+.chip-muted {
+  color: var(--color-text-muted, #888);
+  border-color: rgba(255 255 255 / 0.06);
+  background: rgba(255 255 255 / 0.04);
 }
 
 /* ===========================================
