@@ -1,0 +1,227 @@
+/* Tauri desktop shell — global overrides and layout variables */
+
+/* ── System font stack ── */
+:root {
+  --font-sans:
+    -apple-system, "SF Pro Display", "Segoe UI Variable", "Segoe UI", Ubuntu, system-ui, sans-serif;
+  --font-mono:
+    "SF Mono", "Cascadia Code", "Fira Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+}
+
+/* ── Layout tokens ── */
+:root {
+  --tauri-titlebar-height: 40px;
+  --tauri-sidebar-width: 220px;
+  --tauri-sidebar-collapsed-width: 52px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  /* Content area */
+  --content-max-width: 1400px;
+}
+
+/* ── Color palette (dark default) ── */
+:root,
+[data-theme="dark"] {
+  --color-bg: #0f0f0f;
+  --color-surface: #161616;
+  --color-surface-raised: #1c1c1e;
+  --color-surface-hover: rgba(255 255 255 / 0.05);
+  --color-surface-sidebar: #111111;
+  --color-border: rgba(255 255 255 / 0.08);
+  --color-text: #e8e8e8;
+  --color-text-muted: #888888;
+  --color-text-faint: #505050;
+  --color-accent: #4f8ef7;
+  --color-accent-subtle: rgba(79 142 247 / 0.12);
+  --color-success: #3fb950;
+  --color-error: #f85149;
+  --color-warning: #d29922;
+  --color-status-offline: #444444;
+  --tauri-titlebar-bg: #111111;
+}
+
+[data-theme="light"] {
+  --color-bg: #f5f5f7;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f0f0f2;
+  --color-surface-hover: rgba(0 0 0 / 0.04);
+  --color-surface-sidebar: #f0f0f2;
+  --color-border: rgba(0 0 0 / 0.1);
+  --color-text: #1d1d1f;
+  --color-text-muted: #6e6e73;
+  --color-text-faint: #b0b0b5;
+  --color-accent: #0066cc;
+  --color-accent-subtle: rgba(0 102 204 / 0.1);
+  --color-success: #1a7f37;
+  --color-error: #cf222e;
+  --color-warning: #9a6700;
+  --color-status-offline: #bbb;
+  --tauri-titlebar-bg: #e8e8ed;
+}
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* desktop shell manages its own scroll */
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Shell layout ── */
+tauri-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.tauri-shell__body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tauri-shell__content {
+  flex: 1;
+  overflow: auto;
+  background: var(--color-bg);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border, rgba(255 255 255 / 0.12)) transparent;
+}
+
+.tauri-shell__content::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.tauri-shell__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tauri-shell__content::-webkit-scrollbar-thumb {
+  background: var(--color-border, rgba(255 255 255 / 0.15));
+  border-radius: 3px;
+}
+
+/* ── Inner content wrapper ── */
+.tauri-shell__inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-4);
+  min-height: 100%;
+}
+
+/* ── Footer ── */
+.tauri-shell__footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 16px;
+  height: 28px;
+  background: var(--color-surface-sidebar, #111);
+  border-top: 1px solid var(--color-border, rgba(255 255 255 / 0.06));
+  font-size: 11px;
+  color: var(--color-text-faint, #555);
+}
+
+.tauri-shell__footer-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tauri-shell__footer-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-status-offline, #555);
+  transition: background 0.3s ease;
+}
+
+.tauri-shell__footer-dot--connected {
+  background: var(--color-success, #3fb950);
+}
+
+/* ── Thin native-feeling scrollbars globally ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border, rgba(255 255 255 / 0.12)) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255 255 255 / 0.15);
+  border-radius: 3px;
+}
+
+[data-theme="light"] *::-webkit-scrollbar-thumb {
+  background: rgba(0 0 0 / 0.15);
+}
+
+/* ── Desktop density — tighten existing tab content ── */
+.tab-content {
+  padding: var(--space-4);
+}
+
+/* ── Rounded cards ── */
+.card,
+.panel {
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0 0 0 / 0.3);
+}
+
+/* ── Smooth sidebar transitions ── */
+.tauri-sidebar {
+  transition:
+    width 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    min-width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Hide browser topbar/nav — replaced by titlebar + sidebar in Tauri context ── */
+[data-tauri] .topbar,
+[data-tauri] .nav {
+  display: none !important;
+}
+
+/* The .shell wrapper should not add extra layout in Tauri context */
+[data-tauri] .shell {
+  display: contents;
+}
+
+/* The main content area fills the tauri-shell__content container */
+[data-tauri] .content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0;
+}
