@@ -204,7 +204,7 @@ export function renderExecApprovals(state: ExecApprovalsState) {
   const targetReady = state.target !== "node" || Boolean(state.targetNodeId);
   return html`
     <section class="card">
-      <div class="row" style="justify-content: space-between; align-items: center;">
+      <div class="row" style="justify-content: space-between;">
         <div>
           <div class="card-title">Exec approvals</div>
           <div class="card-sub">
@@ -224,7 +224,7 @@ export function renderExecApprovals(state: ExecApprovalsState) {
 
       ${
         !ready
-          ? html`<div class="row" style="margin-top: 12px; gap: 12px;">
+          ? html`<div class="row" style="margin-top: 12px;">
             <div class="muted">Load exec approvals to edit allowlists.</div>
             <button class="btn" ?disabled=${state.loading || !targetReady} @click=${state.onLoad}>
               ${state.loading ? "Loading…" : "Load approvals"}
