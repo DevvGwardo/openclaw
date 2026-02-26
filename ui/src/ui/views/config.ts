@@ -785,7 +785,7 @@ export function renderConfig(props: ConfigProps) {
                 ${
                   formUnsafe
                     ? html`
-                        <div class="callout danger" style="margin-top: 12px">
+                        <div class="callout danger config-callout--spaced">
                           Form view can't safely edit some fields. Use Raw to avoid losing config entries.
                         </div>
                       `
@@ -807,7 +807,7 @@ export function renderConfig(props: ConfigProps) {
 
         ${
           props.issues.length > 0
-            ? html`<div class="callout danger" style="margin-top: 12px;">
+            ? html`<div class="callout danger config-callout--spaced">
               <pre class="code-block">
 ${JSON.stringify(props.issues, null, 2)}</pre
               >
