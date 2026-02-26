@@ -24,9 +24,10 @@
   gap: 12px;
   flex-wrap: nowrap;
   flex-shrink: 0;
-  padding-bottom: 12px;
-  margin-bottom: 12px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
   background: transparent;
+  /* no border — rely on spacing + surface diff */
 }
 
 .chat-header__left {
@@ -52,11 +53,47 @@
   flex: 1 1 0; /* Grow, shrink, and use 0 base for proper scrolling */
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px 8px;
-  margin: 0 -8px;
+  padding: 16px 24px; /* wider horizontal breathing room */
+  margin: 0 -24px;
   min-height: 0; /* Allow shrinking for flex scroll behavior */
   border-radius: 12px;
   background: transparent;
+  scroll-behavior: smooth;
+  /* Scrollbar hidden by default; appears on hover */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.25s ease;
+}
+
+.chat-thread:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+/* WebKit thin overlay scrollbar */
+.chat-thread::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-thread::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-thread::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+  transition: background 0.25s ease;
+}
+
+.chat-thread:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="light"] .chat-thread:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+}
+
+[data-theme="light"] .chat-thread:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
 }
 
 /* Focus mode exit button */
@@ -148,7 +185,8 @@
   gap: 12px;
   margin-top: auto; /* Push to bottom of flex container */
   padding: 12px 16px 16px;
-  background: linear-gradient(to bottom, transparent, var(--bg) 30%);
+  /* Subtler gradient — less visual weight */
+  background: linear-gradient(to bottom, transparent, var(--bg) 40%);
   z-index: 10;
 }
 
@@ -291,17 +329,22 @@
   max-height: 150px;
   padding: 9px 12px;
   border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
   overflow-y: auto;
   resize: none;
   white-space: pre-wrap;
   font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.45;
-  transition: box-shadow var(--duration-fast) var(--ease-out);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .chat-compose .chat-compose__field textarea:focus {
-  box-shadow: 0 0 0 2px var(--accent-glow);
+  /* Thin accent focus ring — more refined than glow */
+  box-shadow: 0 0 0 1.5px var(--accent);
+  border-color: var(--accent);
   outline: none;
 }
 
@@ -427,6 +470,43 @@
 :root[data-theme="light"] .chat-controls__thinking {
   background: var(--bg-elevated);
   border-color: var(--border);
+}
+
+/* Send button — solid accent fill, clean small radius */
+.chat-compose .chat-compose__actions .btn.btn--primary {
+  background: var(--accent);
+  border-color: transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+}
+
+.chat-compose .chat-compose__actions .btn.btn--primary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+/* Disconnected status callout — inline pill instead of full-width bar */
+.chat > .callout:first-child {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--secondary);
+  color: var(--muted);
+  /* override default callout padding */
+  width: auto;
+}
+
+/* Light theme compose gradient */
+:root[data-theme="light"] .chat-compose {
+  background: linear-gradient(to bottom, transparent, var(--bg-content) 40%);
 }
 
 @media (max-width: 640px) {
