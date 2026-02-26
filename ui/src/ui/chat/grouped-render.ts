@@ -84,7 +84,7 @@ export function renderStreamingGroup(
   const name = assistant?.name ?? "Assistant";
 
   return html`
-    <div class="chat-group assistant">
+    <div class="chat-group assistant streaming">
       ${renderAvatar("assistant", assistant)}
       <div class="chat-group-messages">
         ${renderGroupedMessage(
