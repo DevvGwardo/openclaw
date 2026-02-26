@@ -347,32 +347,47 @@ function resolveSubsections(params: {
   return entries;
 }
 
+type DiffChangeType = "added" | "removed" | "modified";
+type DiffEntry = { path: string; from: unknown; to: unknown; type: DiffChangeType };
+
+function classifyChange(from: unknown, to: unknown): DiffChangeType {
+  const fromEmpty = from == null;
+  const toEmpty = to == null;
+  if (fromEmpty && !toEmpty) {
+    return "added";
+  }
+  if (!fromEmpty && toEmpty) {
+    return "removed";
+  }
+  return "modified";
+}
+
 function computeDiff(
   original: Record<string, unknown> | null,
   current: Record<string, unknown> | null,
-): Array<{ path: string; from: unknown; to: unknown }> {
+): DiffEntry[] {
   if (!original || !current) {
     return [];
   }
-  const changes: Array<{ path: string; from: unknown; to: unknown }> = [];
+  const changes: DiffEntry[] = [];
 
   function compare(orig: unknown, curr: unknown, path: string) {
     if (orig === curr) {
       return;
     }
     if (typeof orig !== typeof curr) {
-      changes.push({ path, from: orig, to: curr });
+      changes.push({ path, from: orig, to: curr, type: classifyChange(orig, curr) });
       return;
     }
     if (typeof orig !== "object" || orig === null || curr === null) {
       if (orig !== curr) {
-        changes.push({ path, from: orig, to: curr });
+        changes.push({ path, from: orig, to: curr, type: classifyChange(orig, curr) });
       }
       return;
     }
     if (Array.isArray(orig) && Array.isArray(curr)) {
       if (JSON.stringify(orig) !== JSON.stringify(curr)) {
-        changes.push({ path, from: orig, to: curr });
+        changes.push({ path, from: orig, to: curr, type: classifyChange(orig, curr) });
       }
       return;
     }
@@ -469,13 +484,33 @@ export function renderConfig(props: ConfigProps) {
       <!-- Sidebar -->
       <aside class="config-sidebar">
         <div class="config-sidebar__header">
-          <div class="config-sidebar__title">Settings</div>
+          <div class="config-sidebar__header-info">
+            <div class="config-sidebar__title">Config</div>
+            <div class="config-sidebar__path">~/.openclaw/openclaw.json</div>
+          </div>
           <span
             class="pill pill--sm ${
-              validity === "valid" ? "pill--ok" : validity === "invalid" ? "pill--danger" : ""
+              validity === "valid"
+                ? "pill--ok"
+                : validity === "invalid"
+                  ? "pill--danger"
+                  : "pill--neutral"
             }"
-            >${validity}</span
           >
+            ${
+              validity === "valid"
+                ? html`
+                    <span class="pill__dot pill__dot--ok"></span>Valid
+                  `
+                : validity === "invalid"
+                  ? html`
+                      <span class="pill__dot pill__dot--danger"></span>Invalid
+                    `
+                  : html`
+                      <span class="pill__dot pill__dot--neutral"></span>
+                    `
+            }
+          </span>
         </div>
 
         <!-- Search -->
@@ -619,18 +654,44 @@ export function renderConfig(props: ConfigProps) {
             ${
               hasChanges
                 ? html`
-                  <span class="config-changes-badge"
+                  <span class="config-changes-badge config-changes-badge--pulse"
                     >${
                       props.formMode === "raw"
                         ? "Unsaved changes"
-                        : `${diff.length} unsaved change${diff.length !== 1 ? "s" : ""}`
+                        : `${diff.length} change${diff.length !== 1 ? "s" : ""} pending`
                     }</span
                   >
                 `
                 : html`
-                    <span class="config-status muted">No changes</span>
+                    <span class="config-saved-badge">✓ All saved</span>
                   `
             }
+            <span class="config-status">
+              <span
+                class="config-status-dot ${
+                  props.connected
+                    ? "config-status-dot--connected"
+                    : "config-status-dot--disconnected"
+                }"
+              ></span>
+              ${props.connected ? "Connected" : "Disconnected"}
+            </span>
+            <!-- Inline mode toggle for mobile (sidebar footer is hidden) -->
+            <div class="config-mode-toggle config-mode-toggle--inline">
+              <button
+                class="config-mode-toggle__btn ${props.formMode === "form" ? "active" : ""}"
+                ?disabled=${props.schemaLoading || !props.schema}
+                @click=${() => props.onFormModeChange("form")}
+              >
+                Form
+              </button>
+              <button
+                class="config-mode-toggle__btn ${props.formMode === "raw" ? "active" : ""}"
+                @click=${() => props.onFormModeChange("raw")}
+              >
+                Raw
+              </button>
+            </div>
           </div>
           <div class="config-actions__right">
             <button
@@ -640,20 +701,23 @@ export function renderConfig(props: ConfigProps) {
             >
               ${props.loading ? "Loading…" : "Reload"}
             </button>
-            <button
-              class="btn btn--sm primary"
-              ?disabled=${!canSave}
-              @click=${props.onSave}
-            >
-              ${props.saving ? "Saving…" : "Save"}
-            </button>
-            <button
-              class="btn btn--sm"
-              ?disabled=${!canApply}
-              @click=${props.onApply}
-            >
-              ${props.applying ? "Applying…" : "Apply"}
-            </button>
+            <!-- Save + Apply grouped (related: save to disk vs apply live) -->
+            <div class="config-actions__btn-group">
+              <button
+                class="btn btn--sm primary"
+                ?disabled=${!canSave}
+                @click=${props.onSave}
+              >
+                ${props.saving ? "Saving…" : "Save"}
+              </button>
+              <button
+                class="btn btn--sm"
+                ?disabled=${!canApply}
+                @click=${props.onApply}
+              >
+                ${props.applying ? "Applying…" : "Apply"}
+              </button>
+            </div>
             <button
               class="btn btn--sm"
               ?disabled=${!canUpdate}
@@ -670,10 +734,22 @@ export function renderConfig(props: ConfigProps) {
             ? html`
               <details class="config-diff">
                 <summary class="config-diff__summary">
-                  <span
-                    >View ${diff.length} pending
-                    change${diff.length !== 1 ? "s" : ""}</span
-                  >
+                  <span>${(() => {
+                    const added = diff.filter((d) => d.type === "added").length;
+                    const removed = diff.filter((d) => d.type === "removed").length;
+                    const modified = diff.filter((d) => d.type === "modified").length;
+                    const parts: string[] = [];
+                    if (added) {
+                      parts.push(`${added} added`);
+                    }
+                    if (removed) {
+                      parts.push(`${removed} removed`);
+                    }
+                    if (modified) {
+                      parts.push(`${modified} modified`);
+                    }
+                    return `${diff.length} change${diff.length !== 1 ? "s" : ""} (${parts.join(", ")})`;
+                  })()}</span>
                   <svg
                     class="config-diff__chevron"
                     viewBox="0 0 24 24"
@@ -687,16 +763,25 @@ export function renderConfig(props: ConfigProps) {
                 <div class="config-diff__content">
                   ${diff.map(
                     (change) => html`
-                      <div class="config-diff__item">
-                        <div class="config-diff__path">${change.path}</div>
-                        <div class="config-diff__values">
-                          <span class="config-diff__from"
-                            >${truncateValue(change.from)}</span
-                          >
-                          <span class="config-diff__arrow">→</span>
-                          <span class="config-diff__to"
-                            >${truncateValue(change.to)}</span
-                          >
+                      <div class="config-diff__item config-diff__item--${change.type}">
+                        <span class="config-diff__type-icon" aria-hidden="true">${
+                          change.type === "added" ? "+" : change.type === "removed" ? "−" : "~"
+                        }</span>
+                        <div class="config-diff__body">
+                          <div class="config-diff__path">${change.path}</div>
+                          <div class="config-diff__values">
+                            ${
+                              change.type !== "added"
+                                ? html`<span class="config-diff__from">${truncateValue(change.from)}</span>
+                                <span class="config-diff__arrow">→</span>`
+                                : nothing
+                            }
+                            ${
+                              change.type !== "removed"
+                                ? html`<span class="config-diff__to">${truncateValue(change.to)}</span>`
+                                : nothing
+                            }
+                          </div>
                         </div>
                       </div>
                     `,
@@ -760,6 +845,26 @@ export function renderConfig(props: ConfigProps) {
         <!-- Form content -->
         <div class="config-content">
           ${
+            props.formMode === "form" && !props.activeSection && !props.searchQuery
+              ? html`
+                <div class="config-all-hero">
+                  <div class="config-all-hero__icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                  </div>
+                  <div class="config-all-hero__text">
+                    <div class="config-all-hero__title">All Settings</div>
+                    <div class="config-all-hero__subtitle">${allSections.length} section${allSections.length !== 1 ? "s" : ""} available</div>
+                  </div>
+                </div>
+              `
+              : nothing
+          }
+          ${
             props.formMode === "form"
               ? html`
                 ${
@@ -793,14 +898,31 @@ export function renderConfig(props: ConfigProps) {
                 }
               `
               : html`
-                <label class="field config-raw-field">
-                  <span>Raw JSON5</span>
+                <div class="config-raw-editor">
+                  <div class="config-raw-editor__header">
+                    <span class="config-raw-editor__title">Raw JSON5</span>
+                    <span class="config-raw-editor__badge">json5</span>
+                    <button
+                      class="config-raw-editor__copy"
+                      type="button"
+                      @click=${() => {
+                        navigator.clipboard.writeText(props.raw).catch(() => {});
+                      }}
+                    >
+                      Copy
+                    </button>
+                  </div>
                   <textarea
+                    class="config-raw-editor__textarea"
                     .value=${props.raw}
                     @input=${(e: Event) =>
                       props.onRawChange((e.target as HTMLTextAreaElement).value)}
                   ></textarea>
-                </label>
+                  <div class="config-raw-editor__footer">
+                    <span>${props.raw.split("\n").length} lines</span>
+                    <span>${props.raw.length} chars</span>
+                  </div>
+                </div>
               `
           }
         </div>
