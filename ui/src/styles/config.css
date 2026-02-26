@@ -1,5 +1,5 @@
 /* ===========================================
-   Config Page — Modern Design System
+   Config Page — Modern Design System v2
    =========================================== */
 
 /* Layout Container */
@@ -25,22 +25,20 @@
   overflow: hidden;
 }
 
-:root[data-theme="light"] .config-sidebar {
-  background: var(--bg-hover);
-}
-
 .config-sidebar__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
 }
 
 .config-sidebar__title {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .config-sidebar__footer {
@@ -82,8 +80,7 @@
   outline: none;
   transition:
     border-color var(--duration-fast) ease,
-    box-shadow var(--duration-fast) ease,
-    background var(--duration-fast) ease;
+    box-shadow var(--duration-fast) ease;
 }
 
 .config-search__input::placeholder {
@@ -93,15 +90,6 @@
 .config-search__input:focus {
   border-color: var(--accent);
   box-shadow: var(--focus-ring);
-  background: var(--card);
-}
-
-:root[data-theme="light"] .config-search__input {
-  background: white;
-}
-
-:root[data-theme="light"] .config-search__input:focus {
-  background: white;
 }
 
 .config-search__clear {
@@ -141,7 +129,7 @@
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
@@ -151,17 +139,12 @@
   background: var(--card);
   transition:
     border-color var(--duration-fast) ease,
-    box-shadow var(--duration-fast) ease,
-    background var(--duration-fast) ease;
+    box-shadow var(--duration-fast) ease;
 }
 
 .config-search__tag-picker[open] {
   border-color: var(--accent);
   box-shadow: var(--focus-ring);
-}
-
-:root[data-theme="light"] .config-search__tag-picker {
-  background: white;
 }
 
 .config-search__tag-trigger {
@@ -192,6 +175,7 @@
   min-width: 0;
 }
 
+/* Tag chips use secondary bg per agent-pill pattern */
 .config-search__tag-chip {
   display: inline-flex;
   align-items: center;
@@ -201,7 +185,7 @@
   font-size: 10px;
   font-weight: 500;
   color: var(--text);
-  background: var(--bg);
+  background: var(--secondary);
 }
 
 .config-search__tag-chip--count {
@@ -249,10 +233,11 @@
   color: var(--text);
 }
 
+/* Active tag option gets accent tint */
 .config-search__tag-option.active {
-  background: var(--bg-hover);
-  color: var(--text);
-  border-color: var(--border);
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-color: transparent;
 }
 
 /* Navigation */
@@ -267,7 +252,7 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 11px 14px;
+  padding: 10px 14px;
   border: none;
   border-radius: var(--radius-md);
   background: transparent;
@@ -286,13 +271,10 @@
   color: var(--text);
 }
 
-:root[data-theme="light"] .config-nav__item:hover {
-  background: rgba(0, 0, 0, 0.04);
-}
-
+/* Active nav: accent-subtle tint — KEY visual change from grey */
 .config-nav__item.active {
-  background: var(--bg-hover);
-  color: var(--text);
+  background: var(--accent-subtle);
+  color: var(--accent);
 }
 
 .config-nav__icon {
@@ -302,10 +284,14 @@
   align-items: center;
   justify-content: center;
   font-size: 15px;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-.config-nav__item:hover .config-nav__icon,
+.config-nav__item:hover .config-nav__icon {
+  opacity: 1;
+}
+
+/* Active icon is fully opaque */
 .config-nav__item.active .config-nav__icon {
   opacity: 1;
 }
@@ -324,17 +310,13 @@
   text-overflow: ellipsis;
 }
 
-/* Mode Toggle */
+/* Mode Toggle — Form/Raw */
 .config-mode-toggle {
   display: flex;
   padding: 4px;
-  background: var(--card);
+  background: var(--secondary);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-}
-
-:root[data-theme="light"] .config-mode-toggle {
-  background: white;
 }
 
 .config-mode-toggle__btn {
@@ -357,7 +339,7 @@
   color: var(--text);
 }
 
-/* Active mode toggle uses accent color */
+/* Active mode toggle: accent-colored, not grey */
 .config-mode-toggle__btn.active {
   background: var(--accent);
   color: #fff;
@@ -372,7 +354,7 @@
   flex-direction: column;
   min-height: 0;
   min-width: 0;
-  background: var(--bg-elevated);
+  background: var(--bg);
   overflow: hidden;
 }
 
@@ -382,8 +364,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 12px 20px;
-  background: var(--bg-elevated);
+  padding: 10px 20px;
+  background: var(--panel-strong);
   border-bottom: 1px solid var(--border);
 }
 
@@ -405,6 +387,7 @@
   font-weight: 600;
 }
 
+/* No-changes status text */
 .config-status {
   font-size: 13px;
   color: var(--muted);
@@ -415,7 +398,7 @@
   margin: 18px 20px 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--bg-elevated);
+  background: var(--card);
   overflow: hidden;
 }
 
@@ -467,10 +450,6 @@
   font-family: var(--mono);
 }
 
-:root[data-theme="light"] .config-diff__item {
-  background: white;
-}
-
 .config-diff__path {
   font-weight: 600;
   color: var(--text);
@@ -502,19 +481,15 @@
 .config-section-hero {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   padding: 16px 22px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-accent);
 }
 
-:root[data-theme="light"] .config-section-hero {
-  background: var(--bg-hover);
-}
-
 .config-section-hero__icon {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   color: var(--accent);
   display: flex;
   align-items: center;
@@ -558,10 +533,7 @@
   overflow-x: auto;
 }
 
-:root[data-theme="light"] .config-subnav {
-  background: var(--bg-hover);
-}
-
+/* Inactive subnav pills use secondary bg */
 .config-subnav__item {
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
@@ -569,7 +541,7 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--muted);
-  background: var(--card);
+  background: var(--secondary);
   cursor: pointer;
   transition:
     background var(--duration-fast) ease,
@@ -578,16 +550,12 @@
   white-space: nowrap;
 }
 
-:root[data-theme="light"] .config-subnav__item {
-  background: white;
-}
-
 .config-subnav__item:hover {
   color: var(--text);
   border-color: var(--border-strong);
 }
 
-/* Active subnav pill uses accent */
+/* Active subnav pill: full accent — pill active pattern */
 .config-subnav__item.active {
   color: #fff;
   border-color: var(--accent);
@@ -665,40 +633,58 @@
   gap: 20px;
 }
 
-/* Section cards animate in with `rise` */
+/* Section cards: var(--card) bg + rise animation */
 .config-section-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--bg-elevated);
+  background: var(--card);
   overflow: hidden;
   transition: border-color var(--duration-fast) ease;
-  animation: rise 0.35s var(--ease-out) backwards;
+  animation: rise 0.35s ease-out both;
 }
 
 .config-section-card:hover {
   border-color: var(--border-strong);
 }
 
-:root[data-theme="light"] .config-section-card {
-  background: white;
+/* Stagger animation delays via nth-child */
+.config-section-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.config-section-card:nth-child(2) {
+  animation-delay: 50ms;
+}
+
+.config-section-card:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.config-section-card:nth-child(4) {
+  animation-delay: 150ms;
+}
+
+.config-section-card:nth-child(5) {
+  animation-delay: 200ms;
+}
+
+.config-section-card:nth-child(6) {
+  animation-delay: 250ms;
 }
 
 .config-section-card__header {
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  padding: 20px 22px;
+  padding: 18px;
   background: var(--bg-accent);
   border-bottom: 1px solid var(--border);
 }
 
-:root[data-theme="light"] .config-section-card__header {
-  background: var(--bg-hover);
-}
-
+/* Section card icon: 28px, accent colored */
 .config-section-card__icon {
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   color: var(--accent);
   flex-shrink: 0;
 }
@@ -715,7 +701,7 @@
 
 .config-section-card__title {
   margin: 0;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.02em;
   white-space: nowrap;
@@ -731,7 +717,7 @@
 }
 
 .config-section-card__content {
-  padding: 18px;
+  padding: 16px;
 }
 
 /* ===========================================
@@ -785,12 +771,8 @@
   padding: 2px 8px;
   font-size: 11px;
   color: var(--muted);
-  background: var(--card);
+  background: var(--secondary);
   white-space: nowrap;
-}
-
-:root[data-theme="light"] .cfg-tag {
-  background: white;
 }
 
 .cfg-field__error {
@@ -810,12 +792,11 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--card);
-  font-size: 14px;
+  font-size: 13px;
   outline: none;
   transition:
     border-color var(--duration-fast) ease,
-    box-shadow var(--duration-fast) ease,
-    background var(--duration-fast) ease;
+    box-shadow var(--duration-fast) ease;
 }
 
 .cfg-input::placeholder {
@@ -828,22 +809,17 @@
   box-shadow: var(--focus-ring);
 }
 
-:root[data-theme="light"] .cfg-input {
-  background: white;
-}
-
 .cfg-input--sm {
   padding: 9px 12px;
-  font-size: 13px;
 }
 
 .cfg-input__reset {
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--bg-elevated);
+  background: var(--secondary);
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition:
     background var(--duration-fast) ease,
@@ -882,10 +858,6 @@
   box-shadow: var(--focus-ring);
 }
 
-:root[data-theme="light"] .cfg-textarea {
-  background: white;
-}
-
 .cfg-textarea--sm {
   padding: 10px 12px;
   font-size: 12px;
@@ -900,14 +872,10 @@
   background: var(--card);
 }
 
-:root[data-theme="light"] .cfg-number {
-  background: white;
-}
-
 .cfg-number__btn {
   width: 44px;
   border: none;
-  background: var(--bg-elevated);
+  background: var(--secondary);
   color: var(--text);
   font-size: 18px;
   font-weight: 300;
@@ -922,14 +890,6 @@
 .cfg-number__btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-:root[data-theme="light"] .cfg-number__btn {
-  background: var(--bg-hover);
-}
-
-:root[data-theme="light"] .cfg-number__btn:hover:not(:disabled) {
-  background: var(--border);
 }
 
 .cfg-number__input {
@@ -960,7 +920,7 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   outline: none;
   appearance: none;
@@ -974,21 +934,13 @@
   box-shadow: var(--focus-ring);
 }
 
-:root[data-theme="light"] .cfg-select {
-  background-color: white;
-}
-
 /* Segmented Control */
 .cfg-segmented {
   display: inline-flex;
   padding: 4px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--card);
-}
-
-:root[data-theme="light"] .cfg-segmented {
-  background: var(--bg-hover);
+  background: var(--secondary);
 }
 
 .cfg-segmented__btn {
@@ -1010,7 +962,7 @@
   color: var(--text);
 }
 
-/* Active segmented button uses accent */
+/* Active segmented button: accent-colored */
 .cfg-segmented__btn.active {
   background: var(--accent);
   color: #fff;
@@ -1044,14 +996,6 @@
 .cfg-toggle-row.disabled {
   opacity: 0.55;
   cursor: not-allowed;
-}
-
-:root[data-theme="light"] .cfg-toggle-row {
-  background: white;
-}
-
-:root[data-theme="light"] .cfg-toggle-row:hover:not(.disabled) {
-  background: var(--bg-hover);
 }
 
 .cfg-toggle-row__content {
@@ -1100,10 +1044,6 @@
     border-color var(--duration-normal) ease;
 }
 
-:root[data-theme="light"] .cfg-toggle__track {
-  background: var(--border);
-}
-
 .cfg-toggle__track::after {
   content: "";
   position: absolute;
@@ -1119,6 +1059,7 @@
     background var(--duration-normal) ease;
 }
 
+/* Toggle on: keep green (ok) — intentional */
 .cfg-toggle input:checked + .cfg-toggle__track {
   background: var(--ok-subtle);
   border-color: rgba(34, 197, 94, 0.4);
@@ -1139,10 +1080,6 @@
   border-radius: var(--radius-lg);
   background: transparent;
   overflow: hidden;
-}
-
-:root[data-theme="light"] .cfg-object {
-  background: transparent;
 }
 
 .cfg-object__header {
@@ -1223,10 +1160,6 @@
   border-bottom: 1px solid var(--border);
 }
 
-:root[data-theme="light"] .cfg-array__header {
-  background: var(--bg-hover);
-}
-
 .cfg-array__label {
   font-size: 14px;
   font-weight: 600;
@@ -1244,14 +1177,11 @@
   font-size: 12px;
   color: var(--muted);
   padding: 4px 10px;
-  background: var(--bg-elevated);
+  background: var(--secondary);
   border-radius: var(--radius-full);
 }
 
-:root[data-theme="light"] .cfg-array__count {
-  background: white;
-}
-
+/* Secondary button style for add actions */
 .cfg-array__add {
   display: inline-flex;
   align-items: center;
@@ -1259,7 +1189,7 @@
   padding: 7px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--bg-elevated);
+  background: var(--secondary);
   color: var(--text);
   font-size: 12px;
   font-weight: 500;
@@ -1307,7 +1237,7 @@
 }
 
 .cfg-array__item {
-  background: var(--bg-elevated);
+  background: var(--card);
 }
 
 .cfg-array__item-header {
@@ -1319,10 +1249,6 @@
   border-bottom: 1px solid var(--border);
 }
 
-:root[data-theme="light"] .cfg-array__item-header {
-  background: var(--bg-hover);
-}
-
 .cfg-array__item-index {
   font-size: 11px;
   font-weight: 600;
@@ -1331,6 +1257,7 @@
   letter-spacing: 0.05em;
 }
 
+/* Remove button: hover shows danger colors */
 .cfg-array__item-remove {
   width: 30px;
   height: 30px;
@@ -1383,16 +1310,13 @@
   border-bottom: 1px solid var(--border);
 }
 
-:root[data-theme="light"] .cfg-map__header {
-  background: var(--bg-hover);
-}
-
 .cfg-map__label {
   font-size: 13px;
   font-weight: 600;
   color: var(--muted);
 }
 
+/* Secondary button style for map add */
 .cfg-map__add {
   display: inline-flex;
   align-items: center;
@@ -1400,7 +1324,7 @@
   padding: 7px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--bg-elevated);
+  background: var(--secondary);
   color: var(--text);
   font-size: 12px;
   font-weight: 500;
@@ -1444,10 +1368,6 @@
   background: var(--card);
 }
 
-:root[data-theme="light"] .cfg-map__item {
-  background: white;
-}
-
 .cfg-map__item-header {
   display: grid;
   grid-template-columns: minmax(0, 300px) auto;
@@ -1467,6 +1387,7 @@
   gap: 10px;
 }
 
+/* Remove button: hover shows danger colors */
 .cfg-map__item-remove {
   width: 32px;
   height: 32px;
@@ -1500,8 +1421,13 @@
 
 /* Pill variants */
 .pill--sm {
-  padding: 5px 12px;
+  padding: 4px 10px;
   font-size: 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .pill--ok {
@@ -1583,7 +1509,7 @@
   }
 
   .config-section-card__content {
-    padding: 18px;
+    padding: 16px;
   }
 
   .cfg-toggle-row {
@@ -1616,12 +1542,12 @@
   }
 
   .config-section-card__icon {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
   }
 
   .config-section-card__title {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .cfg-segmented {
@@ -1631,5 +1557,20 @@
   .cfg-segmented__btn {
     flex: 1 0 auto;
     min-width: 70px;
+  }
+}
+
+/* ===========================================
+   Rise animation (also in base.css — explicit here for completeness)
+   =========================================== */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
