@@ -43,7 +43,7 @@
 }
 
 .card:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .card-title {
@@ -73,7 +73,7 @@
 }
 
 .stat:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .stat-label {
@@ -153,7 +153,7 @@
 }
 
 .account-card:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .account-card-header {
@@ -212,7 +212,7 @@
 }
 
 .pill:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .pill.danger {
@@ -253,7 +253,7 @@
   transform: translateY(-50%)
     translateX(calc(var(--theme-index, 0) * (var(--theme-item) + var(--theme-gap))));
   background: var(--color-surface-hover, rgba(255 255 255 / 0.05));
-  border: 1px solid rgba(255 255 255 / 0.14);
+  border: 1px solid var(--border-strong, rgba(255 255 255 / 0.14));
   transition: transform var(--duration-normal) var(--ease-out);
   z-index: 0;
 }
@@ -338,7 +338,7 @@
 
 .btn:hover {
   background: var(--color-surface-hover, rgba(255 255 255 / 0.05));
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .btn:active {
@@ -400,7 +400,7 @@
 
 /* Active (toggle on) state: neutral, not accent */
 .btn.active {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
   background: var(--color-surface-hover, rgba(255 255 255 / 0.05));
   color: var(--color-text, #e8e8e8);
 }
@@ -765,44 +765,47 @@
 }
 
 .cron-form-status {
-  margin-top: 4px;
-  margin-bottom: 8px;
-  border: 1px solid rgba(248 81 73 / 0.15);
-  background: rgba(248 81 73 / 0.15);
-  border-radius: var(--radius-md);
-  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.cron-form-status__title {
-  color: var(--color-text, #e8e8e8);
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.cron-form-status__list {
-  margin: 8px 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
+.cron-form-status__fields {
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
-.cron-form-status__link {
-  border: 0;
-  background: transparent;
-  color: var(--color-text, #e8e8e8);
+.cron-form-status__chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(248 81 73 / 0.25);
+  background: rgba(248 81 73 / 0.1);
+  color: var(--color-error, #f85149);
   cursor: pointer;
-  font-size: 12px;
-  line-height: 1.4;
-  padding: 0;
-  text-align: left;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+  transition:
+    background var(--duration-fast, 120ms) ease,
+    border-color var(--duration-fast, 120ms) ease;
 }
 
-.cron-form-status__link:hover {
-  color: var(--color-text, #e8e8e8);
+.cron-form-status__chip:hover {
+  background: rgba(248 81 73 / 0.18);
+  border-color: rgba(248 81 73 / 0.4);
+}
+
+.cron-form-status__hint {
+  color: var(--color-text-muted, #888);
+  font-size: 11px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .cron-span-2 {
@@ -869,12 +872,6 @@
   flex-wrap: wrap;
 }
 
-.cron-submit-reason {
-  color: var(--color-text-muted, #888);
-  font-size: 12px;
-  line-height: 1.4;
-}
-
 /* --- Cron modal --- */
 
 #cron-modal-portal {
@@ -891,6 +888,17 @@
   justify-content: center;
   padding: 24px;
   animation: cron-fade-in var(--duration-normal, 200ms) ease-out;
+}
+
+/* Center modal over content area (offset by sidebar width).
+   The portal is a body-level sibling of openclaw-app / tauri-shell. */
+openclaw-app ~ #cron-modal-portal .cron-modal-backdrop {
+  left: 220px;
+}
+
+openclaw-app:has(.shell--nav-collapsed) ~ #cron-modal-portal .cron-modal-backdrop,
+openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
+  left: 0;
 }
 
 .cron-modal {
@@ -960,10 +968,17 @@
 .cron-modal-footer {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 14px 20px;
+  gap: 12px;
+  padding: 12px 20px;
   border-top: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  flex-shrink: 0;
+}
+
+.cron-modal-footer__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
   flex-shrink: 0;
 }
 
@@ -1104,7 +1119,7 @@
 }
 
 .cron-run-entry:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .cron-run-entry__meta {
@@ -1210,6 +1225,11 @@
   .cron-run-entry__meta {
     min-width: 0;
     text-align: left;
+  }
+
+  /* Nav collapses at this breakpoint — reset modal offset */
+  openclaw-app ~ #cron-modal-portal .cron-modal-backdrop {
+    left: 0;
   }
 }
 
@@ -1367,7 +1387,7 @@
 }
 
 .list-item-clickable:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .list-item-selected {
@@ -1444,7 +1464,7 @@
 }
 
 .cron-job:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .cron-job.list-item-selected {
@@ -1654,7 +1674,7 @@
 }
 
 .chip:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .chip input {
@@ -1681,8 +1701,8 @@
 
 .chip-muted {
   color: var(--color-text-muted, #888);
-  border-color: rgba(255 255 255 / 0.06);
-  background: rgba(255 255 255 / 0.04);
+  border-color: var(--color-border, rgba(255 255 255 / 0.06));
+  background: var(--color-surface-hover, rgba(255 255 255 / 0.04));
 }
 
 /* ===========================================
@@ -1718,7 +1738,7 @@
 }
 
 .table-row:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .session-link {
@@ -1942,7 +1962,7 @@
   gap: 12px;
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  border: 1px dashed rgba(255 255 255 / 0.14);
+  border: 1px dashed var(--border-strong, rgba(255 255 255 / 0.14));
   background: var(--color-surface, #161616);
 }
 
@@ -2335,7 +2355,7 @@
   margin-top: 16px;
   border-radius: var(--radius-md);
   background: var(--color-surface-raised, #1c1c1e);
-  border: 1px dashed rgba(255 255 255 / 0.14);
+  border: 1px dashed var(--border-strong, rgba(255 255 255 / 0.14));
   padding: 16px;
   display: inline-flex;
 }
@@ -2486,7 +2506,7 @@
 }
 
 .agent-row:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .agent-row.active {
@@ -2651,7 +2671,7 @@
 }
 
 .agent-file-row:hover {
-  border-color: rgba(255 255 255 / 0.14);
+  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
 .agent-file-row.active {
