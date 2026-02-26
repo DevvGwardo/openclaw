@@ -438,7 +438,16 @@ export function renderCron(props: CronProps) {
           ${
             props.jobs.length === 0
               ? html`
-                  <div class="muted mt-3">No matching jobs.</div>
+                  <div class="cron-empty cron-empty--compact">
+                    <div class="cron-empty__title">No matching jobs</div>
+                    <div class="cron-empty__text">
+                      ${
+                        props.jobsQuery || props.jobsEnabledFilter !== "all"
+                          ? "Try adjusting your filters."
+                          : "Create your first scheduled job to get started."
+                      }
+                    </div>
+                  </div>
                 `
               : html`
                   <div class="list mt-3">
@@ -563,7 +572,10 @@ export function renderCron(props: CronProps) {
                 `
               : runs.length === 0
                 ? html`
-                    <div class="muted mt-3">No matching runs.</div>
+                    <div class="cron-empty cron-empty--compact">
+                      <div class="cron-empty__title">No matching runs</div>
+                      <div class="cron-empty__text">Runs will appear here after a job executes.</div>
+                    </div>
                   `
                 : html`
                     <div class="list mt-3">
@@ -1415,11 +1427,12 @@ function renderJobState(job: CronJob) {
         : status === "skipped"
           ? "cron-job-status-skipped"
           : "cron-job-status-na";
+  const stateClass = `cron-job-state cron-job-state--${status === "ok" || status === "error" || status === "skipped" ? status : "na"}`;
   const nextRunAtMs = job.state?.nextRunAtMs;
   const lastRunAtMs = job.state?.lastRunAtMs;
 
   return html`
-    <div class="cron-job-state">
+    <div class=${stateClass}>
       <div class="cron-job-state-row">
         <span class="cron-job-state-key">Status</span>
         <span class=${`cron-job-status-pill ${statusClass}`}>${status}</span>
@@ -1459,7 +1472,7 @@ function renderRun(entry: CronRunLogEntry, basePath: string) {
       <div class="list-main cron-run-entry__main">
         <div class="list-title cron-run-entry__title">
           ${entry.jobName ?? entry.jobId}
-          <span class="muted"> · ${status}</span>
+          <span class=${`chip chip-${status === "ok" ? "ok" : status === "error" ? "danger" : "muted"}`}>${status}</span>
         </div>
         <div class="list-sub cron-run-entry__summary">${entry.summary ?? entry.error ?? "No summary."}</div>
         <div class="chip-row">
