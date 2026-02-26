@@ -116,7 +116,7 @@ export function renderSessions(props: SessionsProps) {
           <div class="card-title">Sessions</div>
           <div class="card-sub">Active session keys and per-session overrides.</div>
         </div>
-        <button class="btn" ?disabled=${props.loading} @click=${props.onRefresh}>
+        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
           ${props.loading ? "Loading…" : "Refresh"}
         </button>
       </div>

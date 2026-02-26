@@ -360,7 +360,7 @@ export function renderCron(props: CronProps) {
         </div>
       </div>
       <div class="cron-summary-strip__actions">
-        <button class="btn btn--sm" ?disabled=${props.loading} @click=${props.onRefresh}>
+        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
           ${props.loading ? "Refreshing..." : "Refresh"}
         </button>
         ${props.error ? html`<span class="muted">${props.error}</span>` : nothing}

@@ -42,7 +42,7 @@ export function renderSkills(props: SkillsProps) {
           <div class="card-title">Skills</div>
           <div class="card-sub">Bundled, managed, and workspace skills.</div>
         </div>
-        <button class="btn" ?disabled=${props.loading} @click=${props.onRefresh}>
+        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
           ${props.loading ? "Loading…" : "Refresh"}
         </button>
       </div>
