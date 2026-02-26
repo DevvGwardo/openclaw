@@ -8,7 +8,6 @@
   background: var(--tauri-titlebar-bg, var(--color-surface-raised, #1a1a1a));
   border-bottom: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   user-select: none;
-  -webkit-app-region: drag; /* makes the whole bar draggable by default */
 }
 
 /* macOS: traffic-light buttons on the left */
@@ -17,7 +16,6 @@
   align-items: center;
   gap: 6px;
   padding: 0 12px;
-  -webkit-app-region: no-drag; /* buttons must be clickable */
   flex-shrink: 0;
 }
 
@@ -32,7 +30,6 @@
   align-items: center;
   justify-content: center;
   transition: opacity 0.1s ease;
-  -webkit-app-region: no-drag;
 }
 
 .tauri-titlebar__btn:hover {
@@ -81,7 +78,10 @@
 /* Title area */
 .tauri-titlebar__title {
   flex: 1;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   font-size: 13px;
   font-weight: 500;
   color: var(--color-text-muted, #aaa);
@@ -91,7 +91,13 @@
   padding-right: 80px;
 }
 
+.tauri-titlebar__logo {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 .tauri-titlebar--windows .tauri-titlebar__title {
-  text-align: left;
+  justify-content: flex-start;
   padding: 0 12px;
 }

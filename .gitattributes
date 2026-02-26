@@ -1,3 +1,6 @@
 * text=auto eol=lf
 CLAUDE.md -text
 src/gateway/server-methods/CLAUDE.md -text
+
+.seeds/issues.jsonl merge=union
+.seeds/templates.jsonl merge=union

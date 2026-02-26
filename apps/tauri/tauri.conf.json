@@ -4,8 +4,8 @@
   "identifier": "ai.openclaw.desktop",
   "version": "0.1.0",
   "build": {
-    "frontendDist": "../dist-ui",
-    "devUrl": "http://localhost:5174",
+    "frontendDist": "./dist-ui",
+    "devUrl": "http://localhost:5175",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
   },
@@ -14,6 +14,7 @@
     "windows": [
       {
         "label": "main",
+        "url": "tauri.html",
         "title": "OpenClaw",
         "width": 1200,
         "height": 800,
@@ -47,10 +48,6 @@
     ]
   },
   "plugins": {
-    "window-state": {},
-    "autostart": {
-      "args": []
-    },
     "shell": {
       "open": true
     },
@@ -59,7 +56,6 @@
       "desktop": {
         "schemes": ["openclaw"]
       }
-    },
-    "single-instance": {}
+    }
   }
 }

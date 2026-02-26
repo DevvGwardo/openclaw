@@ -40,8 +40,11 @@
   width: 24px;
   height: 24px;
   flex-shrink: 0;
-  opacity: 0.9;
-  color: var(--color-accent, #4f8ef7);
+}
+
+.tauri-sidebar__logo-icon svg {
+  width: 24px;
+  height: 24px;
 }
 
 .tauri-sidebar__logo-text {

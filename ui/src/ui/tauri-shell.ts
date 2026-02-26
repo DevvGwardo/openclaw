@@ -4,7 +4,7 @@
 
 import { html } from "lit";
 import { customElement } from "lit/decorators.js";
-import { renderApp } from "./app-render.ts";
+import { renderApp, renderAppOverlays } from "./app-render.ts";
 import type { AppViewState } from "./app-view-state.ts";
 import { OpenClawApp } from "./app.ts";
 import { titleForTab, type Tab } from "./navigation.ts";
@@ -96,6 +96,8 @@ export class TauriShell extends OpenClawApp {
         </div>
         ${version ? html`<span>v${version}</span>` : ""}
       </div>
+
+      ${renderAppOverlays(this as unknown as AppViewState)}
     `;
   }
 }

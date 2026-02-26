@@ -65,6 +65,7 @@ export type CronState = {
   cronRunsQuery: string;
   cronRunsSortDir: CronSortDir;
   cronBusy: boolean;
+  cronFormOpen: boolean;
 };
 
 export type CronModelSuggestionsState = {
@@ -324,6 +325,12 @@ function resetCronFormToDefaults(state: CronState) {
   state.cronFieldErrors = validateCronForm(state.cronForm);
 }
 
+export function openCronForm(state: CronState) {
+  clearCronEditState(state);
+  resetCronFormToDefaults(state);
+  state.cronFormOpen = true;
+}
+
 function formatDateTimeLocal(input: string): string {
   const ms = Date.parse(input);
   if (!Number.isFinite(ms)) {
@@ -552,6 +559,7 @@ export async function addCronJob(state: CronState) {
       await state.client.request("cron.add", job);
       resetCronFormToDefaults(state);
     }
+    state.cronFormOpen = false;
     await loadCronJobs(state);
     await loadCronStatus(state);
   } catch (err) {
@@ -741,6 +749,7 @@ export function startCronEdit(state: CronState, job: CronJob) {
   state.cronRunsJobId = job.id;
   state.cronForm = jobToForm(job, state.cronForm);
   state.cronFieldErrors = validateCronForm(state.cronForm);
+  state.cronFormOpen = true;
 }
 
 function buildCloneName(name: string, existingNames: Set<string>) {
@@ -768,9 +777,11 @@ export function startCronClone(state: CronState, job: CronJob) {
   cloned.name = buildCloneName(job.name, existingNames);
   state.cronForm = cloned;
   state.cronFieldErrors = validateCronForm(state.cronForm);
+  state.cronFormOpen = true;
 }
 
 export function cancelCronEdit(state: CronState) {
   clearCronEditState(state);
   resetCronFormToDefaults(state);
+  state.cronFormOpen = false;
 }

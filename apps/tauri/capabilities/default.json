@@ -16,8 +16,6 @@
     "core:window:allow-hide",
     "core:window:allow-set-focus",
     "core:app:allow-version",
-    "window-state:allow-save-window-state",
-    "window-state:allow-restore-state",
     "shell:allow-open",
     "notification:default",
     "deep-link:default",

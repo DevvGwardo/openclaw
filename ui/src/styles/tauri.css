@@ -104,8 +104,12 @@ tauri-shell {
 
 .tauri-shell__content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow: auto;
   background: var(--color-bg);
+  padding: var(--space-6);
+  padding-top: 0;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border, rgba(255 255 255 / 0.12)) transparent;
 }
@@ -164,27 +168,36 @@ tauri-shell {
   background: var(--color-success, #3fb950);
 }
 
-/* ── Thin native-feeling scrollbars globally ── */
-* {
+/* ── Thin native-feeling scrollbars (scoped to scrollable containers) ── */
+html,
+.tauri-shell__content,
+.tauri-sidebar__nav {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border, rgba(255 255 255 / 0.12)) transparent;
 }
 
-*::-webkit-scrollbar {
+html::-webkit-scrollbar,
+.tauri-shell__content::-webkit-scrollbar,
+.tauri-sidebar__nav::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-*::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track,
+.tauri-shell__content::-webkit-scrollbar-track,
+.tauri-sidebar__nav::-webkit-scrollbar-track {
   background: transparent;
 }
 
-*::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb,
+.tauri-shell__content::-webkit-scrollbar-thumb,
+.tauri-sidebar__nav::-webkit-scrollbar-thumb {
   background: rgba(255 255 255 / 0.15);
   border-radius: 3px;
 }
 
-[data-theme="light"] *::-webkit-scrollbar-thumb {
+[data-theme="light"] .tauri-shell__content::-webkit-scrollbar-thumb,
+[data-theme="light"] .tauri-sidebar__nav::-webkit-scrollbar-thumb {
   background: rgba(0 0 0 / 0.15);
 }
 
@@ -224,4 +237,9 @@ tauri-shell {
   min-height: 0;
   overflow: auto;
   padding: 0;
+}
+
+/* Chat content must fill height so compose sticks to bottom */
+[data-tauri] .content--chat {
+  overflow: hidden;
 }

@@ -1,7 +1,12 @@
 // Tauri desktop entrypoint — imports desktop-specific CSS and shell component.
 // The browser build (src/main.ts) is NOT imported here, keeping the two entrypoints independent.
 
+// Base UI styles (shared with browser build)
+import "./styles.css";
+// Tauri desktop shell overrides (must come after base for CSS specificity)
 import "./styles/tauri.css";
+import "./styles/tauri-titlebar.css";
+import "./styles/tauri-sidebar.css";
 import "./ui/tauri-shell.ts";
 
 // Configure Tauri-specific behaviour once the Tauri bridge is ready.
