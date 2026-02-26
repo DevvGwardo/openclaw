@@ -119,9 +119,9 @@ export const usageStylesPart3 = `
     background: var(--bg-hover);
   }
   .sessions-card .session-bar-row.selected {
-    border-color: var(--accent);
-    background: var(--accent-subtle);
-    box-shadow: inset 0 0 0 1px rgba(255, 77, 77, 0.15);
+    border-color: var(--border-strong);
+    background: var(--bg-hover);
+    box-shadow: inset 0 0 0 1px var(--border);
   }
   .sessions-card .session-bar-label {
     flex: 1 1 auto;
@@ -139,7 +139,7 @@ export const usageStylesPart3 = `
     opacity: 0.5;
   }
   .sessions-card .session-bar-fill {
-    background: rgba(255, 77, 77, 0.55);
+    background: var(--border-strong);
   }
   .sessions-clear-btn {
     margin-left: auto;
@@ -187,7 +187,7 @@ export const usageStylesPart3 = `
   .session-detail-panel {
     margin-top: 12px;
     /* inherits background, border-radius, shadow from .card */
-    border: 2px solid var(--accent) !important;
+    border: 1px solid var(--border-strong) !important;
   }
   .session-detail-header {
     display: flex;
