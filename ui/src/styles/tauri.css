@@ -243,3 +243,9 @@ html::-webkit-scrollbar-thumb,
 [data-tauri] .content--chat {
   overflow: hidden;
 }
+
+/* ── Center modal over content area, not full viewport ── */
+tauri-shell ~ #cron-modal-portal .cron-modal-backdrop {
+  left: var(--tauri-sidebar-width);
+  top: var(--tauri-titlebar-height);
+}

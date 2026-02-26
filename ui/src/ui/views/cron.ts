@@ -640,10 +640,6 @@ export function renderCronModal(props: CronProps) {
     props.form.deliveryMode === "announce" && !supportsAnnounce ? "none" : props.form.deliveryMode;
   const blockingFields = collectBlockingFields(props.fieldErrors, props.form, selectedDeliveryMode);
   const blockedByValidation = !props.busy && blockingFields.length > 0;
-  const submitDisabledReason =
-    blockedByValidation && !props.canSubmit
-      ? `Fix ${blockingFields.length} ${blockingFields.length === 1 ? "field" : "fields"} to continue.`
-      : "";
   render(
     html`
     <div
@@ -1126,43 +1122,37 @@ export function renderCronModal(props: CronProps) {
           </details>
         </div>
                     </div>
+                  <div class="cron-modal-footer">
                     ${
                       blockedByValidation
                         ? html`
                             <div class="cron-form-status" role="status" aria-live="polite">
-                              <div class="cron-form-status__title">Can't add job yet</div>
-                              <div class="cron-help">Fill the required fields below to enable submit.</div>
-                              <ul class="cron-form-status__list">
+                              <div class="cron-form-status__fields">
                                 ${blockingFields.map(
                                   (field) => html`
-                                    <li>
-                                      <button
-                                        type="button"
-                                        class="cron-form-status__link"
-                                        @click=${() => focusFormField(field.inputId)}
-                                      >
-                                        ${field.label}: ${field.message}
-                                      </button>
-                                    </li>
+                                    <button
+                                      type="button"
+                                      class="cron-form-status__chip"
+                                      @click=${() => focusFormField(field.inputId)}
+                                    >
+                                      ${field.label}
+                                    </button>
                                   `,
                                 )}
-                              </ul>
+                              </div>
+                              <span class="cron-form-status__hint">${blockingFields.length === 1 ? "1 required field" : `${blockingFields.length} required fields`}</span>
                             </div>
                           `
                         : nothing
                     }
-                  <div class="cron-modal-footer">
-                    ${
-                      submitDisabledReason
-                        ? html`<div class="cron-submit-reason" aria-live="polite">${submitDisabledReason}</div>`
-                        : nothing
-                    }
-                    <button class="btn btn--sm" ?disabled=${props.busy} @click=${props.onCancelEdit}>
-                      Cancel
-                    </button>
-                    <button class="btn primary" ?disabled=${props.busy || !props.canSubmit} @click=${props.onAdd}>
-                      ${props.busy ? "Saving..." : isEditing ? "Save changes" : "Add job"}
-                    </button>
+                    <div class="cron-modal-footer__actions">
+                      <button class="btn btn--sm" ?disabled=${props.busy} @click=${props.onCancelEdit}>
+                        Cancel
+                      </button>
+                      <button class="btn primary" ?disabled=${props.busy || !props.canSubmit} @click=${props.onAdd}>
+                        ${props.busy ? "Saving..." : isEditing ? "Save changes" : "Add job"}
+                      </button>
+                    </div>
                   </div>
           ${renderSuggestionList("cron-agent-suggestions", props.agentSuggestions)}
           ${renderSuggestionList("cron-model-suggestions", props.modelSuggestions)}

@@ -491,11 +491,10 @@ describe("cron view", () => {
       container,
     );
 
-    expect(container.textContent).toContain("Name is required.");
-    expect(container.textContent).toContain("Cron expression is required.");
-    expect(container.textContent).toContain("Agent message is required.");
-    expect(container.textContent).toContain("Can't add job yet");
-    expect(container.textContent).toContain("Fix 3 fields to continue.");
+    expect(container.textContent).toContain("Name");
+    expect(container.textContent).toContain("Cron expression");
+    expect(container.textContent).toContain("Assistant task prompt");
+    expect(container.textContent).toContain("3 required fields");
 
     const saveButton = Array.from(container.querySelectorAll("button")).find((btn) =>
       ["Add job", "Save changes"].includes(btn.textContent?.trim() ?? ""),
