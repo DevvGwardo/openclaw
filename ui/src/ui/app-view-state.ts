@@ -229,6 +229,7 @@ export type AppViewState = {
   cronRunsSortDir: CronSortDir;
   cronModelSuggestions: string[];
   cronBusy: boolean;
+  cronFormOpen: boolean;
   skillsLoading: boolean;
   skillsReport: SkillStatusReport | null;
   skillsError: string | null;

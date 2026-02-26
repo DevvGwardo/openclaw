@@ -88,14 +88,6 @@
   background: rgba(255, 255, 255, 0.12);
 }
 
-[data-theme="light"] .chat-thread:hover {
-  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
-}
-
-[data-theme="light"] .chat-thread:hover::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.12);
-}
-
 /* Focus mode exit button */
 .chat-focus-exit {
   position: absolute;
@@ -105,9 +97,9 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--muted);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  background: var(--color-surface, #161616);
+  color: var(--color-text-muted, #888);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -122,9 +114,9 @@
 }
 
 .chat-focus-exit:hover {
-  background: var(--panel-strong);
-  color: var(--text);
-  border-color: var(--accent);
+  background: var(--color-surface, #161616);
+  color: var(--color-text, #e8e8e8);
+  border-color: var(--color-accent, #4f8ef7);
 }
 
 .chat-focus-exit svg {
@@ -147,9 +139,9 @@
   margin: 8px auto;
   font-size: 13px;
   font-family: var(--font-body);
-  color: var(--text);
-  background: var(--panel-strong);
-  border: 1px solid var(--border);
+  color: var(--color-text, #e8e8e8);
+  background: var(--color-surface, #161616);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
@@ -160,8 +152,8 @@
 }
 
 .chat-new-messages:hover {
-  background: var(--panel);
-  border-color: var(--accent);
+  background: var(--color-surface, #161616);
+  border-color: var(--color-accent, #4f8ef7);
 }
 
 .chat-new-messages svg {
@@ -186,7 +178,7 @@
   margin-top: auto; /* Push to bottom of flex container */
   padding: 12px 16px 16px;
   /* Subtler gradient — less visual weight */
-  background: linear-gradient(to bottom, transparent, var(--bg) 40%);
+  background: linear-gradient(to bottom, transparent, var(--color-bg, #0f0f0f) 40%);
   z-index: 10;
 }
 
@@ -196,9 +188,9 @@
   flex-wrap: wrap;
   gap: 8px;
   padding: 8px;
-  background: var(--panel);
+  background: var(--color-surface, #161616);
   border-radius: 8px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   width: fit-content;
   max-width: 100%;
   align-self: flex-start; /* Don't stretch in flex column parent */
@@ -210,8 +202,8 @@
   height: 80px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  background: var(--color-bg, #0f0f0f);
 }
 
 .chat-attachment__img {
@@ -256,21 +248,6 @@
   stroke-width: 2px;
 }
 
-/* Light theme attachment overrides */
-:root[data-theme="light"] .chat-attachments {
-  background: var(--panel-strong);
-  border-color: var(--border);
-}
-
-:root[data-theme="light"] .chat-attachment {
-  border-color: var(--border-strong);
-  background: var(--bg-elevated);
-}
-
-:root[data-theme="light"] .chat-attachment__remove {
-  background: rgba(0, 0, 0, 0.6);
-}
-
 /* Message images (sent images displayed in chat) */
 .chat-message-images {
   display: flex;
@@ -305,10 +282,6 @@
   flex: 1;
 }
 
-:root[data-theme="light"] .chat-compose {
-  background: linear-gradient(to bottom, transparent, var(--bg-content) 30%);
-}
-
 .chat-compose__field {
   flex: 1 1 auto;
   min-width: 0;
@@ -329,7 +302,7 @@
   max-height: 150px;
   padding: 9px 12px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   overflow-y: auto;
   resize: none;
   white-space: pre-wrap;
@@ -343,8 +316,8 @@
 
 .chat-compose .chat-compose__field textarea:focus {
   /* Thin accent focus ring — more refined than glow */
-  box-shadow: 0 0 0 1.5px var(--accent);
-  border-color: var(--accent);
+  box-shadow: 0 0 0 1.5px var(--color-accent, #4f8ef7);
+  border-color: var(--color-accent, #4f8ef7);
   outline: none;
 }
 
@@ -394,7 +367,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   background: rgba(255, 255, 255, 0.06);
 }
 
@@ -406,34 +379,9 @@
   font-weight: 300;
 }
 
-:root[data-theme="light"] .chat-controls__separator {
-  color: rgba(16, 24, 40, 0.3);
-}
-
 .btn--icon:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Light theme icon button overrides */
-:root[data-theme="light"] .btn--icon {
-  background: var(--bg-elevated);
-  border-color: var(--border);
-  box-shadow: var(--shadow-sm);
-  color: var(--muted);
-}
-
-:root[data-theme="light"] .btn--icon:hover {
-  background: var(--bg-elevated);
-  border-color: var(--border-strong);
-  color: var(--text);
-}
-
-:root[data-theme="light"] .chat-controls .btn--icon.active {
-  border-color: var(--accent);
-  background: var(--accent-subtle);
-  color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent-subtle);
 }
 
 .btn--icon svg {
@@ -461,20 +409,14 @@
   gap: 4px;
   font-size: 12px;
   padding: 4px 10px;
-  background: var(--card-highlight);
+  background: var(--color-surface-raised, #1c1c1e);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-}
-
-/* Light theme thinking indicator override */
-:root[data-theme="light"] .chat-controls__thinking {
-  background: var(--bg-elevated);
-  border-color: var(--border);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
 }
 
 /* Send button — solid accent fill, clean small radius */
 .chat-compose .chat-compose__actions .btn.btn--primary {
-  background: var(--accent);
+  background: var(--color-accent, #4f8ef7);
   border-color: transparent;
   border-radius: 8px;
   font-weight: 500;
@@ -497,16 +439,11 @@
   margin-bottom: 8px;
   font-size: 12px;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--secondary);
-  color: var(--muted);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  background: var(--color-surface, #161616);
+  color: var(--color-text-muted, #888);
   /* override default callout padding */
   width: auto;
-}
-
-/* Light theme compose gradient */
-:root[data-theme="light"] .chat-compose {
-  background: linear-gradient(to bottom, transparent, var(--bg-content) 40%);
 }
 
 @media (max-width: 640px) {

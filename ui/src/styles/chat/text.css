@@ -6,17 +6,12 @@
   margin-bottom: 8px;
   padding: 8px 12px;
   border-radius: var(--radius-md);
-  border: 1px dashed var(--border);
+  border: 1px dashed var(--color-border, rgba(255 255 255 / 0.08));
   background: transparent; /* barely distinguishable from page bg */
-  color: var(--muted);
+  color: var(--color-text-muted, #888);
   font-size: 12px;
   line-height: 1.4;
   opacity: 0.8;
-}
-
-:root[data-theme="light"] .chat-thinking {
-  border-color: var(--border-strong);
-  background: var(--secondary);
 }
 
 .chat-text {
@@ -43,7 +38,7 @@
 }
 
 .chat-text :where(a) {
-  color: var(--accent);
+  color: var(--color-accent, #4f8ef7);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -53,20 +48,20 @@
 }
 
 .chat-text :where(code) {
-  font-family: var(--mono);
+  font-family: var(--font-mono);
   font-size: 0.9em;
 }
 
 .chat-text :where(:not(pre) > code) {
-  background: var(--secondary);
+  background: var(--color-surface, #161616);
   padding: 0.15em 0.4em;
   border-radius: 4px;
 }
 
 .chat-text :where(pre) {
   /* Slightly darker surface + explicit border for code blocks */
-  background: var(--bg);
-  border: 1px solid var(--border);
+  background: var(--color-bg, #0f0f0f);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   border-radius: var(--radius-md);
   padding: 10px 12px;
   overflow-x: auto;
@@ -78,50 +73,28 @@
 }
 
 .chat-text :where(blockquote) {
-  border-left: 3px solid var(--border-strong);
+  border-left: 3px solid rgba(255 255 255 / 0.14);
   margin-left: 0;
-  color: var(--muted);
-  background: var(--secondary);
+  color: var(--color-text-muted, #888);
+  background: var(--color-surface, #161616);
   padding: 8px 12px;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .chat-text :where(blockquote blockquote) {
   margin-top: 8px;
-  border-left-color: var(--border-hover);
-  background: var(--card);
+  border-left-color: var(--color-border, rgba(255 255 255 / 0.08));
+  background: var(--color-surface-raised, #1c1c1e);
 }
 
 .chat-text :where(blockquote blockquote blockquote) {
-  border-left-color: var(--muted-strong);
-  background: var(--bg-elevated);
-}
-
-:root[data-theme="light"] .chat-text :where(blockquote) {
-  background: var(--secondary);
-}
-
-:root[data-theme="light"] .chat-text :where(blockquote blockquote) {
-  background: var(--card);
-}
-
-:root[data-theme="light"] .chat-text :where(blockquote blockquote blockquote) {
-  background: var(--bg-elevated);
-}
-
-:root[data-theme="light"] .chat-text :where(:not(pre) > code) {
-  background: var(--secondary);
-  border: 1px solid var(--border);
-}
-
-:root[data-theme="light"] .chat-text :where(pre) {
-  background: var(--secondary);
-  border: 1px solid var(--border);
+  border-left-color: var(--color-text-muted, #888);
+  background: var(--color-surface-raised, #1c1c1e);
 }
 
 .chat-text :where(hr) {
   border: none;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   margin: 1em 0;
 }
 
@@ -140,7 +113,7 @@
 
 .chat-text[dir="rtl"] :where(blockquote) {
   border-left: none;
-  border-right: 3px solid var(--border);
+  border-right: 3px solid var(--color-border, rgba(255 255 255 / 0.08));
   padding-left: 0;
   padding-right: 1em;
 }

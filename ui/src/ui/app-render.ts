@@ -34,6 +34,7 @@ import {
   validateCronForm,
   hasCronFormErrors,
   normalizeCronFormState,
+  openCronForm,
   updateCronJobsFilter,
   updateCronRunsFilter,
 } from "./controllers/cron.ts";
@@ -69,7 +70,7 @@ import { renderAgents } from "./views/agents.ts";
 import { renderChannels } from "./views/channels.ts";
 import { renderChat } from "./views/chat.ts";
 import { renderConfig } from "./views/config.ts";
-import { renderCron } from "./views/cron.ts";
+import { renderCron, renderCronModal, type CronProps } from "./views/cron.ts";
 import { renderDebug } from "./views/debug.ts";
 import { renderExecApprovalPrompt } from "./views/exec-approval.ts";
 import { renderGatewayUrlConfirmation } from "./views/gateway-url-confirmation.ts";
@@ -136,34 +137,7 @@ function resolveAssistantAvatarUrl(state: AppViewState): string | undefined {
   return identity?.avatarUrl;
 }
 
-export function renderApp(state: AppViewState) {
-  const openClawVersion =
-    (typeof state.hello?.server?.version === "string" && state.hello.server.version.trim()) ||
-    state.updateAvailable?.currentVersion ||
-    t("common.na");
-  const availableUpdate =
-    state.updateAvailable &&
-    state.updateAvailable.latestVersion !== state.updateAvailable.currentVersion
-      ? state.updateAvailable
-      : null;
-  const versionStatusClass = availableUpdate ? "warn" : "ok";
-  const presenceCount = state.presenceEntries.length;
-  const sessionsCount = state.sessionsResult?.count ?? null;
-  const cronNext = state.cronStatus?.nextWakeAtMs ?? null;
-  const chatDisabledReason = state.connected ? null : t("chat.disconnected");
-  const isChat = state.tab === "chat";
-  const chatFocus = isChat && (state.settings.chatFocusMode || state.onboarding);
-  const showThinking = state.onboarding ? false : state.settings.chatShowThinking;
-  const assistantAvatarUrl = resolveAssistantAvatarUrl(state);
-  const chatAvatarUrl = state.chatAvatarUrl ?? assistantAvatarUrl ?? null;
-  const configValue =
-    state.configForm ?? (state.configSnapshot?.config as Record<string, unknown> | null);
-  const basePath = normalizeBasePath(state.basePath ?? "");
-  const resolvedAgentId =
-    state.agentsSelectedId ??
-    state.agentsList?.defaultId ??
-    state.agentsList?.agents?.[0]?.id ??
-    null;
+function buildCronProps(state: AppViewState): CronProps {
   const cronAgentSuggestions = Array.from(
     new Set(
       [
@@ -214,6 +188,109 @@ export function renderApp(state: AppViewState) {
     state.cronForm.deliveryMode === "webhook"
       ? rawDeliveryToSuggestions.filter((value) => isHttpUrl(value))
       : rawDeliveryToSuggestions;
+  return {
+    basePath: state.basePath,
+    loading: state.cronLoading,
+    jobsLoadingMore: state.cronJobsLoadingMore,
+    status: state.cronStatus,
+    jobs: state.cronJobs,
+    jobsTotal: state.cronJobsTotal,
+    jobsHasMore: state.cronJobsHasMore,
+    jobsQuery: state.cronJobsQuery,
+    jobsEnabledFilter: state.cronJobsEnabledFilter,
+    jobsSortBy: state.cronJobsSortBy,
+    jobsSortDir: state.cronJobsSortDir,
+    error: state.cronError,
+    busy: state.cronBusy,
+    form: state.cronForm,
+    fieldErrors: state.cronFieldErrors,
+    canSubmit: !hasCronFormErrors(state.cronFieldErrors),
+    editingJobId: state.cronEditingJobId,
+    channels: state.channelsSnapshot?.channelMeta?.length
+      ? state.channelsSnapshot.channelMeta.map((entry) => entry.id)
+      : (state.channelsSnapshot?.channelOrder ?? []),
+    channelLabels: state.channelsSnapshot?.channelLabels ?? {},
+    channelMeta: state.channelsSnapshot?.channelMeta ?? [],
+    runsJobId: state.cronRunsJobId,
+    runs: state.cronRuns,
+    runsTotal: state.cronRunsTotal,
+    runsHasMore: state.cronRunsHasMore,
+    runsLoadingMore: state.cronRunsLoadingMore,
+    runsScope: state.cronRunsScope,
+    runsStatuses: state.cronRunsStatuses,
+    runsDeliveryStatuses: state.cronRunsDeliveryStatuses,
+    runsStatusFilter: state.cronRunsStatusFilter,
+    runsQuery: state.cronRunsQuery,
+    runsSortDir: state.cronRunsSortDir,
+    agentSuggestions: cronAgentSuggestions,
+    modelSuggestions: cronModelSuggestions,
+    thinkingSuggestions: CRON_THINKING_SUGGESTIONS,
+    timezoneSuggestions: CRON_TIMEZONE_SUGGESTIONS,
+    deliveryToSuggestions,
+    formOpen: state.cronFormOpen,
+    onOpenForm: () => openCronForm(state),
+    onFormChange: (patch) => {
+      state.cronForm = normalizeCronFormState({ ...state.cronForm, ...patch });
+      state.cronFieldErrors = validateCronForm(state.cronForm);
+    },
+    onRefresh: () => state.loadCron(),
+    onAdd: () => addCronJob(state),
+    onEdit: (job) => startCronEdit(state, job),
+    onClone: (job) => startCronClone(state, job),
+    onCancelEdit: () => cancelCronEdit(state),
+    onToggle: (job, enabled) => toggleCronJob(state, job, enabled),
+    onRun: (job) => runCronJob(state, job),
+    onRemove: (job) => removeCronJob(state, job),
+    onLoadRuns: async (jobId) => {
+      updateCronRunsFilter(state, { cronRunsScope: "job" });
+      await loadCronRuns(state, jobId);
+    },
+    onLoadMoreJobs: () => loadMoreCronJobs(state),
+    onJobsFiltersChange: async (patch) => {
+      updateCronJobsFilter(state, patch);
+      await reloadCronJobs(state);
+    },
+    onLoadMoreRuns: () => loadMoreCronRuns(state),
+    onRunsFiltersChange: async (patch) => {
+      updateCronRunsFilter(state, patch);
+      if (state.cronRunsScope === "all") {
+        await loadCronRuns(state, null);
+        return;
+      }
+      await loadCronRuns(state, state.cronRunsJobId);
+    },
+  };
+}
+
+export function renderApp(state: AppViewState) {
+  const openClawVersion =
+    (typeof state.hello?.server?.version === "string" && state.hello.server.version.trim()) ||
+    state.updateAvailable?.currentVersion ||
+    t("common.na");
+  const availableUpdate =
+    state.updateAvailable &&
+    state.updateAvailable.latestVersion !== state.updateAvailable.currentVersion
+      ? state.updateAvailable
+      : null;
+  const versionStatusClass = availableUpdate ? "warn" : "ok";
+  const presenceCount = state.presenceEntries.length;
+  const sessionsCount = state.sessionsResult?.count ?? null;
+  const cronNext = state.cronStatus?.nextWakeAtMs ?? null;
+  const chatDisabledReason = state.connected ? null : t("chat.disconnected");
+  const isChat = state.tab === "chat";
+  const chatFocus = isChat && (state.settings.chatFocusMode || state.onboarding);
+  const showThinking = state.onboarding ? false : state.settings.chatShowThinking;
+  const assistantAvatarUrl = resolveAssistantAvatarUrl(state);
+  const chatAvatarUrl = state.chatAvatarUrl ?? assistantAvatarUrl ?? null;
+  const configValue =
+    state.configForm ?? (state.configSnapshot?.config as Record<string, unknown> | null);
+  const basePath = normalizeBasePath(state.basePath ?? "");
+  const resolvedAgentId =
+    state.agentsSelectedId ??
+    state.agentsList?.defaultId ??
+    state.agentsList?.agents?.[0]?.id ??
+    null;
+  const cronProps = buildCronProps(state);
 
   return html`
     <div class="shell ${isChat ? "shell--chat" : ""} ${chatFocus ? "shell--chat-focus" : ""} ${state.settings.navCollapsed ? "shell--nav-collapsed" : ""} ${state.onboarding ? "shell--onboarding" : ""}">
@@ -435,80 +512,7 @@ export function renderApp(state: AppViewState) {
 
         ${renderUsageTab(state)}
 
-        ${
-          state.tab === "cron"
-            ? renderCron({
-                basePath: state.basePath,
-                loading: state.cronLoading,
-                jobsLoadingMore: state.cronJobsLoadingMore,
-                status: state.cronStatus,
-                jobs: state.cronJobs,
-                jobsTotal: state.cronJobsTotal,
-                jobsHasMore: state.cronJobsHasMore,
-                jobsQuery: state.cronJobsQuery,
-                jobsEnabledFilter: state.cronJobsEnabledFilter,
-                jobsSortBy: state.cronJobsSortBy,
-                jobsSortDir: state.cronJobsSortDir,
-                error: state.cronError,
-                busy: state.cronBusy,
-                form: state.cronForm,
-                fieldErrors: state.cronFieldErrors,
-                canSubmit: !hasCronFormErrors(state.cronFieldErrors),
-                editingJobId: state.cronEditingJobId,
-                channels: state.channelsSnapshot?.channelMeta?.length
-                  ? state.channelsSnapshot.channelMeta.map((entry) => entry.id)
-                  : (state.channelsSnapshot?.channelOrder ?? []),
-                channelLabels: state.channelsSnapshot?.channelLabels ?? {},
-                channelMeta: state.channelsSnapshot?.channelMeta ?? [],
-                runsJobId: state.cronRunsJobId,
-                runs: state.cronRuns,
-                runsTotal: state.cronRunsTotal,
-                runsHasMore: state.cronRunsHasMore,
-                runsLoadingMore: state.cronRunsLoadingMore,
-                runsScope: state.cronRunsScope,
-                runsStatuses: state.cronRunsStatuses,
-                runsDeliveryStatuses: state.cronRunsDeliveryStatuses,
-                runsStatusFilter: state.cronRunsStatusFilter,
-                runsQuery: state.cronRunsQuery,
-                runsSortDir: state.cronRunsSortDir,
-                agentSuggestions: cronAgentSuggestions,
-                modelSuggestions: cronModelSuggestions,
-                thinkingSuggestions: CRON_THINKING_SUGGESTIONS,
-                timezoneSuggestions: CRON_TIMEZONE_SUGGESTIONS,
-                deliveryToSuggestions,
-                onFormChange: (patch) => {
-                  state.cronForm = normalizeCronFormState({ ...state.cronForm, ...patch });
-                  state.cronFieldErrors = validateCronForm(state.cronForm);
-                },
-                onRefresh: () => state.loadCron(),
-                onAdd: () => addCronJob(state),
-                onEdit: (job) => startCronEdit(state, job),
-                onClone: (job) => startCronClone(state, job),
-                onCancelEdit: () => cancelCronEdit(state),
-                onToggle: (job, enabled) => toggleCronJob(state, job, enabled),
-                onRun: (job) => runCronJob(state, job),
-                onRemove: (job) => removeCronJob(state, job),
-                onLoadRuns: async (jobId) => {
-                  updateCronRunsFilter(state, { cronRunsScope: "job" });
-                  await loadCronRuns(state, jobId);
-                },
-                onLoadMoreJobs: () => loadMoreCronJobs(state),
-                onJobsFiltersChange: async (patch) => {
-                  updateCronJobsFilter(state, patch);
-                  await reloadCronJobs(state);
-                },
-                onLoadMoreRuns: () => loadMoreCronRuns(state),
-                onRunsFiltersChange: async (patch) => {
-                  updateCronRunsFilter(state, patch);
-                  if (state.cronRunsScope === "all") {
-                    await loadCronRuns(state, null);
-                    return;
-                  }
-                  await loadCronRuns(state, state.cronRunsJobId);
-                },
-              })
-            : nothing
-        }
+        ${state.tab === "cron" ? renderCron(cronProps) : nothing}
 
         ${
           state.tab === "agents"
@@ -1135,8 +1139,16 @@ export function renderApp(state: AppViewState) {
             : nothing
         }
       </main>
-      ${renderExecApprovalPrompt(state)}
-      ${renderGatewayUrlConfirmation(state)}
     </div>
+  `;
+}
+
+/** Modal overlays — must be rendered outside scroll containers (e.g. in Tauri). */
+export function renderAppOverlays(state: AppViewState) {
+  const cronProps = buildCronProps(state);
+  return html`
+    ${renderCronModal(cronProps)}
+    ${renderExecApprovalPrompt(state)}
+    ${renderGatewayUrlConfirmation(state)}
   `;
 }

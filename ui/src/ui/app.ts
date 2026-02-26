@@ -1,4 +1,4 @@
-import { LitElement } from "lit";
+import { LitElement, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { i18n, I18nController, isSupportedLocale } from "../i18n/index.ts";
 import {
@@ -28,7 +28,7 @@ import {
   handleFirstUpdated,
   handleUpdated,
 } from "./app-lifecycle.ts";
-import { renderApp } from "./app-render.ts";
+import { renderApp, renderAppOverlays } from "./app-render.ts";
 import {
   exportLogs as exportLogsInternal,
   handleChatScroll as handleChatScrollInternal,
@@ -332,6 +332,7 @@ export class OpenClawApp extends LitElement {
   @state() cronRunsSortDir: import("./types.js").CronSortDir = "desc";
   @state() cronModelSuggestions: string[] = [];
   @state() cronBusy = false;
+  @state() cronFormOpen = false;
 
   @state() updateAvailable: import("./types.js").UpdateAvailable | null = null;
 
@@ -611,6 +612,6 @@ export class OpenClawApp extends LitElement {
   }
 
   render() {
-    return renderApp(this as unknown as AppViewState);
+    return html`${renderApp(this as unknown as AppViewState)}${renderAppOverlays(this as unknown as AppViewState)}`;
   }
 }

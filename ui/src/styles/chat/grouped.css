@@ -45,12 +45,12 @@
 .chat-sender-name {
   font-weight: 500;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--color-text-muted, #888);
 }
 
 .chat-group-timestamp {
   font-size: 11px;
-  color: var(--muted);
+  color: var(--color-text-muted, #888);
   opacity: 0.7;
 }
 
@@ -60,7 +60,7 @@
   align-items: center;
   gap: 10px;
   margin: 18px 8px;
-  color: var(--muted);
+  color: var(--color-text-muted, #888);
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -70,15 +70,15 @@
 .chat-divider__line {
   flex: 1 1 0;
   height: 1px;
-  background: var(--border);
+  background: var(--color-border, rgba(255 255 255 / 0.08));
   opacity: 0.9;
 }
 
 .chat-divider__label {
   padding: 2px 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   border-radius: 999px;
-  background: var(--secondary);
+  background: var(--color-surface, #161616);
 }
 
 /* Avatar Styles */
@@ -86,7 +86,7 @@
   width: 32px;
   height: 32px;
   border-radius: var(--radius-md); /* smaller radius for tighter look */
-  background: var(--panel-strong);
+  background: var(--color-surface, #161616);
   display: grid;
   place-items: center;
   font-weight: 600;
@@ -98,23 +98,23 @@
 }
 
 .chat-avatar.user {
-  background: var(--accent-subtle);
-  color: var(--accent);
+  background: var(--color-accent-subtle, rgba(79 142 247 / 0.12));
+  color: var(--color-accent, #4f8ef7);
 }
 
 .chat-avatar.assistant {
-  background: var(--secondary);
-  color: var(--muted);
+  background: var(--color-surface, #161616);
+  color: var(--color-text-muted, #888);
 }
 
 .chat-avatar.other {
-  background: var(--secondary);
-  color: var(--muted);
+  background: var(--color-surface, #161616);
+  color: var(--color-text-muted, #888);
 }
 
 .chat-avatar.tool {
-  background: var(--secondary);
-  color: var(--muted);
+  background: var(--color-surface, #161616);
+  color: var(--color-text-muted, #888);
 }
 
 /* Image avatar support */
@@ -129,9 +129,9 @@ img.chat-avatar {
   position: relative;
   display: inline-block;
   border: 1px solid transparent;
-  background: var(--card);
+  background: var(--color-surface-raised, #1c1c1e);
   border-radius: 8px; /* crisper than --radius-lg; matches Linear/Raycast feel */
-  padding: 8px 12px;  /* tighter than 10px 14px */
+  padding: 8px 12px; /* tighter than 10px 14px */
   /* No shadow — muted surfaces barely float above the background */
   transition:
     background var(--duration-fast) var(--ease-out),
@@ -148,9 +148,9 @@ img.chat-avatar {
   position: absolute;
   top: 6px;
   right: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--muted);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  background: var(--color-bg, #0f0f0f);
+  color: var(--color-text-muted, #888);
   border-radius: var(--radius-md);
   padding: 4px 6px;
   font-size: 14px;
@@ -206,7 +206,7 @@ img.chat-avatar {
 }
 
 .chat-copy-btn:hover {
-  background: var(--bg-hover);
+  background: var(--color-surface-hover, rgba(255 255 255 / 0.05));
 }
 
 .chat-copy-btn[data-copying="1"] {
@@ -217,23 +217,23 @@ img.chat-avatar {
 .chat-copy-btn[data-error="1"] {
   opacity: 1;
   pointer-events: auto;
-  border-color: var(--danger-subtle);
-  background: var(--danger-subtle);
-  color: var(--danger);
+  border-color: rgba(248 81 73 / 0.15);
+  background: rgba(248 81 73 / 0.15);
+  color: var(--color-error, #f85149);
 }
 
 .chat-copy-btn[data-copied="1"] {
   opacity: 1;
   pointer-events: auto;
-  border-color: var(--ok-subtle);
-  background: var(--ok-subtle);
-  color: var(--ok);
+  border-color: rgba(63 185 80 / 0.15);
+  background: rgba(63 185 80 / 0.15);
+  color: var(--color-success, #3fb950);
 }
 
 .chat-copy-btn:focus-visible {
   opacity: 1;
   pointer-events: auto;
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--color-accent, #4f8ef7);
   outline-offset: 2px;
 }
 
@@ -244,30 +244,19 @@ img.chat-avatar {
   }
 }
 
-/* Light mode: restore a very faint border */
-:root[data-theme="light"] .chat-bubble {
-  border-color: var(--border);
-  /* no inset highlight — keep it flat */
-}
-
 .chat-bubble:hover {
-  background: var(--bg-hover);
+  background: var(--color-surface-hover, rgba(255 255 255 / 0.05));
 }
 
 /* User bubbles — slightly more rounded but still crisp */
 .chat-group.user .chat-bubble {
-  background: var(--accent-subtle);
+  background: var(--color-accent-subtle, rgba(79 142 247 / 0.12));
   border-color: transparent;
   border-radius: 10px; /* slightly more than assistant, less than old --radius-xl */
 }
 
-:root[data-theme="light"] .chat-group.user .chat-bubble {
-  border-color: rgba(234, 88, 12, 0.2);
-  background: rgba(251, 146, 60, 0.12);
-}
-
 .chat-group.user .chat-bubble:hover {
-  background: rgba(255, 77, 77, 0.15);
+  background: rgba(79, 142, 247, 0.18);
 }
 
 /* Streaming animation */
@@ -278,10 +267,10 @@ img.chat-avatar {
 @keyframes pulsing-border {
   0%,
   100% {
-    border-color: var(--border);
+    border-color: var(--color-border, rgba(255 255 255 / 0.08));
   }
   50% {
-    border-color: var(--accent);
+    border-color: var(--color-accent, #4f8ef7);
   }
 }
 

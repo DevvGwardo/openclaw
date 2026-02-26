@@ -19,6 +19,14 @@
   - Core channel code: `src/telegram`, `src/discord`, `src/slack`, `src/signal`, `src/imessage`, `src/web` (WhatsApp web), `src/channels`, `src/routing`
   - Extensions (channel plugins): `extensions/*` (e.g. `extensions/msteams`, `extensions/matrix`, `extensions/zalo`, `extensions/zalouser`, `extensions/voice-call`)
 - When adding channels/extensions/apps/docs, update `.github/labeler.yml` and create matching GitHub labels (use existing channel/extension label colors).
+- **Tauri desktop app**: `apps/tauri/` — cross-platform (macOS/Windows) native desktop shell wrapping the web UI via Tauri v2.
+  - Rust backend: `apps/tauri/src/lib.rs` (app setup, tray menu, IPC commands, deep-link handling), `apps/tauri/src/main.rs` (entry point).
+  - Config: `apps/tauri/tauri.conf.json` (window size, deep-link scheme `openclaw://`, plugins).
+  - Frontend entrypoint: `ui/src/tauri-main.ts` (separate from browser `main.ts`; imports desktop shell + wires deep-link/tray events).
+  - Desktop UI components: `ui/src/ui/tauri-shell.ts` (extends `OpenClawApp`, custom layout with titlebar + sidebar), `ui/src/ui/tauri-sidebar.ts` (tab navigation), `ui/src/ui/tauri-titlebar.ts` (custom draggable titlebar with window controls).
+  - Styles: `ui/src/styles/tauri.css`, `ui/src/styles/tauri-sidebar.css`, `ui/src/styles/tauri-titlebar.css`.
+  - Vite config: `ui/vite.config.tauri.ts` (outputs to `apps/tauri/dist-ui`, dev on port 5175).
+  - The Tauri shell shares the full app state/lifecycle with the browser UI; only the outer chrome (titlebar, sidebar, layout) differs.
 
 ## Docs Linking (Mintlify)
 
@@ -68,6 +76,7 @@
 - Format check: `pnpm format` (oxfmt --check)
 - Format fix: `pnpm format:fix` (oxfmt --write)
 - Tests: `pnpm test` (vitest); coverage: `pnpm test:coverage`
+- Tauri dev: `pnpm tauri:dev` (rebuilds UI + watches Rust backend). UI-only: `pnpm tauri:ui:dev` (port 5175). Build: `pnpm tauri:build`.
 
 ## Coding Style & Naming Conventions
 

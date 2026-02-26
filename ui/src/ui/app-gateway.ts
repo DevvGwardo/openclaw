@@ -13,7 +13,7 @@ import {
 import { handleAgentEvent, resetToolStream, type AgentEventPayload } from "./app-tool-stream.ts";
 import type { OpenClawApp } from "./app.ts";
 import { shouldReloadHistoryForFinalEvent } from "./chat-event-reload.ts";
-import { loadAgents, loadToolsCatalog } from "./controllers/agents.ts";
+import { loadAgents } from "./controllers/agents.ts";
 import { loadAssistantIdentity } from "./controllers/assistant-identity.ts";
 import { loadChatHistory } from "./controllers/chat.ts";
 import { handleChatEvent, type ChatEventPayload } from "./controllers/chat.ts";
@@ -25,7 +25,6 @@ import {
   parseExecApprovalResolved,
   removeExecApproval,
 } from "./controllers/exec-approval.ts";
-import { loadNodes } from "./controllers/nodes.ts";
 import { loadSessions } from "./controllers/sessions.ts";
 import {
   resolveGatewayErrorDetailCode,
@@ -169,9 +168,6 @@ export function connectGateway(host: GatewayHost) {
       resetToolStream(host as unknown as Parameters<typeof resetToolStream>[0]);
       void loadAssistantIdentity(host as unknown as OpenClawApp);
       void loadAgents(host as unknown as OpenClawApp);
-      void loadToolsCatalog(host as unknown as OpenClawApp);
-      void loadNodes(host as unknown as OpenClawApp, { quiet: true });
-      void loadDevices(host as unknown as OpenClawApp, { quiet: true });
       void refreshActiveTab(host as unknown as Parameters<typeof refreshActiveTab>[0]);
     },
     onClose: ({ code, reason, error }) => {
@@ -257,13 +253,20 @@ function handleChatGatewayEvent(host: GatewayHost, payload: ChatEventPayload | u
   }
 }
 
+let _eventLogSyncTimer: ReturnType<typeof setTimeout> | null = null;
+
 function handleGatewayEventUnsafe(host: GatewayHost, evt: GatewayEventFrame) {
-  host.eventLogBuffer = [
-    { ts: Date.now(), event: evt.event, payload: evt.payload },
-    ...host.eventLogBuffer,
-  ].slice(0, 250);
-  if (host.tab === "debug") {
-    host.eventLog = host.eventLogBuffer;
+  // Mutate buffer in place to avoid O(n) spread+slice on every event.
+  host.eventLogBuffer.unshift({ ts: Date.now(), event: evt.event, payload: evt.payload });
+  if (host.eventLogBuffer.length > 250) {
+    host.eventLogBuffer.length = 250;
+  }
+  // Debounce the reactive eventLog sync so rapid events don't cause 50+ renders/sec.
+  if (host.tab === "debug" && _eventLogSyncTimer === null) {
+    _eventLogSyncTimer = setTimeout(() => {
+      _eventLogSyncTimer = null;
+      host.eventLog = [...host.eventLogBuffer];
+    }, 300);
   }
 
   if (evt.event === "agent") {

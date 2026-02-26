@@ -47,6 +47,7 @@ function createState(overrides: Partial<CronState> = {}): CronState {
     cronRunsQuery: "",
     cronRunsSortDir: "desc",
     cronBusy: false,
+    cronFormOpen: false,
     ...overrides,
   };
 }
