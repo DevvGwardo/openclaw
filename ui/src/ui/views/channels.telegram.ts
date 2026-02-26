@@ -111,7 +111,7 @@ export function renderTelegramCard(params: {
       ${renderChannelConfigSection({ channelId: "telegram", props })}
 
       <div class="row" style="margin-top: 12px;">
-        <button class="btn" @click=${() => props.onRefresh(true)}>
+        <button class="btn btn--sm" @click=${() => props.onRefresh(true)}>
           Probe
         </button>
       </div>

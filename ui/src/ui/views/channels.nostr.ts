@@ -229,7 +229,7 @@ export function renderNostrCard(params: {
       ${renderChannelConfigSection({ channelId: "nostr", props })}
 
       <div class="row" style="margin-top: 12px;">
-        <button class="btn" @click=${() => props.onRefresh(false)}>Refresh</button>
+        <button class="btn btn--sm" @click=${() => props.onRefresh(false)}>Refresh</button>
       </div>
     </div>
   `;
