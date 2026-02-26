@@ -17,6 +17,7 @@ import { isWSL } from "../infra/wsl.js";
 import { runCommandWithTimeout } from "../process/exec.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { stylePromptTitle } from "../terminal/prompt-style.js";
+import { isRich, theme } from "../terminal/theme.js";
 import {
   CONFIG_DIR,
   resolveUserPath,
@@ -99,7 +100,7 @@ export function validateGatewayPasswordInput(value: unknown): string | undefined
 }
 
 export function printWizardHeader(runtime: RuntimeEnv) {
-  const header = [
+  const lines = [
     "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
     "██░▄▄▄░██░▄▄░██░▄▄▄██░▀██░██░▄▄▀██░████░▄▄▀██░███░██",
     "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██",
@@ -107,7 +108,9 @@ export function printWizardHeader(runtime: RuntimeEnv) {
     "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
     "                  🦞 OPENCLAW 🦞                    ",
     " ",
-  ].join("\n");
+  ];
+  // Apply lobster accent color to block-art when terminal supports color.
+  const header = isRich() ? lines.map((l) => theme.accent(l)).join("\n") : lines.join("\n");
   runtime.log(header);
 }
 
