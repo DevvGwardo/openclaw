@@ -179,7 +179,7 @@ function renderRunFilterDropdown(params: {
             )}
           </div>
           <div class="row">
-            <button class="btn" type="button" @click=${params.onClear}>Clear</button>
+            <button class="btn btn--sm" type="button" @click=${params.onClear}>Clear</button>
           </div>
         </div>
       </details>
@@ -340,7 +340,7 @@ export function renderCron(props: CronProps) {
   const statusSummary = summarizeSelection(selectedStatusLabels, "All statuses");
   const deliverySummary = summarizeSelection(selectedDeliveryLabels, "All delivery");
   return html`
-    <section class="card cron-summary-strip">
+    <section class="cron-summary-strip">
       <div class="cron-summary-strip__left">
         <div class="cron-summary-item">
           <div class="cron-summary-label">Enabled</div>
@@ -360,7 +360,7 @@ export function renderCron(props: CronProps) {
         </div>
       </div>
       <div class="cron-summary-strip__actions">
-        <button class="btn" ?disabled=${props.loading} @click=${props.onRefresh}>
+        <button class="btn btn--sm" ?disabled=${props.loading} @click=${props.onRefresh}>
           ${props.loading ? "Refreshing..." : "Refresh"}
         </button>
         ${props.error ? html`<span class="muted">${props.error}</span>` : nothing}
@@ -451,7 +451,7 @@ export function renderCron(props: CronProps) {
               ? html`
                   <div class="row mt-3">
                     <button
-                      class="btn"
+                      class="btn btn--sm"
                       ?disabled=${props.loading || props.jobsLoadingMore}
                       @click=${props.onLoadMoreJobs}
                     >
@@ -576,7 +576,7 @@ export function renderCron(props: CronProps) {
               ? html`
                   <div class="row mt-3">
                     <button
-                      class="btn"
+                      class="btn btn--sm"
                       ?disabled=${props.runsLoadingMore}
                       @click=${props.onLoadMoreRuns}
                     >
@@ -1146,7 +1146,7 @@ export function renderCronModal(props: CronProps) {
                         ? html`<div class="cron-submit-reason" aria-live="polite">${submitDisabledReason}</div>`
                         : nothing
                     }
-                    <button class="btn" ?disabled=${props.busy} @click=${props.onCancelEdit}>
+                    <button class="btn btn--sm" ?disabled=${props.busy} @click=${props.onCancelEdit}>
                       Cancel
                     </button>
                     <button class="btn primary" ?disabled=${props.busy || !props.canSubmit} @click=${props.onAdd}>
@@ -1294,7 +1294,7 @@ function renderJob(job: CronJob, props: CronProps) {
         </div>
         <div class="row cron-job-actions">
           <button
-            class="btn"
+            class="btn btn--sm"
             ?disabled=${props.busy}
             @click=${(event: Event) => {
               event.stopPropagation();
@@ -1304,7 +1304,7 @@ function renderJob(job: CronJob, props: CronProps) {
             Edit
           </button>
           <button
-            class="btn"
+            class="btn btn--sm"
             ?disabled=${props.busy}
             @click=${(event: Event) => {
               event.stopPropagation();
@@ -1314,7 +1314,7 @@ function renderJob(job: CronJob, props: CronProps) {
             Clone
           </button>
           <button
-            class="btn"
+            class="btn btn--sm"
             ?disabled=${props.busy}
             @click=${(event: Event) => {
               event.stopPropagation();
@@ -1324,7 +1324,7 @@ function renderJob(job: CronJob, props: CronProps) {
             ${job.enabled ? "Disable" : "Enable"}
           </button>
           <button
-            class="btn"
+            class="btn btn--sm"
             ?disabled=${props.busy}
             @click=${(event: Event) => {
               event.stopPropagation();
@@ -1334,7 +1334,7 @@ function renderJob(job: CronJob, props: CronProps) {
             Run
           </button>
           <button
-            class="btn"
+            class="btn btn--sm"
             ?disabled=${props.busy}
             @click=${(event: Event) => {
               event.stopPropagation();
@@ -1344,7 +1344,7 @@ function renderJob(job: CronJob, props: CronProps) {
             History
           </button>
           <button
-            class="btn danger"
+            class="btn btn--sm danger"
             ?disabled=${props.busy}
             @click=${(event: Event) => {
               event.stopPropagation();

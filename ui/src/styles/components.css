@@ -573,6 +573,10 @@
   align-items: flex-start;
   gap: 12px 18px;
   padding: 14px 16px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--duration-normal) var(--ease-out);
 }
 
 .cron-summary-strip__left {
@@ -586,7 +590,7 @@
 .cron-summary-item {
   border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   border-radius: var(--radius-md);
-  background: var(--color-surface, #161616);
+  background: var(--secondary);
   padding: 10px 12px;
   min-height: 62px;
   display: grid;
