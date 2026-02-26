@@ -18,6 +18,8 @@ const mocks = vi.hoisted(() => ({
   waitForGatewayReachable: vi.fn(),
   resolveControlUiLinks: vi.fn(),
   summarizeExistingConfig: vi.fn(),
+  isRich: vi.fn(() => false),
+  themeAccent: vi.fn((s: string) => `ACCENT(${s})`),
 }));
 
 vi.mock("@clack/prompts", () => ({
@@ -26,6 +28,11 @@ vi.mock("@clack/prompts", () => ({
   select: mocks.clackSelect,
   text: mocks.clackText,
   confirm: mocks.clackConfirm,
+}));
+
+vi.mock("../terminal/theme.js", () => ({
+  isRich: mocks.isRich,
+  theme: { accent: mocks.themeAccent },
 }));
 
 vi.mock("../config/config.js", () => ({
@@ -157,5 +164,32 @@ describe("runConfigureWizard", () => {
     await runConfigureWizard({ command: "configure" }, runtime);
 
     expect(runtime.exit).toHaveBeenCalledWith(1);
+  });
+});
+
+describe("printWizardHeader (unit)", () => {
+  it("logs plain text when terminal is not rich", async () => {
+    mocks.isRich.mockReturnValue(false);
+    const { printWizardHeader: realPrintWizardHeader } =
+      await vi.importActual<typeof import("./onboard-helpers.js")>("./onboard-helpers.js");
+    const runtime = { log: vi.fn(), error: vi.fn(), exit: vi.fn() };
+    realPrintWizardHeader(runtime);
+    const logged = String(runtime.log.mock.calls[0]?.[0] ?? "");
+    expect(logged).toContain("OPENCLAW");
+    // accent wrapper should not appear in plain mode
+    expect(mocks.themeAccent).not.toHaveBeenCalled();
+  });
+
+  it("wraps block-art with accent color when terminal is rich", async () => {
+    mocks.isRich.mockReturnValue(true);
+    mocks.themeAccent.mockClear();
+    const { printWizardHeader: realPrintWizardHeader } =
+      await vi.importActual<typeof import("./onboard-helpers.js")>("./onboard-helpers.js");
+    const runtime = { log: vi.fn(), error: vi.fn(), exit: vi.fn() };
+    realPrintWizardHeader(runtime);
+    // theme.accent is called once per line
+    expect(mocks.themeAccent).toHaveBeenCalled();
+    const logged = String(runtime.log.mock.calls[0]?.[0] ?? "");
+    expect(logged).toContain("ACCENT(");
   });
 });
