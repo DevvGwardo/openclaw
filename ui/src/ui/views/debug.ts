@@ -108,7 +108,7 @@ export function renderDebug(props: DebugProps) {
       </div>
     </section>
 
-    <section class="card" style="margin-top: 18px;">
+    <section class="card">
       <div class="card-title">Models</div>
       <div class="card-sub">Catalog from models.list.</div>
       <pre class="code-block" style="margin-top: 12px;">${JSON.stringify(
@@ -118,7 +118,7 @@ export function renderDebug(props: DebugProps) {
       )}</pre>
     </section>
 
-    <section class="card" style="margin-top: 18px;">
+    <section class="card">
       <div class="card-title">Event Log</div>
       <div class="card-sub">Latest gateway events.</div>
       ${

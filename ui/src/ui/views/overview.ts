@@ -47,16 +47,14 @@ export function renderOverview(props: OverviewProps) {
       return null;
     }
     return html`
-      <div class="muted" style="margin-top: 8px">
-        ${t("overview.pairing.hint")}
-        <div style="margin-top: 6px">
+      <div style="margin-top: 8px; display: grid; gap: 6px;">
+        <div class="muted">${t("overview.pairing.hint")}</div>
+        <div>
           <span class="mono">openclaw devices list</span><br />
           <span class="mono">openclaw devices approve &lt;requestId&gt;</span>
         </div>
-        <div style="margin-top: 6px; font-size: 12px;">
-          ${t("overview.pairing.mobileHint")}
-        </div>
-        <div style="margin-top: 6px">
+        <div class="muted">${t("overview.pairing.mobileHint")}</div>
+        <div>
           <a
             class="session-link"
             href="https://docs.openclaw.ai/web/control-ui#device-pairing-first-connection"
@@ -107,13 +105,13 @@ export function renderOverview(props: OverviewProps) {
       : !hasToken && !hasPassword;
     if (isAuthRequired) {
       return html`
-        <div class="muted" style="margin-top: 8px">
-          ${t("overview.auth.required")}
-          <div style="margin-top: 6px">
+        <div style="margin-top: 8px; display: grid; gap: 6px;">
+          <div class="muted">${t("overview.auth.required")}</div>
+          <div>
             <span class="mono">openclaw dashboard --no-open</span> → tokenized URL<br />
             <span class="mono">openclaw doctor --generate-gateway-token</span> → set token
           </div>
-          <div style="margin-top: 6px">
+          <div>
             <a
               class="session-link"
               href="https://docs.openclaw.ai/web/dashboard"
@@ -127,9 +125,11 @@ export function renderOverview(props: OverviewProps) {
       `;
     }
     return html`
-      <div class="muted" style="margin-top: 8px">
-        ${t("overview.auth.failed", { command: "openclaw dashboard --no-open" })}
-        <div style="margin-top: 6px">
+      <div style="margin-top: 8px; display: grid; gap: 6px;">
+        <div class="muted">
+          ${t("overview.auth.failed", { command: "openclaw dashboard --no-open" })}
+        </div>
+        <div>
           <a
             class="session-link"
             href="https://docs.openclaw.ai/web/dashboard"
@@ -163,12 +163,16 @@ export function renderOverview(props: OverviewProps) {
       return null;
     }
     return html`
-      <div class="muted" style="margin-top: 8px">
-        ${t("overview.insecure.hint", { url: "http://127.0.0.1:18789" })}
-        <div style="margin-top: 6px">
-          ${t("overview.insecure.stayHttp", { config: "gateway.controlUi.allowInsecureAuth: true" })}
+      <div style="margin-top: 8px; display: grid; gap: 6px;">
+        <div class="muted">
+          ${t("overview.insecure.hint", { url: "http://127.0.0.1:18789" })}
         </div>
-        <div style="margin-top: 6px">
+        <div class="muted">
+          ${t("overview.insecure.stayHttp", {
+            config: "gateway.controlUi.allowInsecureAuth: true",
+          })}
+        </div>
+        <div>
           <a
             class="session-link"
             href="https://docs.openclaw.ai/gateway/tailscale"
@@ -317,7 +321,7 @@ export function renderOverview(props: OverviewProps) {
       </div>
     </section>
 
-    <section class="grid grid-cols-3" style="margin-top: 18px;">
+    <section class="grid grid-cols-3">
       <div class="card stat-card">
         <div class="stat-label">${t("overview.stats.instances")}</div>
         <div class="stat-value">${props.presenceCount}</div>
@@ -337,7 +341,7 @@ export function renderOverview(props: OverviewProps) {
       </div>
     </section>
 
-    <section class="card" style="margin-top: 18px;">
+    <section class="card">
       <div class="card-title">${t("overview.notes.title")}</div>
       <div class="card-sub">${t("overview.notes.subtitle")}</div>
       <div class="note-grid" style="margin-top: 14px;">
