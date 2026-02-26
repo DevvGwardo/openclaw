@@ -191,31 +191,45 @@ export async function refreshActiveTab(host: SettingsHost, gen?: number) {
   // Bail early if a newer tab navigation has already superseded this load.
   const isStale = () => gen !== undefined && _tabGeneration !== gen;
 
-  if (isStale()) return;
+  if (isStale()) {
+    return;
+  }
 
   if (host.tab === "overview") {
     await loadOverview(host);
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
   }
   if (host.tab === "channels") {
     await loadChannelsTab(host);
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
   }
   if (host.tab === "instances") {
     await loadPresence(host as unknown as OpenClawApp);
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
   }
   if (host.tab === "sessions") {
     await loadSessions(host as unknown as OpenClawApp);
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
   }
   if (host.tab === "cron") {
     await loadCron(host);
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
   }
   if (host.tab === "skills") {
     await loadSkills(host as unknown as OpenClawApp);
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
   }
   if (host.tab === "agents") {
     // Parallelize the independent initial loads for this tab.
@@ -224,7 +238,9 @@ export async function refreshActiveTab(host: SettingsHost, gen?: number) {
       loadToolsCatalog(host as unknown as OpenClawApp),
       loadConfig(host as unknown as OpenClawApp),
     ]);
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
     const agentIds = host.agentsList?.agents?.map((entry) => entry.id) ?? [];
     if (agentIds.length > 0) {
       void loadAgentIdentities(host as unknown as OpenClawApp, agentIds);
@@ -252,11 +268,15 @@ export async function refreshActiveTab(host: SettingsHost, gen?: number) {
       loadConfig(host as unknown as OpenClawApp),
       loadExecApprovals(host as unknown as OpenClawApp),
     ]);
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
   }
   if (host.tab === "chat") {
     await refreshChat(host as unknown as Parameters<typeof refreshChat>[0]);
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
     scheduleChatScroll(
       host as unknown as Parameters<typeof scheduleChatScroll>[0],
       !host.chatHasAutoScrolled,
@@ -268,17 +288,23 @@ export async function refreshActiveTab(host: SettingsHost, gen?: number) {
       loadConfigSchema(host as unknown as OpenClawApp),
       loadConfig(host as unknown as OpenClawApp),
     ]);
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
   }
   if (host.tab === "debug") {
     await loadDebug(host as unknown as OpenClawApp);
-    if (isStale()) return;
-    host.eventLog = host.eventLogBuffer;
+    if (isStale()) {
+      return;
+    }
+    host.eventLog = [...host.eventLogBuffer];
   }
   if (host.tab === "logs") {
     host.logsAtBottom = true;
     await loadLogs(host as unknown as OpenClawApp, { reset: true });
-    if (isStale()) return;
+    if (isStale()) {
+      return;
+    }
     scheduleLogsScroll(host as unknown as Parameters<typeof scheduleLogsScroll>[0], true);
   }
 }
