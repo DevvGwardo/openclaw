@@ -447,11 +447,6 @@ export function renderUsage(props: UsageProps) {
   return html`
     <style>${usageStylesString}</style>
 
-    <section class="usage-page-header">
-      <div class="usage-page-title">Usage</div>
-      <div class="usage-page-subtitle">See where tokens go, when sessions spike, and what drives cost.</div>
-    </section>
-
     <section class="card usage-header ${props.headerPinned ? "pinned" : ""}">
       <div class="usage-header-row">
         <div class="usage-header-title">
@@ -623,7 +618,7 @@ export function renderUsage(props: UsageProps) {
             </button>
           </div>
           <button
-            class="btn btn-sm usage-action-btn usage-primary-btn"
+            class="btn btn--pill primary"
             @click=${props.onRefresh}
             ?disabled=${props.loading}
           >
@@ -650,7 +645,7 @@ export function renderUsage(props: UsageProps) {
           />
           <div class="usage-query-actions">
             <button
-              class="btn btn-sm usage-action-btn usage-secondary-btn"
+              class="btn btn--pill"
               @click=${props.onApplyQuery}
               ?disabled=${props.loading || (!hasDraftQuery && !hasQuery)}
             >
@@ -658,7 +653,7 @@ export function renderUsage(props: UsageProps) {
             </button>
             ${
               hasDraftQuery || hasQuery
-                ? html`<button class="btn btn-sm usage-action-btn usage-secondary-btn" @click=${props.onClearQuery}>Clear</button>`
+                ? html`<button class="btn btn--pill" @click=${props.onClearQuery}>Clear</button>`
                 : nothing
             }
             <span class="usage-query-hint">

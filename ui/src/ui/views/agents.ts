@@ -115,7 +115,7 @@ export function renderAgents(props: AgentsProps) {
             <div class="card-title">Agents</div>
             <div class="card-sub">${agents.length} configured.</div>
           </div>
-          <button class="btn btn--sm" ?disabled=${props.loading} @click=${props.onRefresh}>
+          <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
             ${props.loading ? "Loading…" : "Refresh"}
           </button>
         </div>

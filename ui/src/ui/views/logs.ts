@@ -61,11 +61,11 @@ export function renderLogs(props: LogsProps) {
           <div class="card-sub">Gateway file logs (JSONL).</div>
         </div>
         <div class="row" style="gap: 8px;">
-          <button class="btn" ?disabled=${props.loading} @click=${props.onRefresh}>
+          <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
             ${props.loading ? "Loading…" : "Refresh"}
           </button>
           <button
-            class="btn"
+            class="btn btn--pill"
             ?disabled=${filtered.length === 0}
             @click=${() =>
               props.onExport(

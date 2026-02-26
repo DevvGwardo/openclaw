@@ -1,18 +1,4 @@
 export const usageStylesPart1 = `
-  .usage-page-header {
-    margin: 4px 0 12px;
-  }
-  .usage-page-title {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 4px;
-  }
-  .usage-page-subtitle {
-    font-size: 13px;
-    color: var(--muted);
-    margin: 0 0 12px;
-  }
   /* ===== FILTERS & HEADER ===== */
   .usage-filters-inline {
     display: flex;
@@ -142,60 +128,6 @@ export const usageStylesPart1 = `
   .usage-query-actions .btn:hover {
     background: var(--bg);
     border-color: var(--border-strong);
-  }
-  .usage-action-btn {
-    height: 34px;
-    padding: 0 14px;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 13px;
-    line-height: 1;
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text);
-    box-shadow: none;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
-  }
-  .usage-action-btn:hover {
-    background: var(--bg);
-    border-color: var(--border-strong);
-  }
-  .usage-primary-btn {
-    background: var(--accent);
-    color: var(--accent-foreground);
-    border-color: var(--accent);
-  }
-  .btn.usage-primary-btn {
-    background: var(--accent) !important;
-    border-color: var(--accent) !important;
-    color: var(--accent-foreground) !important;
-  }
-  .usage-primary-btn:hover {
-    background: var(--accent-hover);
-    border-color: var(--accent-hover);
-  }
-  .btn.usage-primary-btn:hover {
-    background: var(--accent-hover) !important;
-    border-color: var(--accent-hover) !important;
-  }
-  .usage-primary-btn:disabled {
-    background: var(--accent-subtle);
-    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-    color: var(--accent);
-    box-shadow: none;
-    cursor: default;
-    opacity: 1;
-  }
-  .usage-primary-btn[disabled] {
-    background: var(--accent-subtle) !important;
-    border-color: color-mix(in srgb, var(--accent) 30%, transparent) !important;
-    color: var(--accent) !important;
-    opacity: 1 !important;
-  }
-  .usage-secondary-btn {
-    background: var(--bg-secondary);
-    color: var(--text);
-    border-color: var(--border);
   }
   .usage-query-input {
     width: 100%;
