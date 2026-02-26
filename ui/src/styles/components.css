@@ -876,6 +876,10 @@
 
 /* --- Cron modal --- */
 
+#cron-modal-portal {
+  display: contents;
+}
+
 .cron-modal-backdrop {
   position: fixed;
   inset: 0;
