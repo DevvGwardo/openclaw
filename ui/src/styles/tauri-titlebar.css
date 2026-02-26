@@ -1,0 +1,97 @@
+/* Tauri custom draggable titlebar */
+
+.tauri-titlebar {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  flex-shrink: 0;
+  background: var(--tauri-titlebar-bg, var(--color-surface-raised, #1a1a1a));
+  border-bottom: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  user-select: none;
+  -webkit-app-region: drag; /* makes the whole bar draggable by default */
+}
+
+/* macOS: traffic-light buttons on the left */
+.tauri-titlebar__controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  -webkit-app-region: no-drag; /* buttons must be clickable */
+  flex-shrink: 0;
+}
+
+.tauri-titlebar__btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.1s ease;
+  -webkit-app-region: no-drag;
+}
+
+.tauri-titlebar__btn:hover {
+  opacity: 0.85;
+}
+
+.tauri-titlebar__btn--close {
+  background: #ff5f57;
+}
+
+.tauri-titlebar__btn--minimize {
+  background: #febc2e;
+}
+
+.tauri-titlebar__btn--maximize {
+  background: #28c840;
+}
+
+/* Windows: close/min/max on the right */
+.tauri-titlebar--windows .tauri-titlebar__controls {
+  order: 3;
+  margin-left: auto;
+  padding: 0;
+  gap: 0;
+}
+
+.tauri-titlebar--windows .tauri-titlebar__btn {
+  width: 46px;
+  height: 40px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-muted, #aaa);
+  font-size: 12px;
+}
+
+.tauri-titlebar--windows .tauri-titlebar__btn:hover {
+  background: rgba(255 255 255 / 0.1);
+  opacity: 1;
+}
+
+.tauri-titlebar--windows .tauri-titlebar__btn--close:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+
+/* Title area */
+.tauri-titlebar__title {
+  flex: 1;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted, #aaa);
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  /* On macOS the buttons are on the left so we offset to visually center */
+  padding-right: 80px;
+}
+
+.tauri-titlebar--windows .tauri-titlebar__title {
+  text-align: left;
+  padding: 0 12px;
+}
