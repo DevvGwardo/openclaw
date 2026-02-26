@@ -405,13 +405,12 @@
 }
 
 .nav-item.active {
-  color: var(--text-strong);
-  background: var(--accent-subtle);
+  color: var(--text);
+  background: var(--bg-hover);
 }
 
 .nav-item.active .nav-item__icon {
   opacity: 1;
-  color: var(--accent);
 }
 
 /* ===========================================
@@ -473,18 +472,18 @@
 }
 
 .page-title {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
   color: var(--text-strong);
 }
 
 .page-sub {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
-  margin-top: 6px;
+  margin-top: 4px;
   letter-spacing: -0.01em;
 }
 
