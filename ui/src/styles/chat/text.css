@@ -3,14 +3,15 @@
    ============================================= */
 
 .chat-thinking {
-  margin-bottom: 10px;
-  padding: 10px 12px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
   border-radius: var(--radius-md);
   border: 1px dashed var(--border);
-  background: var(--secondary);
+  background: transparent; /* barely distinguishable from page bg */
   color: var(--muted);
   font-size: 12px;
   line-height: 1.4;
+  opacity: 0.8;
 }
 
 :root[data-theme="light"] .chat-thinking {
@@ -20,7 +21,7 @@
 
 .chat-text {
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.45; /* slightly tighter for a denser, cleaner feel */
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -63,7 +64,8 @@
 }
 
 .chat-text :where(pre) {
-  background: var(--secondary);
+  /* Slightly darker surface + explicit border for code blocks */
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 10px 12px;
