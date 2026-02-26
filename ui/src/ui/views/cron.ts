@@ -484,7 +484,7 @@ export function renderCron(props: CronProps) {
                 }
               </div>
             </div>
-            <div class="muted">${runs.length} shown of ${props.runsTotal}</div>
+            <div class="pill pill--sm">${runs.length} shown of ${props.runsTotal}</div>
           </div>
           <div class="cron-run-filters">
             <div class="cron-run-filters__row cron-run-filters__row--primary">
@@ -568,11 +568,28 @@ export function renderCron(props: CronProps) {
           ${
             props.runsScope === "job" && props.runsJobId == null
               ? html`
-                  <div class="muted mt-3">Select a job to inspect run history.</div>
+                  <div class="cron-empty cron-empty--compact">
+                    <div class="cron-empty__icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </div>
+                    <div class="cron-empty__title">Select a job</div>
+                    <div class="cron-empty__text">Choose a job above to inspect its run history.</div>
+                  </div>
                 `
               : runs.length === 0
                 ? html`
                     <div class="cron-empty cron-empty--compact">
+                      <div class="cron-empty__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                      </div>
                       <div class="cron-empty__title">No matching runs</div>
                       <div class="cron-empty__text">Runs will appear here after a job executes.</div>
                     </div>
@@ -588,7 +605,7 @@ export function renderCron(props: CronProps) {
               ? html`
                   <div class="row mt-3">
                     <button
-                      class="btn btn--sm"
+                      class="btn btn--pill"
                       ?disabled=${props.runsLoadingMore}
                       @click=${props.onLoadMoreRuns}
                     >
