@@ -2,7 +2,7 @@ import { render } from "lit";
 import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_CRON_FORM } from "../app-defaults.ts";
 import type { CronJob } from "../types.ts";
-import { renderCron, type CronProps } from "./cron.ts";
+import { renderCron, renderCronModal, type CronProps } from "./cron.ts";
 
 function createJob(id: string): CronJob {
   return {
@@ -55,12 +55,14 @@ function createProps(overrides: Partial<CronProps> = {}): CronProps {
     thinkingSuggestions: [],
     timezoneSuggestions: [],
     deliveryToSuggestions: [],
+    formOpen: false,
     onFormChange: () => undefined,
     onRefresh: () => undefined,
     onAdd: () => undefined,
     onEdit: () => undefined,
     onClone: () => undefined,
     onCancelEdit: () => undefined,
+    onOpenForm: () => undefined,
     onToggle: () => undefined,
     onRun: () => undefined,
     onRemove: () => undefined,
@@ -73,10 +75,21 @@ function createProps(overrides: Partial<CronProps> = {}): CronProps {
   };
 }
 
+/** Renders the cron page + modal. The modal portals to document.body; we re-parent it into
+ *  the container so tests can query a single root. */
+function renderCronFull(props: CronProps, container: HTMLElement) {
+  render(renderCron(props), container);
+  renderCronModal(props); // triggers portal render into document.body
+  const portal = document.getElementById("cron-modal-portal");
+  if (portal) {
+    container.appendChild(portal);
+  }
+}
+
 describe("cron view", () => {
   it("shows all-job history mode by default", () => {
     const container = document.createElement("div");
-    render(renderCron(createProps()), container);
+    renderCronFull(createProps(), container);
 
     expect(container.textContent).toContain("Latest runs across all jobs.");
     expect(container.textContent).toContain("Status");
@@ -89,12 +102,10 @@ describe("cron view", () => {
   it("toggles run status filter via dropdown checkboxes", () => {
     const container = document.createElement("div");
     const onRunsFiltersChange = vi.fn();
-    render(
-      renderCron(
-        createProps({
-          onRunsFiltersChange,
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        onRunsFiltersChange,
+      }),
       container,
     );
 
@@ -115,13 +126,11 @@ describe("cron view", () => {
     const container = document.createElement("div");
     const onLoadRuns = vi.fn();
     const job = createJob("job-1");
-    render(
-      renderCron(
-        createProps({
-          jobs: [job],
-          onLoadRuns,
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        jobs: [job],
+        onLoadRuns,
+      }),
       container,
     );
 
@@ -136,15 +145,13 @@ describe("cron view", () => {
     const container = document.createElement("div");
     const onLoadRuns = vi.fn();
     const job = createJob("job-1");
-    render(
-      renderCron(
-        createProps({
-          jobs: [job],
-          runsJobId: "job-1",
-          runsScope: "job",
-          onLoadRuns,
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        jobs: [job],
+        runsJobId: "job-1",
+        runsScope: "job",
+        onLoadRuns,
+      }),
       container,
     );
 
@@ -163,22 +170,20 @@ describe("cron view", () => {
 
   it("renders run chat links when session keys are present", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          basePath: "/ui",
-          runsJobId: "job-1",
-          runs: [
-            {
-              ts: Date.now(),
-              jobId: "job-1",
-              status: "ok",
-              summary: "done",
-              sessionKey: "agent:main:cron:job-1:run:abc",
-            },
-          ],
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        basePath: "/ui",
+        runsJobId: "job-1",
+        runs: [
+          {
+            ts: Date.now(),
+            jobId: "job-1",
+            status: "ok",
+            summary: "done",
+            sessionKey: "agent:main:cron:job-1:run:abc",
+          },
+        ],
+      }),
       container,
     );
 
@@ -192,18 +197,16 @@ describe("cron view", () => {
   it("shows selected job name and sorts run history newest first", () => {
     const container = document.createElement("div");
     const job = createJob("job-1");
-    render(
-      renderCron(
-        createProps({
-          jobs: [job],
-          runsJobId: "job-1",
-          runsScope: "job",
-          runs: [
-            { ts: 1, jobId: "job-1", status: "ok", summary: "older run" },
-            { ts: 2, jobId: "job-1", status: "ok", summary: "newer run" },
-          ],
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        jobs: [job],
+        runsJobId: "job-1",
+        runsScope: "job",
+        runs: [
+          { ts: 1, jobId: "job-1", status: "ok", summary: "older run" },
+          { ts: 2, jobId: "job-1", status: "ok", summary: "newer run" },
+        ],
+      }),
       container,
     );
 
@@ -224,21 +227,19 @@ describe("cron view", () => {
 
   it("labels past nextRunAtMs as due instead of next", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          runsScope: "all",
-          runs: [
-            {
-              ts: Date.now(),
-              jobId: "job-1",
-              status: "ok",
-              summary: "done",
-              nextRunAtMs: Date.now() - 13 * 60_000,
-            },
-          ],
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        runsScope: "all",
+        runs: [
+          {
+            ts: Date.now(),
+            jobId: "job-1",
+            status: "ok",
+            summary: "done",
+            nextRunAtMs: Date.now() - 13 * 60_000,
+          },
+        ],
+      }),
       container,
     );
 
@@ -248,12 +249,11 @@ describe("cron view", () => {
 
   it("shows webhook delivery option in the form", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          form: { ...DEFAULT_CRON_FORM, payloadKind: "agentTurn" },
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        form: { ...DEFAULT_CRON_FORM, payloadKind: "agentTurn" },
+      }),
       container,
     );
 
@@ -265,17 +265,16 @@ describe("cron view", () => {
 
   it("normalizes stale announce selection in the form when unsupported", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          form: {
-            ...DEFAULT_CRON_FORM,
-            sessionTarget: "main",
-            payloadKind: "systemEvent",
-            deliveryMode: "announce",
-          },
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        form: {
+          ...DEFAULT_CRON_FORM,
+          sessionTarget: "main",
+          payloadKind: "systemEvent",
+          deliveryMode: "announce",
+        },
+      }),
       container,
     );
 
@@ -296,12 +295,10 @@ describe("cron view", () => {
       payload: { kind: "agentTurn" as const, message: "do it" },
       delivery: { mode: "webhook" as const, to: "https://example.invalid/cron" },
     };
-    render(
-      renderCron(
-        createProps({
-          jobs: [job],
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        jobs: [job],
+      }),
       container,
     );
 
@@ -317,16 +314,15 @@ describe("cron view", () => {
     const onCancelEdit = vi.fn();
     const job = createJob("job-3");
 
-    render(
-      renderCron(
-        createProps({
-          jobs: [job],
-          editingJobId: "job-3",
-          onEdit,
-          onLoadRuns,
-          onCancelEdit,
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        jobs: [job],
+        editingJobId: "job-3",
+        onEdit,
+        onLoadRuns,
+        onCancelEdit,
+      }),
       container,
     );
 
@@ -351,17 +347,16 @@ describe("cron view", () => {
 
   it("renders advanced controls for cron + agent payload + delivery", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          form: {
-            ...DEFAULT_CRON_FORM,
-            scheduleKind: "cron",
-            payloadKind: "agentTurn",
-            deliveryMode: "announce",
-          },
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        form: {
+          ...DEFAULT_CRON_FORM,
+          scheduleKind: "cron",
+          payloadKind: "agentTurn",
+          deliveryMode: "announce",
+        },
+      }),
       container,
     );
 
@@ -375,16 +370,15 @@ describe("cron view", () => {
 
   it("groups stagger window and unit inside the same stagger row", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          form: {
-            ...DEFAULT_CRON_FORM,
-            scheduleKind: "cron",
-            payloadKind: "agentTurn",
-          },
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        form: {
+          ...DEFAULT_CRON_FORM,
+          scheduleKind: "cron",
+          payloadKind: "agentTurn",
+        },
+      }),
       container,
     );
 
@@ -396,16 +390,15 @@ describe("cron view", () => {
 
   it("explains timeout blank behavior and shows cron jitter hint", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          form: {
-            ...DEFAULT_CRON_FORM,
-            scheduleKind: "cron",
-            payloadKind: "agentTurn",
-          },
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        form: {
+          ...DEFAULT_CRON_FORM,
+          scheduleKind: "cron",
+          payloadKind: "agentTurn",
+        },
+      }),
       container,
     );
 
@@ -417,15 +410,14 @@ describe("cron view", () => {
 
   it("disables Agent ID when clear-agent is enabled", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          form: {
-            ...DEFAULT_CRON_FORM,
-            clearAgent: true,
-          },
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        form: {
+          ...DEFAULT_CRON_FORM,
+          clearAgent: true,
+        },
+      }),
       container,
     );
 
@@ -437,7 +429,7 @@ describe("cron view", () => {
 
   it("renders sectioned cron form layout", () => {
     const container = document.createElement("div");
-    render(renderCron(createProps()), container);
+    renderCronFull(createProps({ formOpen: true }), container);
     expect(container.textContent).toContain("Enabled");
     expect(container.textContent).toContain("Jobs");
     expect(container.textContent).toContain("Next wake");
@@ -450,7 +442,7 @@ describe("cron view", () => {
 
   it("renders checkbox fields with input first for alignment", () => {
     const container = document.createElement("div");
-    render(renderCron(createProps()), container);
+    renderCronFull(createProps({ formOpen: true }), container);
     const checkboxLabel = container.querySelector(".cron-checkbox");
     expect(checkboxLabel).not.toBeNull();
     const firstElement = checkboxLabel?.firstElementChild;
@@ -459,17 +451,16 @@ describe("cron view", () => {
 
   it("hides cron-only advanced controls for non-cron schedules", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          form: {
-            ...DEFAULT_CRON_FORM,
-            scheduleKind: "every",
-            payloadKind: "systemEvent",
-            deliveryMode: "none",
-          },
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        form: {
+          ...DEFAULT_CRON_FORM,
+          scheduleKind: "every",
+          payloadKind: "systemEvent",
+          deliveryMode: "none",
+        },
+      }),
       container,
     );
     expect(container.textContent).not.toContain("Exact timing (no stagger)");
@@ -480,24 +471,23 @@ describe("cron view", () => {
 
   it("renders inline validation errors and disables submit when invalid", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          form: {
-            ...DEFAULT_CRON_FORM,
-            name: "",
-            scheduleKind: "cron",
-            cronExpr: "",
-            payloadText: "",
-          },
-          fieldErrors: {
-            name: "Name is required.",
-            cronExpr: "Cron expression is required.",
-            payloadText: "Agent message is required.",
-          },
-          canSubmit: false,
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        form: {
+          ...DEFAULT_CRON_FORM,
+          name: "",
+          scheduleKind: "cron",
+          cronExpr: "",
+          payloadText: "",
+        },
+        fieldErrors: {
+          name: "Name is required.",
+          cronExpr: "Cron expression is required.",
+          payloadText: "Agent message is required.",
+        },
+        canSubmit: false,
+      }),
       container,
     );
 
@@ -516,24 +506,23 @@ describe("cron view", () => {
 
   it("shows required legend and aria bindings for invalid required fields", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          form: {
-            ...DEFAULT_CRON_FORM,
-            scheduleKind: "every",
-            name: "",
-            everyAmount: "",
-            payloadText: "",
-          },
-          fieldErrors: {
-            name: "Name is required.",
-            everyAmount: "Interval must be greater than 0.",
-            payloadText: "Agent message is required.",
-          },
-          canSubmit: false,
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        form: {
+          ...DEFAULT_CRON_FORM,
+          scheduleKind: "every",
+          name: "",
+          everyAmount: "",
+          payloadText: "",
+        },
+        fieldErrors: {
+          name: "Name is required.",
+          everyAmount: "Interval must be greater than 0.",
+          payloadText: "Agent message is required.",
+        },
+        canSubmit: false,
+      }),
       container,
     );
 
@@ -557,14 +546,12 @@ describe("cron view", () => {
     const onClone = vi.fn();
     const onLoadRuns = vi.fn();
     const job = createJob("job-clone");
-    render(
-      renderCron(
-        createProps({
-          jobs: [job],
-          onClone,
-          onLoadRuns,
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        jobs: [job],
+        onClone,
+        onLoadRuns,
+      }),
       container,
     );
 
@@ -584,16 +571,14 @@ describe("cron view", () => {
     const onRemove = vi.fn();
     const onLoadRuns = vi.fn();
     const job = createJob("job-actions");
-    render(
-      renderCron(
-        createProps({
-          jobs: [job],
-          onToggle,
-          onRun,
-          onRemove,
-          onLoadRuns,
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        jobs: [job],
+        onToggle,
+        onRun,
+        onRemove,
+        onLoadRuns,
+      }),
       container,
     );
 
@@ -626,17 +611,16 @@ describe("cron view", () => {
 
   it("renders suggestion datalists for agent/model/thinking/timezone", () => {
     const container = document.createElement("div");
-    render(
-      renderCron(
-        createProps({
-          form: { ...DEFAULT_CRON_FORM, scheduleKind: "cron", payloadKind: "agentTurn" },
-          agentSuggestions: ["main"],
-          modelSuggestions: ["openai/gpt-5.2"],
-          thinkingSuggestions: ["low"],
-          timezoneSuggestions: ["UTC"],
-          deliveryToSuggestions: ["+15551234567"],
-        }),
-      ),
+    renderCronFull(
+      createProps({
+        formOpen: true,
+        form: { ...DEFAULT_CRON_FORM, scheduleKind: "cron", payloadKind: "agentTurn" },
+        agentSuggestions: ["main"],
+        modelSuggestions: ["openai/gpt-5.2"],
+        thinkingSuggestions: ["low"],
+        timezoneSuggestions: ["UTC"],
+        deliveryToSuggestions: ["+15551234567"],
+      }),
       container,
     );
 
