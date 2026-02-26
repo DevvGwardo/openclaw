@@ -28,7 +28,7 @@ export function renderSkillStatusChips(params: {
   const skill = params.skill;
   const showBundledBadge = Boolean(params.showBundledBadge);
   return html`
-    <div class="chip-row" style="margin-top: 6px;">
+    <div class="chip-row">
       <span class="chip">${skill.source}</span>
       ${
         showBundledBadge
