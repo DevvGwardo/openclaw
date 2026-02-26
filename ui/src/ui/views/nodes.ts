@@ -58,7 +58,7 @@ export function renderNodes(props: NodesProps) {
           <div class="card-title">Nodes</div>
           <div class="card-sub">Paired devices and live links.</div>
         </div>
-        <button class="btn" ?disabled=${props.loading} @click=${props.onRefresh}>
+        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
           ${props.loading ? "Loading…" : "Refresh"}
         </button>
       </div>
@@ -86,7 +86,7 @@ function renderDevices(props: NodesProps) {
           <div class="card-title">Devices</div>
           <div class="card-sub">Pairing requests + role tokens.</div>
         </div>
-        <button class="btn" ?disabled=${props.devicesLoading} @click=${props.onDevicesRefresh}>
+        <button class="btn btn--pill primary" ?disabled=${props.devicesLoading} @click=${props.onDevicesRefresh}>
           ${props.devicesLoading ? "Loading…" : "Refresh"}
         </button>
       </div>

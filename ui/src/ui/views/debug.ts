@@ -40,7 +40,7 @@ export function renderDebug(props: DebugProps) {
             <div class="card-title">Snapshots</div>
             <div class="card-sub">Status, health, and heartbeat data.</div>
           </div>
-          <button class="btn" ?disabled=${props.loading} @click=${props.onRefresh}>
+          <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
             ${props.loading ? "Refreshing…" : "Refresh"}
           </button>
         </div>
