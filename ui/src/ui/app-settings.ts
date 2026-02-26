@@ -39,6 +39,9 @@ import { startThemeTransition, type ThemeTransitionContext } from "./theme-trans
 import { resolveTheme, type ResolvedTheme, type ThemeMode } from "./theme.ts";
 import type { AgentsListResult } from "./types.ts";
 
+// Incremented on every tab navigation; used to bail out stale async loads.
+let _tabGeneration = 0;
+
 type SettingsHost = {
   settings: UiSettings;
   password?: string;
@@ -165,7 +168,8 @@ export function setTab(host: SettingsHost, next: Tab) {
   } else {
     stopDebugPolling(host as unknown as Parameters<typeof stopDebugPolling>[0]);
   }
-  void refreshActiveTab(host);
+  const gen = ++_tabGeneration;
+  void refreshActiveTab(host, gen);
   syncUrlWithTab(host, next, false);
 }
 
@@ -183,29 +187,44 @@ export function setTheme(host: SettingsHost, next: ThemeMode, context?: ThemeTra
   });
 }
 
-export async function refreshActiveTab(host: SettingsHost) {
+export async function refreshActiveTab(host: SettingsHost, gen?: number) {
+  // Bail early if a newer tab navigation has already superseded this load.
+  const isStale = () => gen !== undefined && _tabGeneration !== gen;
+
+  if (isStale()) return;
+
   if (host.tab === "overview") {
     await loadOverview(host);
+    if (isStale()) return;
   }
   if (host.tab === "channels") {
     await loadChannelsTab(host);
+    if (isStale()) return;
   }
   if (host.tab === "instances") {
     await loadPresence(host as unknown as OpenClawApp);
+    if (isStale()) return;
   }
   if (host.tab === "sessions") {
     await loadSessions(host as unknown as OpenClawApp);
+    if (isStale()) return;
   }
   if (host.tab === "cron") {
     await loadCron(host);
+    if (isStale()) return;
   }
   if (host.tab === "skills") {
     await loadSkills(host as unknown as OpenClawApp);
+    if (isStale()) return;
   }
   if (host.tab === "agents") {
-    await loadAgents(host as unknown as OpenClawApp);
-    await loadToolsCatalog(host as unknown as OpenClawApp);
-    await loadConfig(host as unknown as OpenClawApp);
+    // Parallelize the independent initial loads for this tab.
+    await Promise.all([
+      loadAgents(host as unknown as OpenClawApp),
+      loadToolsCatalog(host as unknown as OpenClawApp),
+      loadConfig(host as unknown as OpenClawApp),
+    ]);
+    if (isStale()) return;
     const agentIds = host.agentsList?.agents?.map((entry) => entry.id) ?? [];
     if (agentIds.length > 0) {
       void loadAgentIdentities(host as unknown as OpenClawApp, agentIds);
@@ -226,29 +245,40 @@ export async function refreshActiveTab(host: SettingsHost) {
     }
   }
   if (host.tab === "nodes") {
-    await loadNodes(host as unknown as OpenClawApp);
-    await loadDevices(host as unknown as OpenClawApp);
-    await loadConfig(host as unknown as OpenClawApp);
-    await loadExecApprovals(host as unknown as OpenClawApp);
+    // Parallelize the independent node-tab loads.
+    await Promise.all([
+      loadNodes(host as unknown as OpenClawApp),
+      loadDevices(host as unknown as OpenClawApp),
+      loadConfig(host as unknown as OpenClawApp),
+      loadExecApprovals(host as unknown as OpenClawApp),
+    ]);
+    if (isStale()) return;
   }
   if (host.tab === "chat") {
     await refreshChat(host as unknown as Parameters<typeof refreshChat>[0]);
+    if (isStale()) return;
     scheduleChatScroll(
       host as unknown as Parameters<typeof scheduleChatScroll>[0],
       !host.chatHasAutoScrolled,
     );
   }
   if (host.tab === "config") {
-    await loadConfigSchema(host as unknown as OpenClawApp);
-    await loadConfig(host as unknown as OpenClawApp);
+    // Parallelize schema + config fetch.
+    await Promise.all([
+      loadConfigSchema(host as unknown as OpenClawApp),
+      loadConfig(host as unknown as OpenClawApp),
+    ]);
+    if (isStale()) return;
   }
   if (host.tab === "debug") {
     await loadDebug(host as unknown as OpenClawApp);
+    if (isStale()) return;
     host.eventLog = host.eventLogBuffer;
   }
   if (host.tab === "logs") {
     host.logsAtBottom = true;
     await loadLogs(host as unknown as OpenClawApp, { reset: true });
+    if (isStale()) return;
     scheduleLogsScroll(host as unknown as Parameters<typeof scheduleLogsScroll>[0], true);
   }
 }
@@ -365,8 +395,9 @@ export function setTabFromRoute(host: SettingsHost, next: Tab) {
   } else {
     stopDebugPolling(host as unknown as Parameters<typeof stopDebugPolling>[0]);
   }
+  const gen = ++_tabGeneration;
   if (host.connected) {
-    void refreshActiveTab(host);
+    void refreshActiveTab(host, gen);
   }
 }
 
