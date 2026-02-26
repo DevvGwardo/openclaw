@@ -1151,7 +1151,6 @@ export function renderCronModal(props: CronProps) {
                           `
                         : nothing
                     }
-                  </div>
                   <div class="cron-modal-footer">
                     ${
                       submitDisabledReason
@@ -1164,14 +1163,14 @@ export function renderCronModal(props: CronProps) {
                     <button class="btn primary" ?disabled=${props.busy || !props.canSubmit} @click=${props.onAdd}>
                       ${props.busy ? "Saving..." : isEditing ? "Save changes" : "Add job"}
                     </button>
-        ${renderSuggestionList("cron-agent-suggestions", props.agentSuggestions)}
-        ${renderSuggestionList("cron-model-suggestions", props.modelSuggestions)}
-        ${renderSuggestionList("cron-thinking-suggestions", props.thinkingSuggestions)}
-        ${renderSuggestionList("cron-tz-suggestions", props.timezoneSuggestions)}
-        ${renderSuggestionList("cron-delivery-to-suggestions", props.deliveryToSuggestions)}
+                  </div>
+          ${renderSuggestionList("cron-agent-suggestions", props.agentSuggestions)}
+          ${renderSuggestionList("cron-model-suggestions", props.modelSuggestions)}
+          ${renderSuggestionList("cron-thinking-suggestions", props.thinkingSuggestions)}
+          ${renderSuggestionList("cron-tz-suggestions", props.timezoneSuggestions)}
+          ${renderSuggestionList("cron-delivery-to-suggestions", props.deliveryToSuggestions)}
         </div>
       </div>
-    </div>
   `,
     portal,
   );
