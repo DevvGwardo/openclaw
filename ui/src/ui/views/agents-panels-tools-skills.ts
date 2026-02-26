@@ -124,7 +124,7 @@ export function renderAgentTools(params: {
 
   return html`
     <section class="card">
-      <div class="row" style="justify-content: space-between;">
+      <div class="row row--between">
         <div>
           <div class="card-title">Tool Access</div>
           <div class="card-sub">
@@ -132,7 +132,7 @@ export function renderAgentTools(params: {
             <span class="mono">${enabledCount}/${toolIds.length}</span> enabled.
           </div>
         </div>
-        <div class="row" style="gap: 8px;">
+        <div class="row row--gap-sm">
           <button class="btn btn--sm" ?disabled=${!editable} @click=${() => updateAll(true)}>
             Enable All
           </button>
@@ -155,25 +155,21 @@ export function renderAgentTools(params: {
       ${
         params.toolsCatalogError
           ? html`
-              <div class="callout warn" style="margin-top: 12px">
-                Could not load runtime tool catalog. Showing fallback list.
-              </div>
+              <div class="callout warn mt-3">Could not load runtime tool catalog. Showing fallback list.</div>
             `
           : nothing
       }
       ${
         !params.configForm
           ? html`
-              <div class="callout info" style="margin-top: 12px">
-                Load the gateway config to adjust tool profiles.
-              </div>
+              <div class="callout info mt-3">Load the gateway config to adjust tool profiles.</div>
             `
           : nothing
       }
       ${
         hasAgentAllow
           ? html`
-              <div class="callout info" style="margin-top: 12px">
+              <div class="callout info mt-3">
                 This agent is using an explicit allowlist in config. Tool overrides are managed in the Config tab.
               </div>
             `
@@ -182,14 +178,14 @@ export function renderAgentTools(params: {
       ${
         hasGlobalAllow
           ? html`
-              <div class="callout info" style="margin-top: 12px">
+              <div class="callout info mt-3">
                 Global tools.allow is set. Agent overrides cannot enable tools that are globally blocked.
               </div>
             `
           : nothing
       }
 
-      <div class="agent-tools-meta" style="margin-top: 16px;">
+      <div class="agent-tools-meta">
         <div class="agent-kv">
           <div class="label">Profile</div>
           <div class="mono">${profile}</div>
@@ -210,7 +206,7 @@ export function renderAgentTools(params: {
         }
       </div>
 
-      <div class="agent-tools-presets" style="margin-top: 16px;">
+      <div class="agent-tools-presets">
         <div class="label">Quick Presets</div>
         <div class="agent-tools-buttons">
           ${profileOptions.map(
@@ -234,7 +230,7 @@ export function renderAgentTools(params: {
         </div>
       </div>
 
-      <div class="agent-tools-grid" style="margin-top: 20px;">
+      <div class="agent-tools-grid">
         ${sections.map(
           (section) =>
             html`
@@ -244,7 +240,7 @@ export function renderAgentTools(params: {
                   ${
                     "source" in section && section.source === "plugin"
                       ? html`
-                          <span class="mono" style="margin-left: 6px">plugin</span>
+                          <span class="mono agent-tool-badge">plugin</span>
                         `
                       : nothing
                   }
@@ -269,11 +265,11 @@ export function renderAgentTools(params: {
                         <div>
                           <div class="agent-tool-title mono">
                             ${tool.label}
-                            <span class="mono" style="margin-left: 8px; opacity: 0.8;">${source}</span>
+                            <span class="mono agent-tool-badge">${source}</span>
                             ${
                               isOptional
                                 ? html`
-                                    <span class="mono" style="margin-left: 6px; opacity: 0.8">optional</span>
+                                    <span class="mono agent-tool-badge">optional</span>
                                   `
                                 : nothing
                             }
@@ -301,7 +297,7 @@ export function renderAgentTools(params: {
       ${
         params.toolsCatalogLoading
           ? html`
-              <div class="card-sub" style="margin-top: 10px">Refreshing tool catalog…</div>
+              <div class="card-sub mt-3">Refreshing tool catalog…</div>
             `
           : nothing
       }
@@ -349,7 +345,7 @@ export function renderAgentSkills(params: {
 
   return html`
     <section class="card">
-      <div class="row" style="justify-content: space-between;">
+      <div class="row row--between">
         <div>
           <div class="card-title">Skills</div>
           <div class="card-sub">
@@ -361,7 +357,7 @@ export function renderAgentSkills(params: {
             }
           </div>
         </div>
-        <div class="row" style="gap: 8px;">
+        <div class="row row--gap-sm">
           <button class="btn btn--sm" ?disabled=${!editable} @click=${() => params.onClear(params.agentId)}>
             Use All
           </button>
@@ -391,19 +387,17 @@ export function renderAgentSkills(params: {
       ${
         !params.configForm
           ? html`
-              <div class="callout info" style="margin-top: 12px">
-                Load the gateway config to set per-agent skills.
-              </div>
+              <div class="callout info mt-3">Load the gateway config to set per-agent skills.</div>
             `
           : nothing
       }
       ${
         usingAllowlist
           ? html`
-              <div class="callout info" style="margin-top: 12px">This agent uses a custom skill allowlist.</div>
+              <div class="callout info mt-3">This agent uses a custom skill allowlist.</div>
             `
           : html`
-              <div class="callout info" style="margin-top: 12px">
+              <div class="callout info mt-3">
                 All skills are enabled. Disabling any skill will create a per-agent allowlist.
               </div>
             `
@@ -411,20 +405,14 @@ export function renderAgentSkills(params: {
       ${
         !reportReady && !params.loading
           ? html`
-              <div class="callout info" style="margin-top: 12px">
-                Load skills for this agent to view workspace-specific entries.
-              </div>
+              <div class="callout info mt-3">Load skills for this agent to view workspace-specific entries.</div>
             `
           : nothing
       }
-      ${
-        params.error
-          ? html`<div class="callout danger" style="margin-top: 12px;">${params.error}</div>`
-          : nothing
-      }
+      ${params.error ? html`<div class="callout danger mt-3">${params.error}</div>` : nothing}
 
-      <div class="filters" style="margin-top: 14px;">
-        <label class="field" style="flex: 1;">
+      <div class="filters mt-3">
+        <label class="field field--flex">
           <span>Filter</span>
           <input
             .value=${params.filter}
@@ -438,10 +426,10 @@ export function renderAgentSkills(params: {
       ${
         filtered.length === 0
           ? html`
-              <div class="muted" style="margin-top: 16px">No skills found.</div>
+              <div class="muted mt-4">No skills found.</div>
             `
           : html`
-              <div class="agent-skills-groups" style="margin-top: 16px;">
+              <div class="agent-skills-groups">
                 ${groups.map((group) =>
                   renderAgentSkillGroup(group, {
                     agentId: params.agentId,
@@ -511,12 +499,12 @@ function renderAgentSkillRow(
         ${renderSkillStatusChips({ skill })}
         ${
           missing.length > 0
-            ? html`<div class="muted" style="margin-top: 6px;">Missing: ${missing.join(", ")}</div>`
+            ? html`<div class="muted mt-1">Missing: ${missing.join(", ")}</div>`
             : nothing
         }
         ${
           reasons.length > 0
-            ? html`<div class="muted" style="margin-top: 6px;">Reason: ${reasons.join(", ")}</div>`
+            ? html`<div class="muted mt-1">Reason: ${reasons.join(", ")}</div>`
             : nothing
         }
       </div>

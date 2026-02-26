@@ -382,14 +382,14 @@ export function renderCron(props: CronProps) {
     <section class="cron-workspace">
       <div class="cron-workspace-main">
         <section class="card">
-          <div class="row" style="justify-content: space-between; align-items: flex-start; gap: 12px;">
+          <div class="row row--between row--top">
             <div>
               <div class="card-title">Jobs</div>
               <div class="card-sub">All scheduled jobs stored in the gateway.</div>
             </div>
             <div class="muted">${props.jobs.length} shown of ${props.jobsTotal}</div>
           </div>
-          <div class="filters" style="margin-top: 12px;">
+          <div class="filters mt-3">
             <label class="field cron-filter-search">
               <span>Search jobs</span>
               <input
@@ -447,10 +447,10 @@ export function renderCron(props: CronProps) {
           ${
             props.jobs.length === 0
               ? html`
-                  <div class="muted" style="margin-top: 12px">No matching jobs.</div>
+                  <div class="muted mt-3">No matching jobs.</div>
                 `
               : html`
-                  <div class="list" style="margin-top: 12px;">
+                  <div class="list mt-3">
                     ${props.jobs.map((job) => renderJob(job, props))}
                   </div>
                 `
@@ -458,7 +458,7 @@ export function renderCron(props: CronProps) {
           ${
             props.jobsHasMore
               ? html`
-                  <div class="row" style="margin-top: 12px">
+                  <div class="row mt-3">
                     <button
                       class="btn"
                       ?disabled=${props.loading || props.jobsLoadingMore}
@@ -473,7 +473,7 @@ export function renderCron(props: CronProps) {
         </section>
 
         <section class="card">
-          <div class="row" style="justify-content: space-between; align-items: flex-start; gap: 12px;">
+          <div class="row row--between row--top">
             <div>
               <div class="card-title">Run history</div>
               <div class="card-sub">
@@ -568,14 +568,14 @@ export function renderCron(props: CronProps) {
           ${
             props.runsScope === "job" && props.runsJobId == null
               ? html`
-                  <div class="muted" style="margin-top: 12px">Select a job to inspect run history.</div>
+                  <div class="muted mt-3">Select a job to inspect run history.</div>
                 `
               : runs.length === 0
                 ? html`
-                    <div class="muted" style="margin-top: 12px">No matching runs.</div>
+                    <div class="muted mt-3">No matching runs.</div>
                   `
                 : html`
-                    <div class="list" style="margin-top: 12px;">
+                    <div class="list mt-3">
                       ${runs.map((entry) => renderRun(entry, props.basePath))}
                     </div>
                   `
@@ -583,7 +583,7 @@ export function renderCron(props: CronProps) {
           ${
             (props.runsScope === "all" || props.runsJobId != null) && props.runsHasMore
               ? html`
-                  <div class="row" style="margin-top: 12px">
+                  <div class="row mt-3">
                     <button
                       class="btn"
                       ?disabled=${props.runsLoadingMore}
@@ -1117,7 +1117,7 @@ function renderScheduleFields(props: CronProps) {
   const form = props.form;
   if (form.scheduleKind === "at") {
     return html`
-      <label class="field cron-span-2" style="margin-top: 12px;">
+      <label class="field cron-span-2 mt-3">
         ${renderFieldLabel("Run at", true)}
         <input
           id="cron-schedule-at"
@@ -1138,7 +1138,7 @@ function renderScheduleFields(props: CronProps) {
   }
   if (form.scheduleKind === "every") {
     return html`
-      <div class="form-grid cron-form-grid" style="margin-top: 12px;">
+      <div class="form-grid cron-form-grid">
         <label class="field">
           ${renderFieldLabel("Every", true)}
           <input
@@ -1174,7 +1174,7 @@ function renderScheduleFields(props: CronProps) {
     `;
   }
   return html`
-    <div class="form-grid cron-form-grid" style="margin-top: 12px;">
+    <div class="form-grid cron-form-grid">
       <label class="field">
         ${renderFieldLabel("Expression", true)}
         <input
@@ -1409,7 +1409,7 @@ function renderRun(entry: CronRunLogEntry, basePath: string) {
           <span class="muted"> · ${status}</span>
         </div>
         <div class="list-sub cron-run-entry__summary">${entry.summary ?? entry.error ?? "No summary."}</div>
-        <div class="chip-row" style="margin-top: 6px;">
+        <div class="chip-row">
           <span class="chip">${delivery}</span>
           ${entry.model ? html`<span class="chip">${entry.model}</span>` : nothing}
           ${entry.provider ? html`<span class="chip">${entry.provider}</span>` : nothing}

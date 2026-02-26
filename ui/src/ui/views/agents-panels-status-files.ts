@@ -21,7 +21,7 @@ function renderAgentContextCard(context: AgentContext, subtitle: string) {
     <section class="card">
       <div class="card-title">Agent Context</div>
       <div class="card-sub">${subtitle}</div>
-      <div class="agents-overview-grid" style="margin-top: 16px;">
+      <div class="agents-overview-grid">
         <div class="agent-kv">
           <div class="label">Workspace</div>
           <div class="mono">${context.workspace}</div>
@@ -194,7 +194,7 @@ export function renderAgentChannels(params: {
     <section class="grid grid-cols-2">
       ${renderAgentContextCard(params.context, "Workspace, identity, and model configuration.")}
       <section class="card">
-        <div class="row" style="justify-content: space-between;">
+        <div class="row row--between">
           <div>
             <div class="card-title">Channels</div>
             <div class="card-sub">Gateway-wide channel status snapshot.</div>
@@ -203,28 +203,24 @@ export function renderAgentChannels(params: {
             ${params.loading ? "Refreshing…" : "Refresh"}
           </button>
         </div>
-        <div class="muted" style="margin-top: 8px;">
+        <div class="muted mt-2">
           Last refresh: ${lastSuccessLabel}
         </div>
-        ${
-          params.error
-            ? html`<div class="callout danger" style="margin-top: 12px;">${params.error}</div>`
-            : nothing
-        }
+        ${params.error ? html`<div class="callout danger mt-3">${params.error}</div>` : nothing}
         ${
           !params.snapshot
             ? html`
-                <div class="callout info" style="margin-top: 12px">Load channels to see live status.</div>
+                <div class="callout info mt-3">Load channels to see live status.</div>
               `
             : nothing
         }
         ${
           entries.length === 0
             ? html`
-                <div class="muted" style="margin-top: 16px">No channels found.</div>
+                <div class="muted mt-4">No channels found.</div>
               `
             : html`
-                <div class="list" style="margin-top: 16px;">
+                <div class="list mt-4">
                   ${entries.map((entry) => {
                     const summary = summarizeChannelAccounts(entry.accounts);
                     const status = summary.total
@@ -278,7 +274,7 @@ export function renderAgentCron(params: {
     <section class="grid grid-cols-2">
       ${renderAgentContextCard(params.context, "Workspace and scheduling targets.")}
       <section class="card">
-        <div class="row" style="justify-content: space-between;">
+        <div class="row row--between">
           <div>
             <div class="card-title">Scheduler</div>
             <div class="card-sub">Gateway cron status.</div>
@@ -287,7 +283,7 @@ export function renderAgentCron(params: {
             ${params.loading ? "Refreshing…" : "Refresh"}
           </button>
         </div>
-        <div class="stat-grid" style="margin-top: 16px;">
+        <div class="stat-grid mt-4">
           <div class="stat">
             <div class="stat-label">Enabled</div>
             <div class="stat-value">
@@ -303,11 +299,7 @@ export function renderAgentCron(params: {
             <div class="stat-value">${formatNextRun(params.status?.nextWakeAtMs ?? null)}</div>
           </div>
         </div>
-        ${
-          params.error
-            ? html`<div class="callout danger" style="margin-top: 12px;">${params.error}</div>`
-            : nothing
-        }
+        ${params.error ? html`<div class="callout danger mt-3">${params.error}</div>` : nothing}
       </section>
     </section>
     <section class="card">
@@ -316,10 +308,10 @@ export function renderAgentCron(params: {
       ${
         jobs.length === 0
           ? html`
-              <div class="muted" style="margin-top: 16px">No jobs assigned.</div>
+              <div class="muted mt-4">No jobs assigned.</div>
             `
           : html`
-              <div class="list" style="margin-top: 16px;">
+              <div class="list mt-4">
                 ${jobs.map(
                   (job) => html`
                     <div class="list-item">
@@ -330,7 +322,7 @@ export function renderAgentCron(params: {
                             ? html`<div class="list-sub">${job.description}</div>`
                             : nothing
                         }
-                        <div class="chip-row" style="margin-top: 6px;">
+                        <div class="chip-row">
                           <span class="chip">${formatCronSchedule(job)}</span>
                           <span class="chip ${job.enabled ? "chip-ok" : "chip-warn"}">
                             ${job.enabled ? "enabled" : "disabled"}
@@ -377,7 +369,7 @@ export function renderAgentFiles(params: {
 
   return html`
     <section class="card">
-      <div class="row" style="justify-content: space-between;">
+      <div class="row row--between">
         <div>
           <div class="card-title">Core Files</div>
           <div class="card-sub">Bootstrap persona, identity, and tool guidance.</div>
@@ -390,25 +382,19 @@ export function renderAgentFiles(params: {
           ${params.agentFilesLoading ? "Loading…" : "Refresh"}
         </button>
       </div>
-      ${
-        list
-          ? html`<div class="muted mono" style="margin-top: 8px;">Workspace: ${list.workspace}</div>`
-          : nothing
-      }
+      ${list ? html`<div class="muted mono mt-2">Workspace: ${list.workspace}</div>` : nothing}
       ${
         params.agentFilesError
-          ? html`<div class="callout danger" style="margin-top: 12px;">${params.agentFilesError}</div>`
+          ? html`<div class="callout danger mt-3">${params.agentFilesError}</div>`
           : nothing
       }
       ${
         !list
           ? html`
-              <div class="callout info" style="margin-top: 12px">
-                Load the agent workspace files to edit core instructions.
-              </div>
+              <div class="callout info mt-3">Load the agent workspace files to edit core instructions.</div>
             `
           : html`
-              <div class="agent-files-grid" style="margin-top: 16px;">
+              <div class="agent-files-grid">
                 <div class="agent-files-list">
                   ${
                     files.length === 0
@@ -452,13 +438,13 @@ export function renderAgentFiles(params: {
                           ${
                             activeEntry.missing
                               ? html`
-                                  <div class="callout info" style="margin-top: 10px">
+                                  <div class="callout info mt-3">
                                     This file is missing. Saving will create it in the agent workspace.
                                   </div>
                                 `
                               : nothing
                           }
-                          <label class="field" style="margin-top: 12px;">
+                          <label class="field mt-3">
                             <span>Content</span>
                             <textarea
                               .value=${draft}
