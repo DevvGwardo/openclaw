@@ -627,11 +627,7 @@
   padding: 16px 22px;
   border-bottom: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   /* Subtle gradient for depth */
-  background: linear-gradient(
-    to bottom,
-    var(--color-surface, #161616) 60%,
-    transparent
-  );
+  background: linear-gradient(to bottom, var(--color-surface, #161616) 60%, transparent);
 }
 
 .config-section-hero__icon {
@@ -799,11 +795,7 @@
   border: none;
   border-left: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   background: var(--color-surface-raised, #1c1c1e);
-  background-image: linear-gradient(
-    to right,
-    var(--color-surface, #161616) 40px,
-    transparent 40px
-  );
+  background-image: linear-gradient(to right, var(--color-surface, #161616) 40px, transparent 40px);
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.6;

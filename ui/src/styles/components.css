@@ -1069,15 +1069,32 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
 }
 
 .cron-run-filters {
-  margin-top: 12px;
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.cron-run-filters__row {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: flex-end;
+  padding: 14px;
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  border-radius: var(--radius-md);
+  background: var(--color-surface, #161616);
+}
+
+.cron-run-filters__row--secondary {
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  gap: 8px;
 }
 
 .cron-run-filter-search {
   min-width: 0;
+  flex: 1;
 }
 
 .cron-filter-dropdown {
@@ -1227,7 +1244,7 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
     flex: 1 1 100%;
   }
 
-  .cron-run-filters {
+  .cron-run-filters__row {
     flex-direction: column;
     align-items: stretch;
   }
