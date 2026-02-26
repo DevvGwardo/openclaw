@@ -110,7 +110,7 @@ export function renderAgents(props: AgentsProps) {
   return html`
     <div class="agents-layout">
       <section class="card agents-sidebar">
-        <div class="row" style="justify-content: space-between;">
+        <div class="row row--between">
           <div>
             <div class="card-title">Agents</div>
             <div class="card-sub">${agents.length} configured.</div>
@@ -119,12 +119,8 @@ export function renderAgents(props: AgentsProps) {
             ${props.loading ? "Loading…" : "Refresh"}
           </button>
         </div>
-        ${
-          props.error
-            ? html`<div class="callout danger" style="margin-top: 12px;">${props.error}</div>`
-            : nothing
-        }
-        <div class="agent-list" style="margin-top: 12px;">
+        ${props.error ? html`<div class="callout danger mt-3">${props.error}</div>` : nothing}
+        <div class="agent-list">
           ${
             agents.length === 0
               ? html`
@@ -416,7 +412,7 @@ function renderAgentOverview(params: {
     <section class="card">
       <div class="card-title">Overview</div>
       <div class="card-sub">Workspace paths and identity metadata.</div>
-      <div class="agents-overview-grid" style="margin-top: 16px;">
+      <div class="agents-overview-grid">
         <div class="agent-kv">
           <div class="label">Workspace</div>
           <div class="mono">${workspace}</div>
@@ -444,10 +440,10 @@ function renderAgentOverview(params: {
         </div>
       </div>
 
-      <div class="agent-model-select" style="margin-top: 20px;">
+      <div class="agent-model-select">
         <div class="label">Model Selection</div>
-        <div class="row" style="gap: 12px; flex-wrap: wrap;">
-          <label class="field" style="min-width: 260px; flex: 1;">
+        <div class="row row--wrap">
+          <label class="field field--flex">
             <span>Primary model${isDefault ? " (default)" : ""}</span>
             <select
               .value=${effectivePrimary ?? ""}
@@ -467,7 +463,7 @@ function renderAgentOverview(params: {
               ${buildModelOptions(configForm, effectivePrimary ?? undefined)}
             </select>
           </label>
-          <label class="field" style="min-width: 260px; flex: 1;">
+          <label class="field field--flex">
             <span>Fallbacks (comma-separated)</span>
             <input
               .value=${fallbackText}
@@ -481,7 +477,7 @@ function renderAgentOverview(params: {
             />
           </label>
         </div>
-        <div class="row" style="justify-content: flex-end; gap: 8px;">
+        <div class="row row--end row--gap-sm">
           <button class="btn btn--sm" ?disabled=${configLoading} @click=${onConfigReload}>
             Reload Config
           </button>

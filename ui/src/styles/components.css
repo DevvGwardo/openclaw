@@ -612,6 +612,7 @@
 .cron-form-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px 16px;
+  margin-top: 12px;
 }
 
 .cron-help {
@@ -1330,6 +1331,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin-top: 6px;
 }
 
 .chip {
@@ -2182,6 +2184,7 @@
 .agent-list {
   display: grid;
   gap: 8px;
+  margin-top: 12px;
 }
 
 .agent-row {
@@ -2304,6 +2307,7 @@
   display: grid;
   gap: 14px;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin-top: 16px;
 }
 
 .agent-kv {
@@ -2325,6 +2329,7 @@
 .agent-model-select {
   display: grid;
   gap: 12px;
+  margin-top: 20px;
 }
 
 .agent-model-meta {
@@ -2337,6 +2342,7 @@
   display: grid;
   grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
   gap: 16px;
+  margin-top: 16px;
 }
 
 .agent-files-list {
@@ -2412,6 +2418,11 @@
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-top: 16px;
+}
+
+.agent-tools-presets {
+  margin-top: 16px;
 }
 
 .agent-tools-buttons {
@@ -2424,6 +2435,7 @@
 .agent-tools-grid {
   display: grid;
   gap: 16px;
+  margin-top: 20px;
 }
 
 .agent-tools-section {
@@ -2469,6 +2481,7 @@
 .agent-skills-groups {
   display: grid;
   gap: 16px;
+  margin-top: 16px;
 }
 
 .agent-skills-group {
@@ -2558,4 +2571,56 @@
   .agent-tools-list {
     grid-template-columns: 1fr;
   }
+}
+
+/* ===========================================
+   Row Layout Modifiers
+   =========================================== */
+
+.row--between { justify-content: space-between; }
+.row--end { justify-content: flex-end; }
+.row--top { align-items: flex-start; }
+.row--wrap { flex-wrap: wrap; }
+.row--gap-sm { gap: 8px; }
+
+/* ===========================================
+   Spacing Utilities
+   =========================================== */
+
+.mt-1 { margin-top: 6px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+.mt-5 { margin-top: 20px; }
+
+/* ===========================================
+   Field Utilities
+   =========================================== */
+
+/* Flex-grow field (e.g. model selects in a row) */
+.field--flex {
+  flex: 1;
+  min-width: 260px;
+}
+
+/* ===========================================
+   Skill Message Status
+   =========================================== */
+
+.skill-message {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.skill-message--error { color: var(--danger); }
+.skill-message--ok { color: var(--ok); }
+
+/* ===========================================
+   Agent Tool Inline Badges
+   =========================================== */
+
+/* Source / optional badges inside tool title */
+.agent-tool-badge {
+  margin-left: 6px;
+  opacity: 0.8;
 }
