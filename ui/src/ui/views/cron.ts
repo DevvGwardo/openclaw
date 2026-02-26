@@ -1125,52 +1125,52 @@ export function renderCronModal(props: CronProps) {
             </div>
           </details>
         </div>
-        ${
-          blockedByValidation
-            ? html`
-                <div class="cron-form-status" role="status" aria-live="polite">
-                  <div class="cron-form-status__title">Can't add job yet</div>
-                  <div class="cron-help">Fill the required fields below to enable submit.</div>
-                  <ul class="cron-form-status__list">
-                    ${blockingFields.map(
-                      (field) => html`
-                        <li>
-                          <button
-                            type="button"
-                            class="cron-form-status__link"
-                            @click=${() => focusFormField(field.inputId)}
-                          >
-                            ${field.label}: ${field.message}
-                          </button>
-                        </li>
-                      `,
-                    )}
-                  </ul>
-                </div>
-              `
-            : nothing
-        }
-        <div class="row cron-form-actions">
-          <button class="btn primary" ?disabled=${props.busy || !props.canSubmit} @click=${props.onAdd}>
-            ${props.busy ? "Saving..." : isEditing ? "Save changes" : "Add job"}
-          </button>
-          ${
-            submitDisabledReason
-              ? html`<div class="cron-submit-reason" aria-live="polite">${submitDisabledReason}</div>`
-              : nothing
-          }
-          ${
-            isEditing
-              ? html`
-                  <button class="btn btn--sm" ?disabled=${props.busy} @click=${props.onCancelEdit}>
-                    Cancel
-                  </button>
-                `
-              : nothing
-          }
+                    </div>
+                    ${
+                      blockedByValidation
+                        ? html`
+                            <div class="cron-form-status" role="status" aria-live="polite">
+                              <div class="cron-form-status__title">Can't add job yet</div>
+                              <div class="cron-help">Fill the required fields below to enable submit.</div>
+                              <ul class="cron-form-status__list">
+                                ${blockingFields.map(
+                                  (field) => html`
+                                    <li>
+                                      <button
+                                        type="button"
+                                        class="cron-form-status__link"
+                                        @click=${() => focusFormField(field.inputId)}
+                                      >
+                                        ${field.label}: ${field.message}
+                                      </button>
+                                    </li>
+                                  `,
+                                )}
+                              </ul>
+                            </div>
+                          `
+                        : nothing
+                    }
+                  <div class="cron-modal-footer">
+                    ${
+                      submitDisabledReason
+                        ? html`<div class="cron-submit-reason" aria-live="polite">${submitDisabledReason}</div>`
+                        : nothing
+                    }
+                    <button class="btn btn--sm" ?disabled=${props.busy} @click=${props.onCancelEdit}>
+                      Cancel
+                    </button>
+                    <button class="btn primary" ?disabled=${props.busy || !props.canSubmit} @click=${props.onAdd}>
+                      ${props.busy ? "Saving..." : isEditing ? "Save changes" : "Add job"}
+                    </button>
+                  </div>
+          ${renderSuggestionList("cron-agent-suggestions", props.agentSuggestions)}
+          ${renderSuggestionList("cron-model-suggestions", props.modelSuggestions)}
+          ${renderSuggestionList("cron-thinking-suggestions", props.thinkingSuggestions)}
+          ${renderSuggestionList("cron-tz-suggestions", props.timezoneSuggestions)}
+          ${renderSuggestionList("cron-delivery-to-suggestions", props.deliveryToSuggestions)}
         </div>
       </div>
-    </div>
   `,
     portal,
   );
