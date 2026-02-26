@@ -272,7 +272,7 @@ function renderBindings(state: BindingState) {
   const defaultValue = state.defaultBinding ?? "";
   return html`
     <section class="card">
-      <div class="row" style="justify-content: space-between; align-items: center;">
+      <div class="row" style="justify-content: space-between;">
         <div>
           <div class="card-title">Exec node binding</div>
           <div class="card-sub">
@@ -300,7 +300,7 @@ function renderBindings(state: BindingState) {
 
       ${
         !state.ready
-          ? html`<div class="row" style="margin-top: 12px; gap: 12px;">
+          ? html`<div class="row" style="margin-top: 12px;">
             <div class="muted">Load config to edit bindings.</div>
             <button class="btn" ?disabled=${state.configLoading} @click=${state.onLoadConfig}>
               ${state.configLoading ? "Loading…" : "Load config"}
