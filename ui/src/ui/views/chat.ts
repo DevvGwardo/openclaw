@@ -336,6 +336,19 @@ export function renderChat(props: ChatProps) {
           : nothing
       }
 
+      <div class="chat-header">
+        <div class="chat-header__left"></div>
+        <div class="chat-header__right">
+          <button
+            class="btn"
+            ?disabled=${!props.connected || (!canAbort && props.sending)}
+            @click=${canAbort ? props.onAbort : props.onNewSession}
+          >
+            ${canAbort ? "Stop" : "New session"}
+          </button>
+        </div>
+      </div>
+
       <div
         class="chat-split-container ${sidebarOpen ? "chat-split-container--open" : ""}"
       >
@@ -458,13 +471,6 @@ export function renderChat(props: ChatProps) {
             ></textarea>
           </label>
           <div class="chat-compose__actions">
-            <button
-              class="btn"
-              ?disabled=${!props.connected || (!canAbort && props.sending)}
-              @click=${canAbort ? props.onAbort : props.onNewSession}
-            >
-              ${canAbort ? "Stop" : "New session"}
-            </button>
             <button
               class="btn primary"
               ?disabled=${!props.connected}
