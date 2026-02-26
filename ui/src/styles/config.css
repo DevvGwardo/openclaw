@@ -253,9 +253,9 @@
 }
 
 .config-search__tag-option.active {
-  background: var(--accent-subtle);
-  color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+  background: var(--bg-hover);
+  color: var(--text);
+  border-color: var(--border);
 }
 
 /* Navigation */
@@ -294,8 +294,8 @@
 }
 
 .config-nav__item.active {
-  background: var(--accent-subtle);
-  color: var(--accent);
+  background: var(--bg-hover);
+  color: var(--text);
 }
 
 .config-nav__icon {
@@ -361,8 +361,8 @@
 }
 
 .config-mode-toggle__btn.active {
-  background: var(--accent);
-  color: white;
+  background: var(--bg-hover);
+  color: var(--text);
   box-shadow: var(--shadow-sm);
 }
 
@@ -385,13 +385,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 14px 22px;
-  background: var(--bg-accent);
+  padding: 12px 22px;
+  background: var(--panel);
   border-bottom: 1px solid var(--border);
 }
 
 :root[data-theme="light"] .config-actions {
-  background: var(--bg-hover);
+  background: var(--panel);
 }
 
 .config-actions__left,
@@ -404,9 +404,9 @@
 .config-changes-badge {
   padding: 6px 14px;
   border-radius: var(--radius-full);
-  background: var(--accent-subtle);
-  border: 1px solid rgba(255, 77, 77, 0.3);
-  color: var(--accent);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text);
   font-size: 12px;
   font-weight: 600;
 }
@@ -419,9 +419,9 @@
 /* Diff Panel */
 .config-diff {
   margin: 18px 22px 0;
-  border: 1px solid rgba(255, 77, 77, 0.25);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--accent-subtle);
+  background: var(--bg-elevated);
   overflow: hidden;
 }
 
@@ -433,7 +433,7 @@
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--text);
   list-style: none;
 }
 
@@ -594,9 +594,9 @@
 }
 
 .config-subnav__item.active {
-  color: var(--accent);
-  border-color: rgba(255, 77, 77, 0.4);
-  background: var(--accent-subtle);
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--bg-hover);
 }
 
 /* Content Area */
@@ -1018,8 +1018,8 @@
 }
 
 .cfg-segmented__btn.active {
-  background: var(--accent);
-  color: white;
+  background: var(--bg-hover);
+  color: var(--text);
   box-shadow: var(--shadow-sm);
 }
 
