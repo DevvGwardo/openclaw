@@ -12,7 +12,7 @@
 :root {
   --tauri-titlebar-height: 40px;
   --tauri-sidebar-width: 220px;
-  --tauri-sidebar-collapsed-width: 52px;
+  --tauri-sidebar-collapsed-width: 60px;
 
   /* Spacing */
   --space-1: 4px;

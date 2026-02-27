@@ -205,21 +205,8 @@ export class TauriSidebar extends LitElement {
           )}
         </nav>
 
-        <!-- Footer: connection status pill + theme toggle with label + version badge -->
+        <!-- Footer: theme toggle + version badge -->
         <div class="tauri-sidebar__footer">
-          <div class="tauri-sidebar__footer-row">
-            <span
-              class="tauri-sidebar__status-pill tauri-sidebar__status-pill--${this.connected ? "connected" : "disconnected"}"
-            >
-              <span
-                class="tauri-sidebar__status-dot ${this.connected ? "tauri-sidebar__status-dot--connected" : ""}"
-                title=${this.connected ? "Connected to gateway" : "Disconnected"}
-              ></span>
-              <span class="tauri-sidebar__status-text">
-                ${this.connected ? "Connected" : "Disconnected"}
-              </span>
-            </span>
-          </div>
           <div class="tauri-sidebar__footer-row">
             <button
               class="tauri-sidebar__theme-btn"
