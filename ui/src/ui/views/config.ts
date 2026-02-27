@@ -20,6 +20,7 @@ export type ConfigProps = {
   formMode: "form" | "raw";
   formValue: Record<string, unknown> | null;
   originalValue: Record<string, unknown> | null;
+  privacyMode: boolean;
   searchQuery: string;
   activeSection: string | null;
   activeSubsection: string | null;
@@ -416,6 +417,30 @@ function truncateValue(value: unknown, maxLen = 40): string {
   return str.slice(0, maxLen - 3) + "...";
 }
 
+function parsePath(path: string): Array<string | number> {
+  if (!path) {
+    return [];
+  }
+  return path.split(".").map((segment) => (/^\d+$/.test(segment) ? Number(segment) : segment));
+}
+
+function maybeMaskSensitiveValue(params: {
+  value: unknown;
+  path: string;
+  uiHints: ConfigUiHints;
+  privacyMode: boolean;
+}): unknown {
+  const { value, path, uiHints, privacyMode } = params;
+  if (!privacyMode) {
+    return value;
+  }
+  const hint = hintForPath(parsePath(path), uiHints);
+  if (hint?.sensitive) {
+    return "••••••••";
+  }
+  return value;
+}
+
 export function renderConfig(props: ConfigProps) {
   const validity = props.valid == null ? "unknown" : props.valid ? "valid" : "invalid";
   const analysis = analyzeConfigSchema(props.schema);
@@ -784,13 +809,31 @@ export function renderConfig(props: ConfigProps) {
                             <div class="config-diff__values">
                               ${
                                 change.type !== "added"
-                                  ? html`<span class="config-diff__from">${truncateValue(change.from)}</span>
+                                  ? html`<span class="config-diff__from"
+                                      >${truncateValue(
+                                        maybeMaskSensitiveValue({
+                                          value: change.from,
+                                          path: change.path,
+                                          uiHints: props.uiHints,
+                                          privacyMode: props.privacyMode,
+                                        }),
+                                      )}</span
+                                    >
                                       <span class="config-diff__arrow">→</span>`
                                   : nothing
                               }
                               ${
                                 change.type !== "removed"
-                                  ? html`<span class="config-diff__to">${truncateValue(change.to)}</span>`
+                                  ? html`<span class="config-diff__to"
+                                      >${truncateValue(
+                                        maybeMaskSensitiveValue({
+                                          value: change.to,
+                                          path: change.path,
+                                          uiHints: props.uiHints,
+                                          privacyMode: props.privacyMode,
+                                        }),
+                                      )}</span
+                                    >`
                                   : nothing
                               }
                             </div>
@@ -871,6 +914,7 @@ export function renderConfig(props: ConfigProps) {
                             disabled: props.loading || !props.formValue,
                             unsupportedPaths: analysis.unsupportedPaths,
                             onPatch: props.onFormPatch,
+                            forceSensitiveMask: props.privacyMode,
                             searchQuery: props.searchQuery,
                             activeSection: props.activeSection,
                             activeSubsection: effectiveSubsection,
@@ -902,7 +946,7 @@ export function renderConfig(props: ConfigProps) {
                       </button>
                     </div>
                     <textarea
-                      class="config-raw-editor__textarea"
+                      class="config-raw-editor__textarea ${props.privacyMode ? "config-raw-editor__textarea--masked" : ""}"
                       .value=${props.raw}
                       @input=${(e: Event) =>
                         props.onRawChange((e.target as HTMLTextAreaElement).value)}

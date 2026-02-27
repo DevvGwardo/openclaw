@@ -257,7 +257,7 @@ export const usageStylesPart1 = `
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background: var(--bg);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 6%, var(--card)) 0%, var(--card) 60%);
   }
   .usage-header.pinned {
     position: sticky;

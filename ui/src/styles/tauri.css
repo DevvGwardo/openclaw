@@ -153,6 +153,35 @@ tauri-shell {
   background: var(--color-success, #3fb950);
 }
 
+.tauri-shell__footer-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  color: var(--color-text-faint, #555);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.tauri-shell__footer-btn:hover {
+  color: var(--color-text-secondary, #999);
+  background: rgba(255 255 255 / 0.05);
+}
+
+.tauri-shell__footer-btn--active {
+  color: var(--color-accent, #58a6ff);
+  background: rgba(88 166 255 / 0.1);
+  border-color: rgba(88 166 255 / 0.2);
+}
+
+.tauri-shell__footer-btn--active:hover {
+  color: var(--color-accent, #58a6ff);
+  background: rgba(88 166 255 / 0.15);
+}
+
 /* ── Thin native-feeling scrollbars (scoped to scrollable containers) ── */
 html,
 .tauri-shell__content,

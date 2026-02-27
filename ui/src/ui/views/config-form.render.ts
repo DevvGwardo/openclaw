@@ -13,6 +13,7 @@ export type ConfigFormProps = {
   searchQuery?: string;
   activeSection?: string | null;
   activeSubsection?: string | null;
+  forceSensitiveMask?: boolean;
   onPatch: (path: Array<string | number>, value: unknown) => void;
 };
 
