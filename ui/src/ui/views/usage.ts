@@ -1,5 +1,6 @@
 import { html, nothing } from "lit";
 import { extractQueryTerms, filterSessionsByQuery } from "../usage-helpers.ts";
+import { surfaceHero, surfaceMain, surfacePage } from "./surface-page.ts";
 import {
   buildAggregatesFromSessions,
   buildPeakErrorHours,
@@ -42,57 +43,65 @@ import {
 
 export type { UsageColumnId, SessionLogEntry, SessionLogRole };
 
+const usageHero = surfaceHero({
+  title: "Usage",
+  subtitle: "Track token usage and costs across sessions.",
+});
+
 export function renderUsage(props: UsageProps) {
   // Show loading skeleton if loading and no data yet
   if (props.loading && !props.totals) {
     // Use inline styles since main stylesheet hasn't loaded yet on initial render
-    return html`
-      <style>
-        @keyframes initial-spin {
-          to { transform: rotate(360deg); }
-        }
-        @keyframes initial-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
-        }
-      </style>
-      <section class="card">
-        <div class="row" style="justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
-          <div style="flex: 1; min-width: 250px;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2px;">
-              <div class="card-title" style="margin: 0;">Token Usage</div>
-              <span style="
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                padding: 4px 10px;
-                background: var(--bg-elevated);
-                border-radius: 4px;
-                font-size: 12px;
-                color: var(--muted);
-              ">
+    return surfacePage("usage", {
+      hero: usageHero,
+      main: surfaceMain(html`
+        <style>
+          @keyframes initial-spin {
+            to { transform: rotate(360deg); }
+          }
+          @keyframes initial-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+          }
+        </style>
+        <section class="card">
+          <div class="row" style="justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+            <div style="flex: 1; min-width: 250px;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2px;">
+                <div class="card-title" style="margin: 0;">Token Usage</div>
                 <span style="
-                  width: 10px;
-                  height: 10px;
-                  border: 2px solid var(--border-strong);
-                  border-top-color: transparent;
-                  border-radius: 50%;
-                  animation: initial-spin 0.6s linear infinite;
-                "></span>
-                Loading
-              </span>
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 6px;
+                  padding: 4px 10px;
+                  background: var(--bg-elevated);
+                  border-radius: 4px;
+                  font-size: 12px;
+                  color: var(--muted);
+                ">
+                  <span style="
+                    width: 10px;
+                    height: 10px;
+                    border: 2px solid var(--border-strong);
+                    border-top-color: transparent;
+                    border-radius: 50%;
+                    animation: initial-spin 0.6s linear infinite;
+                  "></span>
+                  Loading
+                </span>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="date" .value=${props.startDate} disabled style="padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 13px; opacity: 0.6;" />
+                <span style="color: var(--muted);">to</span>
+                <input type="date" .value=${props.endDate} disabled style="padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 13px; opacity: 0.6;" />
+              </div>
             </div>
           </div>
-          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <input type="date" .value=${props.startDate} disabled style="padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 13px; opacity: 0.6;" />
-              <span style="color: var(--muted);">to</span>
-              <input type="date" .value=${props.endDate} disabled style="padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 13px; opacity: 0.6;" />
-            </div>
-          </div>
-        </div>
-      </section>
-    `;
+        </section>
+      `),
+    });
   }
 
   const isTokenMode = props.chartMode === "tokens";
@@ -444,7 +453,9 @@ export function renderUsage(props: UsageProps) {
   };
   const exportStamp = formatIsoDate(new Date());
 
-  return html`
+  return surfacePage("usage", {
+    hero: usageHero,
+    main: surfaceMain(html`
     <style>${usageStylesString}</style>
 
     <section class="card usage-header ${props.headerPinned ? "pinned" : ""}">
@@ -833,7 +844,8 @@ export function renderUsage(props: UsageProps) {
           )
         : renderEmptyDetailState()
     }
-  `;
+  `),
+  });
 }
 
 // Exposed for Playwright/Vitest browser unit tests.
