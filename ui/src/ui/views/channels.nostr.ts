@@ -7,6 +7,7 @@ import {
   type NostrProfileFormState,
   type NostrProfileFormCallbacks,
 } from "./channels.nostr-profile-form.ts";
+import { deriveChannelStatus } from "./channels.shared.ts";
 import type { ChannelsProps } from "./channels.types.ts";
 
 /**
@@ -52,6 +53,11 @@ export function renderNostrCard(params: {
   const summaryLastError = nostr?.lastError ?? primaryAccount?.lastError ?? null;
   const hasMultipleAccounts = nostrAccounts.length > 1;
   const showingForm = profileFormState !== null && profileFormState !== undefined;
+  const channelStatus = deriveChannelStatus({
+    configured: summaryConfigured,
+    running: summaryRunning,
+    lastError: summaryLastError,
+  });
 
   const renderAccountCard = (account: ChannelAccountSnapshot) => {
     const publicKey = (account as { publicKey?: string }).publicKey;
@@ -67,19 +73,25 @@ export function renderNostrCard(params: {
         <div class="status-list account-card-status">
           <div>
             <span class="label">Running</span>
-            <span>${account.running ? "Yes" : "No"}</span>
+            <span class="${account.running ? "status-value--yes" : "status-value--no"}">
+              ${account.running ? "Yes" : "No"}
+            </span>
           </div>
           <div>
             <span class="label">Configured</span>
-            <span>${account.configured ? "Yes" : "No"}</span>
+            <span class="${account.configured ? "status-value--yes" : "status-value--no"}">
+              ${account.configured ? "Yes" : "No"}
+            </span>
           </div>
           <div>
             <span class="label">Public Key</span>
-            <span class="mono" title="${publicKey ?? ""}">${truncatePubkey(publicKey)}</span>
+            <span class="mono status-value--no" title="${publicKey ?? ""}">${truncatePubkey(publicKey)}</span>
           </div>
           <div>
             <span class="label">Last inbound</span>
-            <span>${account.lastInboundAt ? formatRelativeTimestamp(account.lastInboundAt) : "n/a"}</span>
+            <span class="status-value--no">
+              ${account.lastInboundAt ? formatRelativeTimestamp(account.lastInboundAt) : "n/a"}
+            </span>
           </div>
           ${
             account.lastError
@@ -183,7 +195,15 @@ export function renderNostrCard(params: {
 
   return html`
     <div class="card">
-      <div class="card-title">Nostr</div>
+      <div class="channel-card__header">
+        <div class="channel-card__title-row">
+          <span class="channel-card__dot channel-card__dot--${channelStatus.dot}"></span>
+          <div class="card-title">Nostr</div>
+        </div>
+        <span class="channel-card__badge channel-card__badge--${channelStatus.badgeVariant}">
+          ${channelStatus.badge}
+        </span>
+      </div>
       <div class="card-sub">Decentralized DMs via Nostr relays (NIP-04).</div>
       ${accountCountLabel}
 
@@ -198,21 +218,27 @@ export function renderNostrCard(params: {
             <div class="status-list" style="margin-top: 16px;">
               <div>
                 <span class="label">Configured</span>
-                <span>${summaryConfigured ? "Yes" : "No"}</span>
+                <span class="${summaryConfigured ? "status-value--yes" : "status-value--no"}">
+                  ${summaryConfigured ? "Yes" : "No"}
+                </span>
               </div>
               <div>
                 <span class="label">Running</span>
-                <span>${summaryRunning ? "Yes" : "No"}</span>
+                <span class="${summaryRunning ? "status-value--yes" : "status-value--no"}">
+                  ${summaryRunning ? "Yes" : "No"}
+                </span>
               </div>
               <div>
                 <span class="label">Public Key</span>
-                <span class="mono" title="${summaryPublicKey ?? ""}"
-                  >${truncatePubkey(summaryPublicKey)}</span
-                >
+                <span class="mono status-value--no" title="${summaryPublicKey ?? ""}">
+                  ${truncatePubkey(summaryPublicKey)}
+                </span>
               </div>
               <div>
                 <span class="label">Last start</span>
-                <span>${summaryLastStartAt ? formatRelativeTimestamp(summaryLastStartAt) : "n/a"}</span>
+                <span class="status-value--no">
+                  ${summaryLastStartAt ? formatRelativeTimestamp(summaryLastStartAt) : "n/a"}
+                </span>
               </div>
             </div>
           `
@@ -226,7 +252,11 @@ export function renderNostrCard(params: {
 
       ${renderProfileSection()}
 
-      ${renderChannelConfigSection({ channelId: "nostr", props })}
+      ${renderChannelConfigSection({
+        channelId: "nostr",
+        props,
+        isConfigured: summaryConfigured,
+      })}
 
       <div class="row" style="margin-top: 12px;">
         <button class="btn btn--sm" @click=${() => props.onRefresh(false)}>Refresh</button>

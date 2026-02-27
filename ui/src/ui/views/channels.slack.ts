@@ -2,6 +2,7 @@ import { html, nothing } from "lit";
 import { formatRelativeTimestamp } from "../format.ts";
 import type { SlackStatus } from "../types.ts";
 import { renderChannelConfigSection } from "./channels.config.ts";
+import { deriveChannelStatus } from "./channels.shared.ts";
 import type { ChannelsProps } from "./channels.types.ts";
 
 export function renderSlackCard(params: {
@@ -10,29 +11,50 @@ export function renderSlackCard(params: {
   accountCountLabel: unknown;
 }) {
   const { props, slack, accountCountLabel } = params;
+  const channelStatus = deriveChannelStatus({
+    configured: slack?.configured ?? undefined,
+    running: slack?.running ?? undefined,
+    lastError: slack?.lastError,
+  });
 
   return html`
     <div class="card">
-      <div class="card-title">Slack</div>
+      <div class="channel-card__header">
+        <div class="channel-card__title-row">
+          <span class="channel-card__dot channel-card__dot--${channelStatus.dot}"></span>
+          <div class="card-title">Slack</div>
+        </div>
+        <span class="channel-card__badge channel-card__badge--${channelStatus.badgeVariant}">
+          ${channelStatus.badge}
+        </span>
+      </div>
       <div class="card-sub">Socket mode status and channel configuration.</div>
       ${accountCountLabel}
 
       <div class="status-list" style="margin-top: 16px;">
         <div>
           <span class="label">Configured</span>
-          <span>${slack?.configured ? "Yes" : "No"}</span>
+          <span class="${slack?.configured ? "status-value--yes" : "status-value--no"}">
+            ${slack?.configured ? "Yes" : "No"}
+          </span>
         </div>
         <div>
           <span class="label">Running</span>
-          <span>${slack?.running ? "Yes" : "No"}</span>
+          <span class="${slack?.running ? "status-value--yes" : "status-value--no"}">
+            ${slack?.running ? "Yes" : "No"}
+          </span>
         </div>
         <div>
           <span class="label">Last start</span>
-          <span>${slack?.lastStartAt ? formatRelativeTimestamp(slack.lastStartAt) : "n/a"}</span>
+          <span class="status-value--no">
+            ${slack?.lastStartAt ? formatRelativeTimestamp(slack.lastStartAt) : "n/a"}
+          </span>
         </div>
         <div>
           <span class="label">Last probe</span>
-          <span>${slack?.lastProbeAt ? formatRelativeTimestamp(slack.lastProbeAt) : "n/a"}</span>
+          <span class="status-value--no">
+            ${slack?.lastProbeAt ? formatRelativeTimestamp(slack.lastProbeAt) : "n/a"}
+          </span>
         </div>
       </div>
 
@@ -53,7 +75,11 @@ export function renderSlackCard(params: {
           : nothing
       }
 
-      ${renderChannelConfigSection({ channelId: "slack", props })}
+      ${renderChannelConfigSection({
+        channelId: "slack",
+        props,
+        isConfigured: slack?.configured ?? false,
+      })}
 
       <div class="row" style="margin-top: 12px;">
         <button class="btn btn--sm" @click=${() => props.onRefresh(true)}>
