@@ -65,7 +65,7 @@ export function renderTelegramCard(params: {
   };
 
   return html`
-    <div class="card">
+    <div class="card card--static">
       <div class="channel-card__header">
         <div class="channel-card__title-row">
           <span class="channel-card__dot channel-card__dot--${channelStatus.dot}"></span>
