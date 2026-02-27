@@ -100,7 +100,9 @@ export function surfaceHeroStat(stat: SurfaceHeroStat): TemplateResult {
  * Renders a vertical divider between hero stats.
  */
 export function surfaceHeroDivider(): TemplateResult {
-  return html`<div class="surface-hero__divider"></div>`;
+  return html`
+    <div class="surface-hero__divider"></div>
+  `;
 }
 
 /**
@@ -132,7 +134,9 @@ export function surfaceKpiCard(card: SurfaceKpiCard): TemplateResult {
  * Renders a single action pill.
  */
 export function surfaceActionPill(pill: SurfaceActionPill): TemplateResult {
-  const icon = pill.icon ? html`<span class="surface-action-pill__icon">${pill.icon}</span>` : nothing;
+  const icon = pill.icon
+    ? html`<span class="surface-action-pill__icon">${pill.icon}</span>`
+    : nothing;
 
   if (pill.href) {
     return html`
@@ -169,22 +173,20 @@ export function surfaceHero(opts: SurfaceHeroOptions): TemplateResult {
         </div>
       `
     : opts.title || opts.subtitle
-    ? html`
+      ? html`
         <div class="surface-hero__title-block">
           ${opts.title ? html`<div class="surface-hero__title">${opts.title}</div>` : nothing}
           ${opts.subtitle ? html`<div class="surface-hero__sub">${opts.subtitle}</div>` : nothing}
         </div>
       `
-    : nothing;
+      : nothing;
 
   const statsRow =
     opts.stats && opts.stats.length > 0
       ? html`
           <div class="surface-hero__stats">
             ${opts.stats.map((s, i) =>
-              i === 0
-                ? surfaceHeroStat(s)
-                : html`${surfaceHeroDivider()}${surfaceHeroStat(s)}`
+              i === 0 ? surfaceHeroStat(s) : html`${surfaceHeroDivider()}${surfaceHeroStat(s)}`,
             )}
           </div>
         `
@@ -205,9 +207,7 @@ export function surfaceHero(opts: SurfaceHeroOptions): TemplateResult {
  * Renders the compact KPI card row.
  * Accepts an array of SurfaceKpiCard descriptors or a pre-rendered TemplateResult.
  */
-export function surfaceKpis(
-  cards: SurfaceKpiCard[] | TemplateResult
-): TemplateResult {
+export function surfaceKpis(cards: SurfaceKpiCard[] | TemplateResult): TemplateResult {
   const content = Array.isArray(cards)
     ? cards.map((c, i) => surfaceKpiCard({ ...c, index: i }))
     : cards;
@@ -225,9 +225,7 @@ export function surfaceMain(content: TemplateResult | typeof nothing): TemplateR
  * Renders the quick-action pill row.
  * Accepts an array of SurfaceActionPill descriptors or a pre-rendered TemplateResult.
  */
-export function surfaceActions(
-  pills: SurfaceActionPill[] | TemplateResult
-): TemplateResult {
+export function surfaceActions(pills: SurfaceActionPill[] | TemplateResult): TemplateResult {
   const content = Array.isArray(pills) ? pills.map(surfaceActionPill) : pills;
   return html`<section class="surface-actions">${content}</section>`;
 }

@@ -36,9 +36,7 @@ export function renderDebug(props: DebugProps) {
   const hero = surfaceHero({
     title: "Debug",
     subtitle: "Status, health, and heartbeat data.",
-    stats: securitySummary
-      ? [{ label: "Security", value: securityLabel }]
-      : [],
+    stats: securitySummary ? [{ label: "Security", value: securityLabel }] : [],
     actions: html`
       <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
         ${props.loading ? "Refreshing…" : "Refresh"}
