@@ -19,7 +19,11 @@ import { renderDiscordCard } from "./channels.discord.ts";
 import { renderGoogleChatCard } from "./channels.googlechat.ts";
 import { renderIMessageCard } from "./channels.imessage.ts";
 import { renderNostrCard } from "./channels.nostr.ts";
-import { channelEnabled, renderChannelAccountCount } from "./channels.shared.ts";
+import {
+  channelEnabled,
+  deriveChannelStatus,
+  renderChannelAccountCount,
+} from "./channels.shared.ts";
 import { renderSignalCard } from "./channels.signal.ts";
 import { renderSlackCard } from "./channels.slack.ts";
 import { renderTelegramCard } from "./channels.telegram.ts";
@@ -50,43 +54,81 @@ export function renderChannels(props: ChannelsProps) {
       return a.order - b.order;
     });
 
+  const activeCount = orderedChannels.filter((c) => c.enabled).length;
+  const totalCount = orderedChannels.length;
+  // Count channels with an explicit connected=true in their status
+  const connectedCount = orderedChannels.filter((c) => {
+    const st = channels?.[c.key] as Record<string, unknown> | undefined;
+    return typeof st?.connected === "boolean" && st.connected;
+  }).length;
+
   return html`
+    <div class="channels-hero">
+      <div>
+        <div class="channels-hero__title">Channels</div>
+        <div class="channels-hero__sub">Manage channels and settings.</div>
+      </div>
+      <div class="channels-hero__stats">
+        <div class="channels-hero__stat">
+          <span class="channels-hero__stat-label">Active</span>
+          <span class="channels-hero__stat-value">${activeCount} of ${totalCount}</span>
+        </div>
+        <div class="channels-hero__divider"></div>
+        <div class="channels-hero__stat">
+          <span class="channels-hero__stat-label">Connected</span>
+          <span class="channels-hero__stat-value">${connectedCount}</span>
+        </div>
+        <div class="channels-hero__divider"></div>
+        <div class="channels-hero__stat">
+          <span class="channels-hero__stat-label">Last refresh</span>
+          <span class="channels-hero__stat-value">
+            ${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a"}
+          </span>
+        </div>
+      </div>
+    </div>
+
     <section class="grid grid-cols-2">
-      ${orderedChannels.map((channel) =>
-        renderChannel(channel.key, props, {
-          whatsapp,
-          telegram,
-          discord,
-          googlechat,
-          slack,
-          signal,
-          imessage,
-          nostr,
-          channelAccounts: props.snapshot?.channelAccounts ?? null,
-        }),
-      )}
+      ${orderedChannels.map((channel, idx) => {
+        const animDelay = (idx + 1) * 50 + 50; // 100ms, 150ms, 200ms …
+        return html`
+          <div
+            class="${channel.enabled ? "" : "channel-card--disabled"}"
+            style="animation: rise 0.3s var(--ease-out) ${animDelay}ms backwards;"
+          >
+            ${renderChannel(channel.key, props, {
+              whatsapp,
+              telegram,
+              discord,
+              googlechat,
+              slack,
+              signal,
+              imessage,
+              nostr,
+              channelAccounts: props.snapshot?.channelAccounts ?? null,
+            })}
+          </div>
+        `;
+      })}
     </section>
 
-    <details class="card" style="margin-top: 18px;">
-      <summary style="cursor: pointer; list-style: none; outline: none;">
-        <div class="row" style="justify-content: space-between;">
-          <div>
-            <div class="card-title">Channel health</div>
-            <div class="card-sub">Channel status snapshots from the gateway.</div>
-          </div>
-          <div class="muted">${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a"}</div>
-        </div>
+    <details class="channels-health">
+      <summary class="channels-health__summary">
+        <span class="channels-health__title">Channel health</span>
+        <span class="channels-health__timestamp">
+          ${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a"}
+        </span>
       </summary>
-      ${
-        props.lastError
-          ? html`<div class="callout danger" style="margin-top: 12px;">
-            ${props.lastError}
-          </div>`
-          : nothing
-      }
-      <pre class="code-block" style="margin-top: 12px;">
+      <div class="channels-health__body">
+        ${
+          props.lastError
+            ? html`<div class="callout danger" style="margin-bottom: 12px;">${props.lastError}</div>`
+            : nothing
+        }
+        <pre class="code-block">
 ${props.snapshot ? JSON.stringify(props.snapshot, null, 2) : "No snapshot yet."}
-      </pre>
+        </pre>
+      </div>
     </details>
   `;
 }
@@ -192,10 +234,19 @@ function renderGenericChannelCard(
   const lastError = typeof status?.lastError === "string" ? status.lastError : undefined;
   const accounts = channelAccounts[key] ?? [];
   const accountCountLabel = renderChannelAccountCount(key, channelAccounts);
+  const channelStatus = deriveChannelStatus({ configured, running, connected, lastError });
 
   return html`
     <div class="card">
-      <div class="card-title">${label}</div>
+      <div class="channel-card__header">
+        <div class="channel-card__title-row">
+          <span class="channel-card__dot channel-card__dot--${channelStatus.dot}"></span>
+          <div class="card-title">${label}</div>
+        </div>
+        <span class="channel-card__badge channel-card__badge--${channelStatus.badgeVariant}">
+          ${channelStatus.badge}
+        </span>
+      </div>
       <div class="card-sub">Channel status and configuration.</div>
       ${accountCountLabel}
 
@@ -210,15 +261,21 @@ function renderGenericChannelCard(
             <div class="status-list" style="margin-top: 16px;">
               <div>
                 <span class="label">Configured</span>
-                <span>${configured == null ? "n/a" : configured ? "Yes" : "No"}</span>
+                <span class="${configured ? "status-value--yes" : "status-value--no"}">
+                  ${configured == null ? "n/a" : configured ? "Yes" : "No"}
+                </span>
               </div>
               <div>
                 <span class="label">Running</span>
-                <span>${running == null ? "n/a" : running ? "Yes" : "No"}</span>
+                <span class="${running ? "status-value--yes" : "status-value--no"}">
+                  ${running == null ? "n/a" : running ? "Yes" : "No"}
+                </span>
               </div>
               <div>
                 <span class="label">Connected</span>
-                <span>${connected == null ? "n/a" : connected ? "Yes" : "No"}</span>
+                <span class="${connected ? "status-value--yes" : "status-value--no"}">
+                  ${connected == null ? "n/a" : connected ? "Yes" : "No"}
+                </span>
               </div>
             </div>
           `
@@ -226,13 +283,11 @@ function renderGenericChannelCard(
 
       ${
         lastError
-          ? html`<div class="callout danger" style="margin-top: 12px;">
-            ${lastError}
-          </div>`
+          ? html`<div class="callout danger" style="margin-top: 12px;">${lastError}</div>`
           : nothing
       }
 
-      ${renderChannelConfigSection({ channelId: key, props })}
+      ${renderChannelConfigSection({ channelId: key, props, isConfigured: configured ?? false })}
     </div>
   `;
 }

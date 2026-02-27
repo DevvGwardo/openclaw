@@ -2,6 +2,7 @@ import { html, nothing } from "lit";
 import { formatRelativeTimestamp } from "../format.ts";
 import type { ChannelAccountSnapshot, TelegramStatus } from "../types.ts";
 import { renderChannelConfigSection } from "./channels.config.ts";
+import { deriveChannelStatus } from "./channels.shared.ts";
 import type { ChannelsProps } from "./channels.types.ts";
 
 export function renderTelegramCard(params: {
@@ -12,6 +13,11 @@ export function renderTelegramCard(params: {
 }) {
   const { props, telegram, telegramAccounts, accountCountLabel } = params;
   const hasMultipleAccounts = telegramAccounts.length > 1;
+  const channelStatus = deriveChannelStatus({
+    configured: telegram?.configured,
+    running: telegram?.running,
+    lastError: telegram?.lastError,
+  });
 
   const renderAccountCard = (account: ChannelAccountSnapshot) => {
     const probe = account.probe as { bot?: { username?: string } } | undefined;
@@ -28,15 +34,21 @@ export function renderTelegramCard(params: {
         <div class="status-list account-card-status">
           <div>
             <span class="label">Running</span>
-            <span>${account.running ? "Yes" : "No"}</span>
+            <span class="${account.running ? "status-value--yes" : "status-value--no"}">
+              ${account.running ? "Yes" : "No"}
+            </span>
           </div>
           <div>
             <span class="label">Configured</span>
-            <span>${account.configured ? "Yes" : "No"}</span>
+            <span class="${account.configured ? "status-value--yes" : "status-value--no"}">
+              ${account.configured ? "Yes" : "No"}
+            </span>
           </div>
           <div>
             <span class="label">Last inbound</span>
-            <span>${account.lastInboundAt ? formatRelativeTimestamp(account.lastInboundAt) : "n/a"}</span>
+            <span class="status-value--no">
+              ${account.lastInboundAt ? formatRelativeTimestamp(account.lastInboundAt) : "n/a"}
+            </span>
           </div>
           ${
             account.lastError
@@ -54,7 +66,15 @@ export function renderTelegramCard(params: {
 
   return html`
     <div class="card">
-      <div class="card-title">Telegram</div>
+      <div class="channel-card__header">
+        <div class="channel-card__title-row">
+          <span class="channel-card__dot channel-card__dot--${channelStatus.dot}"></span>
+          <div class="card-title">Telegram</div>
+        </div>
+        <span class="channel-card__badge channel-card__badge--${channelStatus.badgeVariant}">
+          ${channelStatus.badge}
+        </span>
+      </div>
       <div class="card-sub">Bot status and channel configuration.</div>
       ${accountCountLabel}
 
@@ -69,23 +89,31 @@ export function renderTelegramCard(params: {
             <div class="status-list" style="margin-top: 16px;">
               <div>
                 <span class="label">Configured</span>
-                <span>${telegram?.configured ? "Yes" : "No"}</span>
+                <span class="${telegram?.configured ? "status-value--yes" : "status-value--no"}">
+                  ${telegram?.configured ? "Yes" : "No"}
+                </span>
               </div>
               <div>
                 <span class="label">Running</span>
-                <span>${telegram?.running ? "Yes" : "No"}</span>
+                <span class="${telegram?.running ? "status-value--yes" : "status-value--no"}">
+                  ${telegram?.running ? "Yes" : "No"}
+                </span>
               </div>
               <div>
                 <span class="label">Mode</span>
-                <span>${telegram?.mode ?? "n/a"}</span>
+                <span class="status-value--no">${telegram?.mode ?? "n/a"}</span>
               </div>
               <div>
                 <span class="label">Last start</span>
-                <span>${telegram?.lastStartAt ? formatRelativeTimestamp(telegram.lastStartAt) : "n/a"}</span>
+                <span class="status-value--no">
+                  ${telegram?.lastStartAt ? formatRelativeTimestamp(telegram.lastStartAt) : "n/a"}
+                </span>
               </div>
               <div>
                 <span class="label">Last probe</span>
-                <span>${telegram?.lastProbeAt ? formatRelativeTimestamp(telegram.lastProbeAt) : "n/a"}</span>
+                <span class="status-value--no">
+                  ${telegram?.lastProbeAt ? formatRelativeTimestamp(telegram.lastProbeAt) : "n/a"}
+                </span>
               </div>
             </div>
           `
@@ -108,7 +136,11 @@ export function renderTelegramCard(params: {
           : nothing
       }
 
-      ${renderChannelConfigSection({ channelId: "telegram", props })}
+      ${renderChannelConfigSection({
+        channelId: "telegram",
+        props,
+        isConfigured: telegram?.configured ?? false,
+      })}
 
       <div class="row" style="margin-top: 12px;">
         <button class="btn btn--sm" @click=${() => props.onRefresh(true)}>
