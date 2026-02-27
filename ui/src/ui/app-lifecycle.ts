@@ -9,6 +9,7 @@ import {
 } from "./app-polling.ts";
 import { observeTopbar, scheduleChatScroll, scheduleLogsScroll } from "./app-scroll.ts";
 import {
+  applySettings,
   applySettingsFromUrl,
   attachThemeListener,
   detachThemeListener,
@@ -18,12 +19,16 @@ import {
 } from "./app-settings.ts";
 import { loadControlUiBootstrapConfig } from "./controllers/control-ui-bootstrap.ts";
 import type { Tab } from "./navigation.ts";
+import type { UiSettings } from "./storage.ts";
+import { resolveGatewayUrlFromTauri } from "./tauri-bootstrap.ts";
 
 type LifecycleHost = {
   basePath: string;
   client?: { stop: () => void } | null;
   connected?: boolean;
   tab: Tab;
+  settings: UiSettings;
+  pendingGatewayUrl?: string | null;
   assistantName: string;
   assistantAvatar: string | null;
   assistantAgentId: string | null;
@@ -40,7 +45,7 @@ type LifecycleHost = {
   topbarObserver: ResizeObserver | null;
 };
 
-export function handleConnected(host: LifecycleHost) {
+export async function handleConnected(host: LifecycleHost) {
   host.basePath = inferBasePath();
   void loadControlUiBootstrapConfig(host);
   applySettingsFromUrl(host as unknown as Parameters<typeof applySettingsFromUrl>[0]);
@@ -48,6 +53,22 @@ export function handleConnected(host: LifecycleHost) {
   syncThemeWithSettings(host as unknown as Parameters<typeof syncThemeWithSettings>[0]);
   attachThemeListener(host as unknown as Parameters<typeof attachThemeListener>[0]);
   window.addEventListener("popstate", host.popStateHandler);
+  // Resolve gateway URL from Tauri backend when no URL override was provided via query params.
+  // This runs after applySettingsFromUrl so any ?gatewayUrl= param takes precedence.
+  if (window.__TAURI__ && !host.pendingGatewayUrl) {
+    const tauriUrl = await resolveGatewayUrlFromTauri();
+    if (tauriUrl) {
+      const browserDefault = `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}`;
+      // Only override if the current URL is still the browser-inferred default,
+      // meaning the user has not explicitly saved a different gateway URL.
+      if (host.settings.gatewayUrl === browserDefault) {
+        applySettings(host as unknown as Parameters<typeof applySettings>[0], {
+          ...host.settings,
+          gatewayUrl: tauriUrl,
+        });
+      }
+    }
+  }
   connectGateway(host as unknown as Parameters<typeof connectGateway>[0]);
   startNodesPolling(host as unknown as Parameters<typeof startNodesPolling>[0]);
   if (host.tab === "logs") {

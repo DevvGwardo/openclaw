@@ -20,6 +20,12 @@ export type UiSettings = {
 
 export function loadSettings(): UiSettings {
   const defaultUrl = (() => {
+    // In Tauri, location.host is meaningless (resolves to tauri.localhost or localhost:5175).
+    // Use the known local gateway port as a sensible default; the async IPC bootstrap will
+    // refine this further once the Rust backend resolves the actual configured URL.
+    if (typeof window !== "undefined" && window.__TAURI__) {
+      return "ws://localhost:18789";
+    }
     const proto = location.protocol === "https:" ? "wss" : "ws";
     return `${proto}://${location.host}`;
   })();
