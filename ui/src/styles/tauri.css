@@ -110,6 +110,15 @@ tauri-shell {
   background: var(--color-bg);
   padding: var(--space-6);
   padding-top: 0;
+  /* Scrollbar styles are set in the consolidated section below */
+}
+
+/* ── Inner content wrapper ── */
+.tauri-shell__inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-4);
+  min-height: 100%;
 }
 
 /* ── Footer ── */
@@ -217,4 +226,9 @@ html::-webkit-scrollbar-thumb,
 tauri-shell ~ #cron-modal-portal .cron-modal-backdrop {
   left: var(--tauri-sidebar-width);
   top: var(--tauri-titlebar-height);
+}
+
+/* When sidebar is collapsed, modal uses the narrower width */
+tauri-shell:has(.tauri-sidebar--collapsed) ~ #cron-modal-portal .cron-modal-backdrop {
+  left: var(--tauri-sidebar-collapsed-width);
 }

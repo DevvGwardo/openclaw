@@ -8,6 +8,8 @@
   background: var(--tauri-titlebar-bg, var(--color-surface-raised, #1a1a1a));
   border-bottom: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
   user-select: none;
+  /* Entire bar is draggable; buttons use pointer-events to opt out */
+  cursor: default;
 }
 
 /* macOS: traffic-light buttons on the left */
@@ -29,11 +31,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.1s ease;
+  transition:
+    opacity 0.1s ease,
+    filter 0.1s ease;
+  /* Buttons must not trigger window drag */
+  pointer-events: all;
 }
 
 .tauri-titlebar__btn:hover {
-  opacity: 0.85;
+  filter: brightness(1.15);
+}
+
+.tauri-titlebar__btn:active {
+  filter: brightness(0.85);
+}
+
+.tauri-titlebar__btn:focus-visible {
+  outline: 2px solid var(--color-accent, #4f8ef7);
+  outline-offset: 2px;
 }
 
 .tauri-titlebar__btn--close {
@@ -63,11 +78,19 @@
   background: transparent;
   color: var(--color-text-muted, #aaa);
   font-size: 12px;
+  /* Reset mac-button overrides */
+  filter: none;
 }
 
 .tauri-titlebar--windows .tauri-titlebar__btn:hover {
   background: rgba(255 255 255 / 0.1);
-  opacity: 1;
+  filter: none;
+  color: var(--color-text, #e8e8e8);
+}
+
+.tauri-titlebar--windows .tauri-titlebar__btn:active {
+  background: rgba(255 255 255 / 0.05);
+  filter: none;
 }
 
 .tauri-titlebar--windows .tauri-titlebar__btn--close:hover {
@@ -95,9 +118,14 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
+  opacity: 0.7;
 }
 
 .tauri-titlebar--windows .tauri-titlebar__title {
   justify-content: flex-start;
   padding: 0 12px;
+}
+
+.tauri-titlebar--windows .tauri-titlebar__logo {
+  opacity: 0.8;
 }
