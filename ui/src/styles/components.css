@@ -3004,21 +3004,7 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
 
 /* === Overview Redesign === */
 
-/* ------------------------------------------
-   Overview Hero Banner
-   ------------------------------------------ */
-
-@keyframes pulse-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 8px var(--ok-muted);
-  }
-  50% {
-    box-shadow:
-      0 0 16px var(--ok-muted),
-      0 0 24px var(--ok-subtle);
-  }
-}
+/* ----- Hero Status Banner ----- */
 
 .overview-hero {
   display: flex;
@@ -3099,7 +3085,18 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   background: var(--border);
 }
 
-/* Hero banner — mobile stacking */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 8px var(--ok-muted);
+  }
+  50% {
+    box-shadow:
+      0 0 16px var(--ok-muted),
+      0 0 24px var(--ok-subtle);
+  }
+}
+
 @media (max-width: 640px) {
   .overview-hero {
     flex-direction: column;
@@ -3117,9 +3114,7 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   }
 }
 
-/* ------------------------------------------
-   Overview Alert / Error Banner
-   ------------------------------------------ */
+/* ----- Error/Hint Alert Banner ----- */
 
 .overview-alert {
   display: flex;
@@ -3159,9 +3154,7 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   color: var(--text);
 }
 
-/* ------------------------------------------
-   Overview Dashboard Stat Grid
-   ------------------------------------------ */
+/* ----- Dashboard Stat Cards ----- */
 
 .overview-dashboard {
   display: grid;
@@ -3208,7 +3201,7 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
 }
 
 .overview-dash-card__icon--blue {
-  background: rgba(59, 130, 246, 0.12);
+  background: rgba(59 130 246 / 0.12);
   color: var(--info);
 }
 
@@ -3263,9 +3256,7 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   }
 }
 
-/* ------------------------------------------
-   Overview Collapsible Connection Panel
-   ------------------------------------------ */
+/* ----- Collapsible Connection Form ----- */
 
 .overview-connection {
   border: 1px solid var(--border);
@@ -3298,23 +3289,30 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .overview-connection__title {
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
+  white-space: nowrap;
 }
 
 .overview-connection__url {
   font-size: 12px;
   color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .overview-connection__actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .overview-connection__chevron {
@@ -3332,7 +3330,6 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   border-top: 1px solid var(--border);
 }
 
-/* Connection summary — mobile stacking */
 @media (max-width: 640px) {
   .overview-connection__summary {
     flex-direction: column;
@@ -3346,9 +3343,7 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   }
 }
 
-/* ------------------------------------------
-   Overview Quick-Action Pills
-   ------------------------------------------ */
+/* ----- Quick Action Pills ----- */
 
 .overview-actions {
   display: flex;
@@ -3380,11 +3375,8 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   border-color: var(--border-strong);
   background: var(--bg-hover);
   transform: translateY(-1px);
-  text-decoration: none;
 }
 
 .overview-action-pill__icon {
   font-size: 14px;
 }
-
-/* === End Overview Redesign === */
