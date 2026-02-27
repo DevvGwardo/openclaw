@@ -15,7 +15,7 @@ export function renderGoogleChatBody(params: {
   return html`
     ${accountCountLabel}
 
-    <div class="status-list" style="margin-top: 16px;">
+    <div class="status-list channel-card__status-list">
       <div>
         <span class="label">Configured</span>
         <span class="${googleChat?.configured ? "status-value--yes" : "status-value--no"}">
@@ -58,7 +58,7 @@ export function renderGoogleChatBody(params: {
 
     ${
       googleChat?.lastError
-        ? html`<div class="callout danger" style="margin-top: 12px;">
+        ? html`<div class="callout danger channel-card__callout">
             ${googleChat.lastError}
           </div>`
         : nothing
@@ -66,7 +66,7 @@ export function renderGoogleChatBody(params: {
 
     ${
       googleChat?.probe
-        ? html`<div class="callout" style="margin-top: 12px;">
+        ? html`<div class="callout channel-card__callout">
             Probe ${googleChat.probe.ok ? "ok" : "failed"} ·
             ${googleChat.probe.status ?? ""} ${googleChat.probe.error ?? ""}
           </div>`

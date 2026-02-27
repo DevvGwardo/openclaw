@@ -70,7 +70,7 @@ export function renderTelegramBody(params: {
           </div>
         `
         : html`
-          <div class="status-list" style="margin-top: 16px;">
+          <div class="status-list channel-card__status-list">
             <div>
               <span class="label">Configured</span>
               <span class="${telegram?.configured ? "status-value--yes" : "status-value--no"}">
@@ -105,7 +105,7 @@ export function renderTelegramBody(params: {
 
     ${
       telegram?.lastError
-        ? html`<div class="callout danger" style="margin-top: 12px;">
+        ? html`<div class="callout danger channel-card__callout">
             ${telegram.lastError}
           </div>`
         : nothing
@@ -113,7 +113,7 @@ export function renderTelegramBody(params: {
 
     ${
       telegram?.probe
-        ? html`<div class="callout" style="margin-top: 12px;">
+        ? html`<div class="callout channel-card__callout">
             Probe ${telegram.probe.ok ? "ok" : "failed"} ·
             ${telegram.probe.status ?? ""} ${telegram.probe.error ?? ""}
           </div>`

@@ -15,7 +15,7 @@ export function renderSignalBody(params: {
   return html`
     ${accountCountLabel}
 
-    <div class="status-list" style="margin-top: 16px;">
+    <div class="status-list channel-card__status-list">
       <div>
         <span class="label">Configured</span>
         <span class="${signal?.configured ? "status-value--yes" : "status-value--no"}">
@@ -48,7 +48,7 @@ export function renderSignalBody(params: {
 
     ${
       signal?.lastError
-        ? html`<div class="callout danger" style="margin-top: 12px;">
+        ? html`<div class="callout danger channel-card__callout">
             ${signal.lastError}
           </div>`
         : nothing
@@ -56,7 +56,7 @@ export function renderSignalBody(params: {
 
     ${
       signal?.probe
-        ? html`<div class="callout" style="margin-top: 12px;">
+        ? html`<div class="callout channel-card__callout">
             Probe ${signal.probe.ok ? "ok" : "failed"} ·
             ${signal.probe.status ?? ""} ${signal.probe.error ?? ""}
           </div>`

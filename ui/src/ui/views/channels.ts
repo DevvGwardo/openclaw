@@ -131,7 +131,7 @@ export function renderChannels(props: ChannelsProps) {
       <div class="channels-health__body">
         ${
           props.lastError
-            ? html`<div class="callout danger" style="margin-bottom: 12px;">${props.lastError}</div>`
+            ? html`<div class="callout danger channel-card__callout-bottom">${props.lastError}</div>`
             : nothing
         }
         <pre class="code-block">
@@ -275,7 +275,7 @@ function renderGenericChannelBody(
           </div>
         `
         : html`
-          <div class="status-list" style="margin-top: 16px;">
+          <div class="status-list channel-card__status-list">
             <div>
               <span class="label">Configured</span>
               <span class="${configured ? "status-value--yes" : "status-value--no"}">
@@ -300,7 +300,7 @@ function renderGenericChannelBody(
 
     ${
       lastError
-        ? html`<div class="callout danger" style="margin-top: 12px;">${lastError}</div>`
+        ? html`<div class="callout danger channel-card__callout">${lastError}</div>`
         : nothing
     }
 

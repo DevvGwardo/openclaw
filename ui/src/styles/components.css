@@ -3465,6 +3465,23 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   transition: opacity 150ms;
 }
 
+/* Channel card spacing utilities */
+.channel-card__status-list {
+  margin-top: 16px;
+}
+
+.channel-card__callout {
+  margin-top: 12px;
+}
+
+.channel-card__actions {
+  margin-top: 12px;
+}
+
+.channel-card__callout-bottom {
+  margin-bottom: 12px;
+}
+
 
 
 /* ----- Status list value coloring ----- */
