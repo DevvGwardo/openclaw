@@ -1,6 +1,7 @@
 // Tauri desktop entrypoint — imports desktop-specific CSS and shell component.
 // The browser build (src/main.ts) is NOT imported here, keeping the two entrypoints independent.
 
+import { parseTauriDeepLink } from "./ui/tauri-deeplink.ts";
 // Base UI styles (shared with browser build)
 import "./styles.css";
 // Tauri desktop shell overrides (must come after base for CSS specificity)
@@ -30,15 +31,9 @@ if (window.__TAURI__) {
   await tauriEvent.listen("deep-link", (event: { payload: string[] }) => {
     const urls = event.payload;
     for (const url of urls) {
-      try {
-        const parsed = new URL(url);
-        // openclaw://tab/<tabname>
-        if (parsed.protocol === "openclaw:" && parsed.pathname.startsWith("//tab/")) {
-          const tab = parsed.pathname.replace("//tab/", "").split("/")[0];
-          window.dispatchEvent(new CustomEvent("openclaw:navigate", { detail: { tab } }));
-        }
-      } catch {
-        // ignore malformed URLs
+      const result = parseTauriDeepLink(url);
+      if (result) {
+        window.dispatchEvent(new CustomEvent("openclaw:navigate", { detail: { tab: result.tab } }));
       }
     }
   });

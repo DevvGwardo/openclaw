@@ -26,7 +26,7 @@ export type Tab =
   | "debug"
   | "logs";
 
-const TAB_PATHS: Record<Tab, string> = {
+export const TAB_PATHS: Record<Tab, string> = {
   agents: "/agents",
   overview: "/overview",
   channels: "/channels",
@@ -92,7 +92,7 @@ export function tabFromPath(pathname: string, basePath = ""): Tab | null {
     }
   }
   let normalized = normalizePath(path).toLowerCase();
-  if (normalized.endsWith("/index.html")) {
+  if (normalized.endsWith("/index.html") || normalized.endsWith("/tauri.html")) {
     normalized = "/";
   }
   if (normalized === "/") {
@@ -105,6 +105,9 @@ export function inferBasePathFromPathname(pathname: string): string {
   let normalized = normalizePath(pathname);
   if (normalized.endsWith("/index.html")) {
     normalized = normalizePath(normalized.slice(0, -"/index.html".length));
+  }
+  if (normalized.endsWith("/tauri.html")) {
+    normalized = normalizePath(normalized.slice(0, -"/tauri.html".length));
   }
   if (normalized === "/") {
     return "";

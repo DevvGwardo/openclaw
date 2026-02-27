@@ -136,6 +136,10 @@ describe("tabFromPath", () => {
     expect(tabFromPath("/")).toBe("chat");
   });
 
+  it("returns chat for tauri.html entry document", () => {
+    expect(tabFromPath("/tauri.html")).toBe("chat");
+  });
+
   it("handles base paths", () => {
     expect(tabFromPath("/ui/chat", "/ui")).toBe("chat");
     expect(tabFromPath("/apps/openclaw/sessions", "/apps/openclaw")).toBe("sessions");
@@ -169,6 +173,11 @@ describe("inferBasePathFromPathname", () => {
   it("handles index.html suffix", () => {
     expect(inferBasePathFromPathname("/index.html")).toBe("");
     expect(inferBasePathFromPathname("/ui/index.html")).toBe("/ui");
+  });
+
+  it("handles tauri.html suffix", () => {
+    expect(inferBasePathFromPathname("/tauri.html")).toBe("");
+    expect(inferBasePathFromPathname("/some/prefix/tauri.html")).toBe("/some/prefix");
   });
 });
 
