@@ -7,6 +7,7 @@ import type { GatewayHelloOk } from "../gateway.ts";
 import { formatNextRun } from "../presenter.ts";
 import type { UiSettings } from "../storage.ts";
 import { shouldShowPairingHint } from "./overview-hints.ts";
+import { surfaceHero, surfaceKpis, surfaceMain, surfacePage } from "./surface-page.ts";
 
 export type OverviewProps = {
   connected: boolean;
@@ -212,44 +213,115 @@ export function renderOverview(props: OverviewProps) {
 
   const currentLocale = i18n.getLocale();
 
-  return html`
-    <!-- 1. Hero Status Banner -->
-    <div class="overview-hero">
-      <div class="overview-hero__status">
-        <span
-          class="overview-hero__dot overview-hero__dot--${props.connected ? "ok" : "offline"}"
-        ></span>
-        <span class="overview-hero__label">
-          ${props.connected ? t("common.ok") : t("common.offline")}
-        </span>
-      </div>
-      <div class="overview-hero__stats">
-        <div class="overview-hero__stat">
-          <span class="overview-hero__stat-label">${t("overview.snapshot.uptime")}</span>
-          <span class="overview-hero__stat-value">${uptime}</span>
-        </div>
-        <div class="overview-hero__divider"></div>
-        <div class="overview-hero__stat">
-          <span class="overview-hero__stat-label">${t("overview.snapshot.tickInterval")}</span>
-          <span class="overview-hero__stat-value">${tick}</span>
-        </div>
-        <div class="overview-hero__divider"></div>
-        <div class="overview-hero__stat">
-          <span class="overview-hero__stat-label"
-            >${t("overview.snapshot.lastChannelsRefresh")}</span
-          >
-          <span class="overview-hero__stat-value">
-            ${
-              props.lastChannelsRefresh
-                ? formatRelativeTimestamp(props.lastChannelsRefresh)
-                : t("common.na")
-            }
-          </span>
-        </div>
-      </div>
-    </div>
+  // ── Hero strip ─────────────────────────────────────────────────────────────
+  const hero = surfaceHero({
+    status: {
+      label: props.connected ? t("common.ok") : t("common.offline"),
+      ok: props.connected,
+    },
+    stats: [
+      { label: t("overview.snapshot.uptime"), value: uptime },
+      { label: t("overview.snapshot.tickInterval"), value: tick },
+      {
+        label: t("overview.snapshot.lastChannelsRefresh"),
+        value: props.lastChannelsRefresh
+          ? formatRelativeTimestamp(props.lastChannelsRefresh)
+          : t("common.na"),
+      },
+    ],
+  });
 
-    <!-- 2. Error/Hint Banner — only renders when there's a lastError -->
+  // ── KPI cards ──────────────────────────────────────────────────────────────
+  const kpis = surfaceKpis([
+    {
+      iconColor: "teal",
+      icon: html`
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+        </svg>
+      `,
+      value: props.presenceCount,
+      label: t("overview.stats.instances"),
+      sub: t("overview.stats.instancesHint"),
+      index: 0,
+    },
+    {
+      iconColor: "blue",
+      icon: html`
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      `,
+      value: props.sessionsCount ?? t("common.na"),
+      label: t("overview.stats.sessions"),
+      sub: t("overview.stats.sessionsHint"),
+      index: 1,
+    },
+    {
+      iconColor: "amber",
+      icon: html`
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      `,
+      value:
+        props.cronEnabled == null
+          ? t("common.na")
+          : props.cronEnabled
+            ? t("common.enabled")
+            : t("common.disabled"),
+      label: t("overview.stats.cron"),
+      sub: t("overview.stats.cronNext", { time: formatNextRun(props.cronNext) }),
+      index: 2,
+    },
+    {
+      iconColor: "green",
+      icon: html`
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+        </svg>
+      `,
+      value: props.lastChannelsRefresh
+        ? formatRelativeTimestamp(props.lastChannelsRefresh)
+        : t("common.na"),
+      label: t("overview.snapshot.lastChannelsRefresh"),
+      index: 3,
+    },
+  ]);
+
+  // ── Main content ───────────────────────────────────────────────────────────
+  const main = surfaceMain(html`
+    <!-- Error/Hint Banner — only renders when there's a lastError -->
     ${
       props.lastError
         ? html`
@@ -264,76 +336,7 @@ export function renderOverview(props: OverviewProps) {
         : ""
     }
 
-    <!-- 3. Dashboard Stat Grid -->
-    <section class="overview-dashboard">
-      <div class="overview-dash-card" style="animation-delay: 100ms;">
-        <div class="overview-dash-card__icon overview-dash-card__icon--teal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="4"/>
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-          </svg>
-        </div>
-        <div class="overview-dash-card__content">
-          <div class="overview-dash-card__value">${props.presenceCount}</div>
-          <div class="overview-dash-card__label">${t("overview.stats.instances")}</div>
-          <div class="overview-dash-card__sub">${t("overview.stats.instancesHint")}</div>
-        </div>
-      </div>
-      <div class="overview-dash-card" style="animation-delay: 150ms;">
-        <div class="overview-dash-card__icon overview-dash-card__icon--blue">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-        </div>
-        <div class="overview-dash-card__content">
-          <div class="overview-dash-card__value">${props.sessionsCount ?? t("common.na")}</div>
-          <div class="overview-dash-card__label">${t("overview.stats.sessions")}</div>
-          <div class="overview-dash-card__sub">${t("overview.stats.sessionsHint")}</div>
-        </div>
-      </div>
-      <div class="overview-dash-card" style="animation-delay: 200ms;">
-        <div class="overview-dash-card__icon overview-dash-card__icon--amber">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-        </div>
-        <div class="overview-dash-card__content">
-          <div class="overview-dash-card__value">
-            ${
-              props.cronEnabled == null
-                ? t("common.na")
-                : props.cronEnabled
-                  ? t("common.enabled")
-                  : t("common.disabled")
-            }
-          </div>
-          <div class="overview-dash-card__label">${t("overview.stats.cron")}</div>
-          <div class="overview-dash-card__sub">
-            ${t("overview.stats.cronNext", { time: formatNextRun(props.cronNext) })}
-          </div>
-        </div>
-      </div>
-      <div class="overview-dash-card" style="animation-delay: 250ms;">
-        <div class="overview-dash-card__icon overview-dash-card__icon--green">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-          </svg>
-        </div>
-        <div class="overview-dash-card__content">
-          <div class="overview-dash-card__value">
-            ${
-              props.lastChannelsRefresh
-                ? formatRelativeTimestamp(props.lastChannelsRefresh)
-                : t("common.na")
-            }
-          </div>
-          <div class="overview-dash-card__label">${t("overview.snapshot.lastChannelsRefresh")}</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4. Collapsible Connection Form -->
+    <!-- Collapsible Connection Form -->
     <details class="overview-connection" ?open=${!props.connected}>
       <summary class="overview-connection__summary">
         <div class="overview-connection__header">
@@ -442,7 +445,7 @@ export function renderOverview(props: OverviewProps) {
       </div>
     </details>
 
-    <!-- 5. Quick Actions — replaces the Notes section -->
+    <!-- Quick Actions -->
     <section class="overview-actions">
       <a class="overview-action-pill" href="#/channels">
         <span class="overview-action-pill__icon">&#9889;</span>
@@ -466,5 +469,7 @@ export function renderOverview(props: OverviewProps) {
         ${t("overview.quickActions.docs")}
       </a>
     </section>
-  `;
+  `);
+
+  return surfacePage("overview", { hero, kpis, main });
 }
