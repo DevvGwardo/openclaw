@@ -1,6 +1,7 @@
 import { html, nothing } from "lit";
 import { formatPresenceAge, formatPresenceSummary } from "../presenter.ts";
 import type { PresenceEntry } from "../types.ts";
+import { surfaceHero, surfaceMain, surfacePage } from "./surface-page.ts";
 
 export type InstancesProps = {
   loading: boolean;
@@ -11,42 +12,32 @@ export type InstancesProps = {
 };
 
 export function renderInstances(props: InstancesProps) {
-  return html`
-    <section class="card">
-      <div class="row" style="justify-content: space-between;">
-        <div>
-          <div class="card-title">Connected Instances</div>
-          <div class="card-sub">Presence beacons from the gateway and clients.</div>
-        </div>
-        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
-          ${props.loading ? "Loading…" : "Refresh"}
-        </button>
-      </div>
+  const hero = surfaceHero({
+    title: "Instances",
+    subtitle: "Presence beacons from the gateway and clients.",
+    stats: [{ label: "Connected", value: props.entries.length }],
+    actions: html`
+      <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
+        ${props.loading ? "Loading…" : "Refresh"}
+      </button>
+    `,
+  });
+
+  const main = surfaceMain(html`
+    ${props.lastError ? html`<div class="callout danger">${props.lastError}</div>` : nothing}
+    ${props.statusMessage ? html`<div class="callout">${props.statusMessage}</div>` : nothing}
+    <div class="list">
       ${
-        props.lastError
-          ? html`<div class="callout danger" style="margin-top: 12px;">
-            ${props.lastError}
-          </div>`
-          : nothing
+        props.entries.length === 0
+          ? html`
+              <div class="muted">No instances reported yet.</div>
+            `
+          : props.entries.map((entry) => renderEntry(entry))
       }
-      ${
-        props.statusMessage
-          ? html`<div class="callout" style="margin-top: 12px;">
-            ${props.statusMessage}
-          </div>`
-          : nothing
-      }
-      <div class="list" style="margin-top: 16px;">
-        ${
-          props.entries.length === 0
-            ? html`
-                <div class="muted">No instances reported yet.</div>
-              `
-            : props.entries.map((entry) => renderEntry(entry))
-        }
-      </div>
-    </section>
-  `;
+    </div>
+  `);
+
+  return surfacePage("instances", { hero, main });
 }
 
 function renderEntry(entry: PresenceEntry) {
