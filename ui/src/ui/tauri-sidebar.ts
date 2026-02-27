@@ -37,6 +37,25 @@ export class TauriSidebar extends LitElement {
     this.dispatchEvent(new CustomEvent("theme-toggle", { bubbles: true, composed: true }));
   };
 
+  // Arrow up/down to navigate between nav items; wraps around at edges
+  private _handleKeyDown = (event: KeyboardEvent) => {
+    const items = Array.from(this.querySelectorAll(".tauri-sidebar__item"));
+    const currentIndex = items.indexOf(event.target as HTMLElement);
+    if (currentIndex === -1) {
+      return;
+    }
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      const next = items[currentIndex + 1] ?? items[0];
+      next.focus();
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      const prev = items[currentIndex - 1] ?? items[items.length - 1];
+      prev.focus();
+    }
+  };
+
   private _renderChevronIcon(collapsed: boolean) {
     // Chevron points left (collapse) or right (expand)
     return collapsed
@@ -147,7 +166,12 @@ export class TauriSidebar extends LitElement {
         </div>
 
         <!-- Navigation groups -->
-        <nav class="tauri-sidebar__nav" role="navigation" aria-label="Main navigation">
+        <nav
+          class="tauri-sidebar__nav"
+          role="navigation"
+          aria-label="Main navigation"
+          @keydown=${this._handleKeyDown}
+        >
           ${repeat(
             TAB_GROUPS,
             (group) => group.label,
@@ -159,15 +183,19 @@ export class TauriSidebar extends LitElement {
                   (tab) => tab,
                   (tab) => {
                     const active = this.activeTab === tab;
+                    const label = titleForTab(tab);
                     return html`
                       <button
                         class="tauri-sidebar__item ${active ? "tauri-sidebar__item--active" : ""}"
-                        title=${titleForTab(tab)}
+                        title=${collapsed ? label : ""}
+                        aria-label=${label}
                         aria-current=${active ? "page" : "false"}
+                        tabindex="0"
+                        role="tab"
                         @click=${() => this._handleTabClick(tab)}
                       >
                         <span class="tauri-sidebar__item-icon">${icons[iconForTab(tab)]}</span>
-                        <span class="tauri-sidebar__item-label">${titleForTab(tab)}</span>
+                        <span class="tauri-sidebar__item-label">${label}</span>
                       </button>
                     `;
                   },
@@ -177,22 +205,34 @@ export class TauriSidebar extends LitElement {
           )}
         </nav>
 
-        <!-- Footer: connection status + theme toggle -->
+        <!-- Footer: connection status pill + theme toggle with label + version badge -->
         <div class="tauri-sidebar__footer">
-          <span
-            class="tauri-sidebar__status-dot ${this.connected ? "tauri-sidebar__status-dot--connected" : ""}"
-            title=${this.connected ? "Connected to gateway" : "Disconnected"}
-          ></span>
-          <span class="tauri-sidebar__status-label">
-            ${this.connected ? "Connected" : "Disconnected"}
-          </span>
-          <button
-            class="tauri-sidebar__theme-btn"
-            title="Toggle theme"
-            @click=${this._handleThemeToggle}
-          >
-            ${this._renderThemeIcon(this.theme)}
-          </button>
+          <div class="tauri-sidebar__footer-row">
+            <span
+              class="tauri-sidebar__status-pill tauri-sidebar__status-pill--${this.connected ? "connected" : "disconnected"}"
+            >
+              <span
+                class="tauri-sidebar__status-dot ${this.connected ? "tauri-sidebar__status-dot--connected" : ""}"
+                title=${this.connected ? "Connected to gateway" : "Disconnected"}
+              ></span>
+              <span class="tauri-sidebar__status-text">
+                ${this.connected ? "Connected" : "Disconnected"}
+              </span>
+            </span>
+          </div>
+          <div class="tauri-sidebar__footer-row">
+            <button
+              class="tauri-sidebar__theme-btn"
+              title="Toggle theme (${this.theme})"
+              @click=${this._handleThemeToggle}
+            >
+              ${this._renderThemeIcon(this.theme)}
+              <span class="tauri-sidebar__theme-label">
+                ${this.theme === "dark" ? "Dark" : this.theme === "light" ? "Light" : "System"}
+              </span>
+            </button>
+            ${this.version ? html`<span class="tauri-sidebar__version">v${this.version}</span>` : ""}
+          </div>
         </div>
       </div>
     `;
