@@ -2,6 +2,21 @@ import { html, nothing } from "lit";
 import type { ChannelAccountSnapshot } from "../types.ts";
 import type { ChannelKey, ChannelsProps } from "./channels.types.ts";
 
+const CHANNEL_ICONS: Record<string, string> = {
+  whatsapp: "💬",
+  telegram: "✈️",
+  discord: "🎮",
+  googlechat: "💬",
+  slack: "📨",
+  signal: "🔒",
+  imessage: "💬",
+  nostr: "🔮",
+};
+
+export function getChannelIcon(key: string, meta?: { systemImage?: string } | null): string {
+  return meta?.systemImage ?? CHANNEL_ICONS[key] ?? "📡";
+}
+
 export function shouldAutoExpand(params: {
   configured?: boolean;
   running?: boolean;
