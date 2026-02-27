@@ -5,7 +5,7 @@ import { LitElement, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
 import { t } from "../i18n/index.ts";
-import { icons } from "./icons.ts";
+import { icons, renderLobsterLogo } from "./icons.ts";
 import { TAB_GROUPS, iconForTab, titleForTab, type Tab } from "./navigation.ts";
 import type { ThemeMode } from "./theme.ts";
 
@@ -14,6 +14,7 @@ export class TauriSidebar extends LitElement {
   @property({ type: String }) activeTab: Tab = "chat";
   @property({ type: Boolean }) collapsed = false;
   @property({ type: Boolean }) connected = false;
+  @property({ type: Boolean }) privacyMode = false;
   @property({ type: String }) theme: ThemeMode = "system";
   @property({ type: String }) version = "";
 
@@ -35,6 +36,10 @@ export class TauriSidebar extends LitElement {
 
   private _handleThemeToggle = () => {
     this.dispatchEvent(new CustomEvent("theme-toggle", { bubbles: true, composed: true }));
+  };
+
+  private _handlePrivacyToggle = () => {
+    this.dispatchEvent(new CustomEvent("privacy-toggle", { bubbles: true, composed: true }));
   };
 
   // Arrow up/down to navigate between nav items; wraps around at edges
@@ -118,30 +123,23 @@ export class TauriSidebar extends LitElement {
     `;
   }
 
-  private _renderLogoIcon() {
+  private _renderPrivacyIcon(privacyMode: boolean) {
+    if (privacyMode) {
+      // Eye-off: privacy is active
+      return html`
+        <svg viewBox="0 0 24 24">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+          <line x1="1" y1="1" x2="23" y2="23" />
+          <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+        </svg>
+      `;
+    }
+    // Eye: privacy is off
     return html`
-      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="sb-lobster" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ff4d4d" />
-            <stop offset="100%" stop-color="#991b1b" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M60 10 C30 10 15 35 15 55 C15 75 30 95 45 100 L45 110 L55 110 L55 100 C55 100 60 102 65 100 L65 110 L75 110 L75 100 C90 95 105 75 105 55 C105 35 90 10 60 10Z"
-          fill="url(#sb-lobster)"
-        />
-        <path d="M20 45 C5 40 0 50 5 60 C10 70 20 65 25 55 C28 48 25 45 20 45Z" fill="url(#sb-lobster)" />
-        <path
-          d="M100 45 C115 40 120 50 115 60 C110 70 100 65 95 55 C92 48 95 45 100 45Z"
-          fill="url(#sb-lobster)"
-        />
-        <path d="M45 15 Q35 5 30 8" stroke="#ff4d4d" stroke-width="3" stroke-linecap="round" />
-        <path d="M75 15 Q85 5 90 8" stroke="#ff4d4d" stroke-width="3" stroke-linecap="round" />
-        <circle cx="45" cy="35" r="6" fill="#050810" />
-        <circle cx="75" cy="35" r="6" fill="#050810" />
-        <circle cx="46" cy="34" r="2.5" fill="#00e5cc" />
-        <circle cx="76" cy="34" r="2.5" fill="#00e5cc" />
+      <svg viewBox="0 0 24 24">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+        <circle cx="12" cy="12" r="3" />
       </svg>
     `;
   }
@@ -153,7 +151,7 @@ export class TauriSidebar extends LitElement {
         <!-- Header: logo + collapse toggle -->
         <div class="tauri-sidebar__header">
           <div class="tauri-sidebar__logo">
-            <span class="tauri-sidebar__logo-icon">${this._renderLogoIcon()}</span>
+            <span class="tauri-sidebar__logo-icon">${renderLobsterLogo("sb-lobster")}</span>
             <span class="tauri-sidebar__logo-text">OpenClaw</span>
           </div>
           <button
@@ -205,7 +203,7 @@ export class TauriSidebar extends LitElement {
           )}
         </nav>
 
-        <!-- Footer: theme toggle + version badge -->
+        <!-- Footer: theme + privacy toggles, version badge, connection status -->
         <div class="tauri-sidebar__footer">
           <div class="tauri-sidebar__footer-row">
             <button
@@ -218,7 +216,24 @@ export class TauriSidebar extends LitElement {
                 ${this.theme === "dark" ? "Dark" : this.theme === "light" ? "Light" : "System"}
               </span>
             </button>
+            <button
+              class="tauri-sidebar__privacy-btn ${this.privacyMode ? "tauri-sidebar__privacy-btn--active" : ""}"
+              title="${this.privacyMode ? "Privacy mode on" : "Privacy mode off"}"
+              aria-label="Toggle privacy mode"
+              aria-pressed="${this.privacyMode ? "true" : "false"}"
+              @click=${this._handlePrivacyToggle}
+            >
+              ${this._renderPrivacyIcon(this.privacyMode)}
+            </button>
             ${this.version ? html`<span class="tauri-sidebar__version">v${this.version}</span>` : ""}
+          </div>
+          <div class="tauri-sidebar__status-row">
+            <span
+              class="tauri-sidebar__status-dot ${this.connected ? "tauri-sidebar__status-dot--connected" : ""}"
+            ></span>
+            <span class="tauri-sidebar__status-label">
+              ${this.connected ? "Connected" : "Disconnected"}
+            </span>
           </div>
         </div>
       </div>
