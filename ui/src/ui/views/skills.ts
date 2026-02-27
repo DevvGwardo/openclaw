@@ -36,63 +36,64 @@ export function renderSkills(props: SkillsProps) {
     : skills;
   const groups = groupSkills(filtered);
 
-  return surfacePage("skills", {
-    hero: surfaceHero({
-      title: "Skills",
-      subtitle: "Bundled, managed, and workspace skills.",
-      stats: [
-        { label: "Total", value: skills.length },
-        { label: "Shown", value: filtered.length },
-      ],
-      actions: html`
-        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
-          ${props.loading ? "Loading…" : "Refresh"}
-        </button>
-      `,
-    }),
-    main: surfaceMain(html`
-      <section class="card">
-        <div class="filters">
-          <label class="field field--flex">
-            <span>Filter</span>
-            <input
-              .value=${props.filter}
-              @input=${(e: Event) => props.onFilterChange((e.target as HTMLInputElement).value)}
-              placeholder="Search skills"
-            />
-          </label>
-          <div class="muted">${filtered.length} shown</div>
-        </div>
+  const enabledCount = skills.filter((s) => !s.disabled).length;
 
-        ${props.error ? html`<div class="callout danger mt-3">${props.error}</div>` : nothing}
-
-        ${
-          filtered.length === 0
-            ? html`
-                <div class="muted mt-4">No skills found.</div>
-              `
-            : html`
-              <div class="agent-skills-groups">
-                ${groups.map((group) => {
-                  const collapsedByDefault = group.id === "workspace" || group.id === "built-in";
-                  return html`
-                    <details class="agent-skills-group" ?open=${!collapsedByDefault}>
-                      <summary class="agent-skills-header">
-                        <span>${group.label}</span>
-                        <span class="muted">${group.skills.length}</span>
-                      </summary>
-                      <div class="list skills-grid">
-                        ${group.skills.map((skill) => renderSkill(skill, props))}
-                      </div>
-                    </details>
-                  `;
-                })}
-              </div>
-            `
-        }
-      </section>
-    `),
+  const hero = surfaceHero({
+    title: "Skills",
+    subtitle: "Bundled, managed, and workspace skills.",
+    stats: [
+      { label: "Total", value: skills.length },
+      { label: "Enabled", value: enabledCount },
+    ],
+    actions: html`
+      <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
+        ${props.loading ? "Loading…" : "Refresh"}
+      </button>
+    `,
   });
+
+  const main = surfaceMain(html`
+    <div class="filters">
+      <label class="field field--flex">
+        <span>Filter</span>
+        <input
+          .value=${props.filter}
+          @input=${(e: Event) => props.onFilterChange((e.target as HTMLInputElement).value)}
+          placeholder="Search skills"
+        />
+      </label>
+      <div class="muted">${filtered.length} shown</div>
+    </div>
+
+    ${props.error ? html`<div class="callout danger">${props.error}</div>` : nothing}
+
+    ${
+      filtered.length === 0
+        ? html`
+            <div class="muted">No skills found.</div>
+          `
+        : html`
+        <div class="agent-skills-groups">
+          ${groups.map((group) => {
+            const collapsedByDefault = group.id === "workspace" || group.id === "built-in";
+            return html`
+              <details class="agent-skills-group" ?open=${!collapsedByDefault}>
+                <summary class="agent-skills-header">
+                  <span>${group.label}</span>
+                  <span class="muted">${group.skills.length}</span>
+                </summary>
+                <div class="list skills-grid">
+                  ${group.skills.map((skill) => renderSkill(skill, props))}
+                </div>
+              </details>
+            `;
+          })}
+        </div>
+      `
+    }
+  `);
+
+  return surfacePage("skills", { hero, main });
 }
 
 function renderSkill(skill: SkillStatusEntry, props: SkillsProps) {

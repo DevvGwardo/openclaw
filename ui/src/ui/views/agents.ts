@@ -108,21 +108,21 @@ export function renderAgents(props: AgentsProps) {
     ? (agents.find((agent) => agent.id === selectedId) ?? null)
     : null;
 
-  return surfacePage("agents", {
-    hero: surfaceHero({
-      title: "Agents",
-      subtitle: "Configure and inspect agent workspaces.",
-      stats: [{ label: "Configured", value: agents.length }],
-      actions: html`
-        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
-          ${props.loading ? "Loading…" : "Refresh"}
-        </button>
-      `,
-    }),
-    main: surfaceMain(html`
+  const hero = surfaceHero({
+    title: "Agents",
+    subtitle: "Configured agents, workspaces, and routing.",
+    stats: [{ label: "Configured", value: agents.length }],
+    actions: html`
+      <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
+        ${props.loading ? "Loading…" : "Refresh"}
+      </button>
+    `,
+  });
+
+  const main = surfaceMain(html`
     <div class="agents-layout">
       <section class="card agents-sidebar">
-        ${props.error ? html`<div class="callout danger" style="margin-bottom: 12px;">${props.error}</div>` : nothing}
+        ${props.error ? html`<div class="callout danger">${props.error}</div>` : nothing}
         <div class="agent-list">
           ${
             agents.length === 0
@@ -288,8 +288,9 @@ export function renderAgents(props: AgentsProps) {
         }
       </section>
     </div>
-    `),
-  });
+  `);
+
+  return surfacePage("agents", { hero, main });
 }
 
 function renderAgentHeader(

@@ -19,6 +19,16 @@ declare global {
   }
 }
 
+// Shared helper: dispatch navigation for each URL in a deep-link payload.
+function handleDeepLinkUrls(urls: string[]) {
+  for (const url of urls) {
+    const result = parseTauriDeepLink(url);
+    if (result) {
+      window.dispatchEvent(new CustomEvent("openclaw:navigate", { detail: { tab: result.tab } }));
+    }
+  }
+}
+
 if (window.__TAURI__) {
   // Disable browser context menu in the desktop shell.
   document.addEventListener("contextmenu", (event) => {
@@ -29,14 +39,15 @@ if (window.__TAURI__) {
   // The shell listens for the custom "openclaw:navigate" event.
   const tauriEvent = await import("@tauri-apps/api/event");
   await tauriEvent.listen("deep-link", (event: { payload: string[] }) => {
-    const urls = event.payload;
-    for (const url of urls) {
-      const result = parseTauriDeepLink(url);
-      if (result) {
-        window.dispatchEvent(new CustomEvent("openclaw:navigate", { detail: { tab: result.tab } }));
-      }
-    }
+    handleDeepLinkUrls(event.payload);
   });
+
+  // Read any URL that triggered a cold launch via deep-link (startup read).
+  const { getCurrent } = await import("@tauri-apps/plugin-deep-link");
+  const currentUrls = await getCurrent();
+  if (currentUrls) {
+    handleDeepLinkUrls(currentUrls);
+  }
 
   // Quick-status tray event — navigate to overview tab.
   await tauriEvent.listen("tray:status", () => {

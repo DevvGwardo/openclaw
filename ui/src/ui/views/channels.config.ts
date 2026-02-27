@@ -8,6 +8,7 @@ type ChannelConfigFormProps = {
   configValue: Record<string, unknown> | null;
   schema: unknown;
   uiHints: ConfigUiHints;
+  privacyMode: boolean;
   disabled: boolean;
   onPatch: (path: Array<string | number>, value: unknown) => void;
 };
@@ -158,6 +159,7 @@ export function renderChannelConfigSection(params: {
                 configValue: props.configForm,
                 schema: props.configSchema,
                 uiHints: props.configUiHints,
+                privacyMode: props.privacyMode,
                 disabled,
                 onPatch: props.onConfigPatch,
               })

@@ -12,35 +12,32 @@ export type InstancesProps = {
 };
 
 export function renderInstances(props: InstancesProps) {
-  const count = props.entries.length;
-
-  return surfacePage("instances", {
-    hero: surfaceHero({
-      title: "Instances",
-      subtitle: "Presence beacons from the gateway and clients.",
-      stats: [{ label: "Connected", value: count }],
-      actions: html`
-        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
-          ${props.loading ? "Loading…" : "Refresh"}
-        </button>
-      `,
-    }),
-    main: surfaceMain(html`
-      ${props.lastError ? html`<div class="callout danger">${props.lastError}</div>` : nothing}
-      ${props.statusMessage ? html`<div class="callout">${props.statusMessage}</div>` : nothing}
-      <section class="card">
-        <div class="list">
-          ${
-            count === 0
-              ? html`
-                  <div class="muted">No instances reported yet.</div>
-                `
-              : props.entries.map((entry) => renderEntry(entry))
-          }
-        </div>
-      </section>
-    `),
+  const hero = surfaceHero({
+    title: "Instances",
+    subtitle: "Presence beacons from the gateway and clients.",
+    stats: [{ label: "Connected", value: props.entries.length }],
+    actions: html`
+      <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
+        ${props.loading ? "Loading…" : "Refresh"}
+      </button>
+    `,
   });
+
+  const main = surfaceMain(html`
+    ${props.lastError ? html`<div class="callout danger">${props.lastError}</div>` : nothing}
+    ${props.statusMessage ? html`<div class="callout">${props.statusMessage}</div>` : nothing}
+    <div class="list">
+      ${
+        props.entries.length === 0
+          ? html`
+              <div class="muted">No instances reported yet.</div>
+            `
+          : props.entries.map((entry) => renderEntry(entry))
+      }
+    </div>
+  `);
+
+  return surfacePage("instances", { hero, main });
 }
 
 function renderEntry(entry: PresenceEntry) {

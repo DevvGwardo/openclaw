@@ -7,7 +7,7 @@ import { customElement } from "lit/decorators.js";
 import { renderApp, renderAppOverlays } from "./app-render.ts";
 import type { AppViewState } from "./app-view-state.ts";
 import { OpenClawApp } from "./app.ts";
-import { titleForTab, type Tab } from "./navigation.ts";
+import { TAB_PATHS, titleForTab, type Tab } from "./navigation.ts";
 import "./tauri-sidebar.ts";
 import "./tauri-titlebar.ts";
 
@@ -29,6 +29,9 @@ export class TauriShell extends OpenClawApp {
   private _onNavigate = (event: Event) => {
     const detail = (event as CustomEvent<{ tab?: string }>).detail;
     if (detail?.tab) {
+      if (!(detail.tab in TAB_PATHS)) {
+        return;
+      }
       this.setTab(detail.tab as Tab);
     }
   };
@@ -37,6 +40,9 @@ export class TauriShell extends OpenClawApp {
   private _handleTabChange = (event: Event) => {
     const tab = (event as CustomEvent<string>).detail;
     if (tab) {
+      if (!(tab in TAB_PATHS)) {
+        return;
+      }
       this.setTab(tab as Tab);
     }
   };
