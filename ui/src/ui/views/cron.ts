@@ -1,6 +1,7 @@
 import { html, nothing, render } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import type { CronFieldErrors, CronFieldKey } from "../controllers/cron.ts";
+import { surfaceHero, surfaceMain, surfacePage } from "./surface-page.ts";
 import { formatRelativeTimestamp, formatMs } from "../format.ts";
 import { pathForTab } from "../navigation.ts";
 import { formatCronSchedule, formatNextRun } from "../presenter.ts";
@@ -339,35 +340,27 @@ export function renderCron(props: CronProps) {
   ).map((option) => option.label);
   const statusSummary = summarizeSelection(selectedStatusLabels, "All statuses");
   const deliverySummary = summarizeSelection(selectedDeliveryLabels, "All delivery");
-  return html`
-    <section class="cron-summary-strip">
-      <div class="cron-summary-strip__left">
-        <div class="cron-summary-item">
-          <div class="cron-summary-label">Enabled</div>
-          <div class="cron-summary-value">
-            <span class=${`chip ${props.status?.enabled ? "chip-ok" : "chip-danger"}`}>
-              ${props.status ? (props.status.enabled ? "Yes" : "No") : "n/a"}
-            </span>
-          </div>
-        </div>
-        <div class="cron-summary-item">
-          <div class="cron-summary-label">Jobs</div>
-          <div class="cron-summary-value">${props.status?.jobs ?? "n/a"}</div>
-        </div>
-        <div class="cron-summary-item cron-summary-item--wide">
-          <div class="cron-summary-label">Next wake</div>
-          <div class="cron-summary-value">${formatNextRun(props.status?.nextWakeAtMs ?? null)}</div>
-        </div>
-      </div>
-      <div class="cron-summary-strip__actions">
-        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
-          ${props.loading ? "Refreshing..." : "Refresh"}
-        </button>
-        ${props.error ? html`<span class="muted">${props.error}</span>` : nothing}
-      </div>
-    </section>
+  const enabledValue = props.status
+    ? html`<span class=${`chip ${props.status.enabled ? "chip-ok" : "chip-danger"}`}>${props.status.enabled ? "Yes" : "No"}</span>`
+    : html`<span class="muted">n/a</span>`;
 
-    <section class="cron-workspace">
+  const hero = surfaceHero({
+    title: "Cron",
+    subtitle: "Scheduled jobs and run history.",
+    stats: [
+      { label: "Enabled", value: enabledValue },
+      { label: "Jobs", value: props.status?.jobs ?? "n/a" },
+      { label: "Next wake", value: formatNextRun(props.status?.nextWakeAtMs ?? null) },
+    ],
+    actions: html`
+      <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
+        ${props.loading ? "Refreshing..." : "Refresh"}
+      </button>
+      ${props.error ? html`<span class="muted">${props.error}</span>` : nothing}
+    `,
+  });
+
+  const main = surfaceMain(html`<section class="cron-workspace">
       <div class="cron-workspace-main">
         <section class="card">
           <div class="row row--between row--top">
@@ -625,7 +618,9 @@ export function renderCron(props: CronProps) {
     ${renderSuggestionList("cron-thinking-suggestions", props.thinkingSuggestions)}
     ${renderSuggestionList("cron-tz-suggestions", props.timezoneSuggestions)}
     ${renderSuggestionList("cron-delivery-to-suggestions", props.deliveryToSuggestions)}
-  `;
+  `);
+
+  return surfacePage("cron", { hero, main });
 }
 
 const CRON_MODAL_PORTAL_ID = "cron-modal-portal";

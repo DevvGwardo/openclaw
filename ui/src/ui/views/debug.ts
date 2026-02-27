@@ -1,6 +1,7 @@
 import { html, nothing } from "lit";
 import type { EventLogEntry } from "../app-events.ts";
 import { formatEventPayload } from "../presenter.ts";
+import { surfaceHero, surfaceMain, surfacePage } from "./surface-page.ts";
 
 export type DebugProps = {
   loading: boolean;
@@ -32,18 +33,24 @@ export function renderDebug(props: DebugProps) {
   const securityLabel =
     critical > 0 ? `${critical} critical` : warn > 0 ? `${warn} warnings` : "No critical issues";
 
-  return html`
+  const hero = surfaceHero({
+    title: "Debug",
+    subtitle: "Status, health, and heartbeat data.",
+    stats: securitySummary
+      ? [{ label: "Security", value: securityLabel }]
+      : [],
+    actions: html`
+      <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
+        ${props.loading ? "Refreshing…" : "Refresh"}
+      </button>
+    `,
+  });
+
+  const main = surfaceMain(html`
     <section class="grid grid-cols-2">
       <div class="card">
-        <div class="row" style="justify-content: space-between;">
-          <div>
-            <div class="card-title">Snapshots</div>
-            <div class="card-sub">Status, health, and heartbeat data.</div>
-          </div>
-          <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
-            ${props.loading ? "Refreshing…" : "Refresh"}
-          </button>
-        </div>
+        <div class="card-title">Snapshots</div>
+        <div class="card-sub">Status, health, and heartbeat data.</div>
         <div class="stack" style="margin-top: 12px;">
           <div>
             <div class="muted">Status</div>
@@ -145,5 +152,7 @@ export function renderDebug(props: DebugProps) {
           `
       }
     </section>
-  `;
+  `);
+
+  return surfacePage("debug", { hero, main });
 }
