@@ -2,6 +2,28 @@ import { html, nothing } from "lit";
 import type { ChannelAccountSnapshot } from "../types.ts";
 import type { ChannelKey, ChannelsProps } from "./channels.types.ts";
 
+export function shouldAutoExpand(params: {
+  configured?: boolean;
+  running?: boolean;
+  connected?: boolean | null;
+  lastError?: string | null;
+}): boolean {
+  return !!(params.configured || params.running || params.connected || params.lastError);
+}
+
+/** Generic "Probe" primary action used by all non-WhatsApp channels in the summary row. */
+export function channelPrimaryAction(props: ChannelsProps) {
+  return html`<button
+    class="btn btn--xs"
+    @click=${(e: Event) => {
+      e.stopPropagation();
+      props.onRefresh(true);
+    }}
+  >
+    Probe
+  </button>`;
+}
+
 export type ChannelStatusInfo = {
   dot: "ok" | "warn" | "error" | "off";
   badge: string;

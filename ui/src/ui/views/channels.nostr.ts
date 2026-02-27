@@ -7,7 +7,6 @@ import {
   type NostrProfileFormState,
   type NostrProfileFormCallbacks,
 } from "./channels.nostr-profile-form.ts";
-import { deriveChannelStatus } from "./channels.shared.ts";
 import type { ChannelsProps } from "./channels.types.ts";
 
 /**
@@ -23,7 +22,8 @@ function truncatePubkey(pubkey: string | null | undefined): string {
   return `${pubkey.slice(0, 8)}...${pubkey.slice(-8)}`;
 }
 
-export function renderNostrCard(params: {
+/** Body content for the Nostr channel card (inside channel-card-v2__body). */
+export function renderNostrBody(params: {
   props: ChannelsProps;
   nostr?: NostrStatus | null;
   nostrAccounts: ChannelAccountSnapshot[];
@@ -53,11 +53,6 @@ export function renderNostrCard(params: {
   const summaryLastError = nostr?.lastError ?? primaryAccount?.lastError ?? null;
   const hasMultipleAccounts = nostrAccounts.length > 1;
   const showingForm = profileFormState !== null && profileFormState !== undefined;
-  const channelStatus = deriveChannelStatus({
-    configured: summaryConfigured,
-    running: summaryRunning,
-    lastError: summaryLastError,
-  });
 
   const renderAccountCard = (account: ChannelAccountSnapshot) => {
     const publicKey = (account as { publicKey?: string }).publicKey;
@@ -194,73 +189,57 @@ export function renderNostrCard(params: {
   };
 
   return html`
-    <div class="card card--static">
-      <div class="channel-card__header">
-        <div class="channel-card__title-row">
-          <span class="channel-card__dot channel-card__dot--${channelStatus.dot}"></span>
-          <div class="card-title">Nostr</div>
-        </div>
-        <span class="channel-card__badge channel-card__badge--${channelStatus.badgeVariant}">
-          ${channelStatus.badge}
-        </span>
-      </div>
-      <div class="card-sub">Decentralized DMs via Nostr relays (NIP-04).</div>
-      ${accountCountLabel}
+    ${accountCountLabel}
 
-      ${
-        hasMultipleAccounts
-          ? html`
-            <div class="account-card-list">
-              ${nostrAccounts.map((account) => renderAccountCard(account))}
+    ${
+      hasMultipleAccounts
+        ? html`
+          <div class="account-card-list">
+            ${nostrAccounts.map((account) => renderAccountCard(account))}
+          </div>
+        `
+        : html`
+          <div class="status-list" style="margin-top: 16px;">
+            <div>
+              <span class="label">Configured</span>
+              <span class="${summaryConfigured ? "status-value--yes" : "status-value--no"}">
+                ${summaryConfigured ? "Yes" : "No"}
+              </span>
             </div>
-          `
-          : html`
-            <div class="status-list" style="margin-top: 16px;">
-              <div>
-                <span class="label">Configured</span>
-                <span class="${summaryConfigured ? "status-value--yes" : "status-value--no"}">
-                  ${summaryConfigured ? "Yes" : "No"}
-                </span>
-              </div>
-              <div>
-                <span class="label">Running</span>
-                <span class="${summaryRunning ? "status-value--yes" : "status-value--no"}">
-                  ${summaryRunning ? "Yes" : "No"}
-                </span>
-              </div>
-              <div>
-                <span class="label">Public Key</span>
-                <span class="mono status-value--no" title="${summaryPublicKey ?? ""}">
-                  ${truncatePubkey(summaryPublicKey)}
-                </span>
-              </div>
-              <div>
-                <span class="label">Last start</span>
-                <span class="status-value--no">
-                  ${summaryLastStartAt ? formatRelativeTimestamp(summaryLastStartAt) : "n/a"}
-                </span>
-              </div>
+            <div>
+              <span class="label">Running</span>
+              <span class="${summaryRunning ? "status-value--yes" : "status-value--no"}">
+                ${summaryRunning ? "Yes" : "No"}
+              </span>
             </div>
-          `
-      }
+            <div>
+              <span class="label">Public Key</span>
+              <span class="mono status-value--no" title="${summaryPublicKey ?? ""}">
+                ${truncatePubkey(summaryPublicKey)}
+              </span>
+            </div>
+            <div>
+              <span class="label">Last start</span>
+              <span class="status-value--no">
+                ${summaryLastStartAt ? formatRelativeTimestamp(summaryLastStartAt) : "n/a"}
+              </span>
+            </div>
+          </div>
+        `
+    }
 
-      ${
-        summaryLastError
-          ? html`<div class="callout danger" style="margin-top: 12px;">${summaryLastError}</div>`
-          : nothing
-      }
+    ${
+      summaryLastError
+        ? html`<div class="callout danger" style="margin-top: 12px;">${summaryLastError}</div>`
+        : nothing
+    }
 
-      ${renderProfileSection()}
+    ${renderProfileSection()}
 
-      ${renderChannelConfigSection({
-        channelId: "nostr",
-        props,
-        isConfigured: summaryConfigured,
-      })}
-
-      <div class="row" style="margin-top: 12px;">
-        <button class="btn btn--sm" @click=${() => props.onRefresh(false)}>Refresh</button>
-      </div>
-    </div>
+    ${renderChannelConfigSection({
+      channelId: "nostr",
+      props,
+      isConfigured: summaryConfigured,
+    })}
   `;
 }

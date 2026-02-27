@@ -168,12 +168,14 @@ export function surfaceHero(opts: SurfaceHeroOptions): TemplateResult {
           ${opts.subtitle ? html`<span class="surface-hero__sub">${opts.subtitle}</span>` : nothing}
         </div>
       `
-    : html`
+    : opts.title || opts.subtitle
+    ? html`
         <div class="surface-hero__title-block">
           ${opts.title ? html`<div class="surface-hero__title">${opts.title}</div>` : nothing}
           ${opts.subtitle ? html`<div class="surface-hero__sub">${opts.subtitle}</div>` : nothing}
         </div>
-      `;
+      `
+    : nothing;
 
   const statsRow =
     opts.stats && opts.stats.length > 0
