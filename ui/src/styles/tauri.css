@@ -121,67 +121,6 @@ tauri-shell {
   min-height: 100%;
 }
 
-/* ── Footer ── */
-.tauri-shell__footer {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 16px;
-  height: 28px;
-  background: var(--color-surface-sidebar, #111);
-  border-top: 1px solid var(--color-border, rgba(255 255 255 / 0.06));
-  font-size: 11px;
-  color: var(--color-text-faint, #555);
-}
-
-.tauri-shell__footer-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tauri-shell__footer-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-status-offline, #555);
-  transition: background 0.3s ease;
-}
-
-.tauri-shell__footer-dot--connected {
-  background: var(--color-success, #3fb950);
-}
-
-.tauri-shell__footer-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  padding: 2px 4px;
-  color: var(--color-text-faint, #555);
-  cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease;
-}
-
-.tauri-shell__footer-btn:hover {
-  color: var(--color-text-secondary, #999);
-  background: rgba(255 255 255 / 0.05);
-}
-
-.tauri-shell__footer-btn--active {
-  color: var(--color-accent, #58a6ff);
-  background: rgba(88 166 255 / 0.1);
-  border-color: rgba(88 166 255 / 0.2);
-}
-
-.tauri-shell__footer-btn--active:hover {
-  color: var(--color-accent, #58a6ff);
-  background: rgba(88 166 255 / 0.15);
-}
-
 /* ── Thin native-feeling scrollbars (scoped to scrollable containers) ── */
 html,
 .tauri-shell__content,
