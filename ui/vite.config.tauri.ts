@@ -10,6 +10,7 @@ export default defineConfig({
   publicDir: path.resolve(here, "public"),
   optimizeDeps: {
     include: ["lit/directives/repeat.js"],
+    exclude: ["@tauri-apps/api", "@tauri-apps/plugin-deep-link"],
   },
   build: {
     outDir: path.resolve(here, "../apps/tauri/dist-ui"),
