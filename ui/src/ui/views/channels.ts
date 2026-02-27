@@ -77,7 +77,7 @@ export function renderChannels(props: ChannelsProps) {
   });
 
   const main = surfaceMain(html`
-    <section class="grid grid-cols-2">
+    <section class="grid grid-channels">
       ${orderedChannels.map((channel, idx) => {
         const animDelay = (idx + 1) * 50 + 50; // 100ms, 150ms, 200ms …
         return html`
@@ -228,7 +228,7 @@ function renderGenericChannelCard(
   const channelStatus = deriveChannelStatus({ configured, running, connected, lastError });
 
   return html`
-    <div class="card">
+    <div class="card card--static">
       <div class="channel-card__header">
         <div class="channel-card__title-row">
           <span class="channel-card__dot channel-card__dot--${channelStatus.dot}"></span>

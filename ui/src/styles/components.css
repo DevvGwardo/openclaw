@@ -46,6 +46,14 @@
   border-color: var(--border-strong, rgba(255 255 255 / 0.14));
 }
 
+.card--static,
+.card--static:hover {
+  transition: none;
+}
+.card--static:hover {
+  border-color: var(--color-border, rgba(255 255 255 / 0.08));
+}
+
 .card-title {
   font-size: 15px;
   font-weight: 600;
@@ -152,9 +160,6 @@
   transition: border-color var(--duration-fast) ease;
 }
 
-.account-card:hover {
-  border-color: var(--border-strong, rgba(255 255 255 / 0.14));
-}
 
 .account-card-header {
   display: flex;
@@ -3525,9 +3530,7 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   transition: opacity 150ms;
 }
 
-.channel-card--disabled:hover {
-  opacity: 1;
-}
+
 
 /* ----- Status list value coloring ----- */
 
