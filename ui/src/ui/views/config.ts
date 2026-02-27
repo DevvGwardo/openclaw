@@ -2,7 +2,7 @@ import { html, nothing } from "lit";
 import type { ConfigUiHints } from "../types.ts";
 import { hintForPath, humanize, schemaType, type JsonSchema } from "./config-form.shared.ts";
 import { analyzeConfigSchema, renderConfigForm, SECTION_META } from "./config-form.ts";
-import { getTagFilters, replaceTagFilters } from "./config-search.ts";
+import { getTagFilters, toggleTagFilter } from "./config-search.ts";
 
 export type ConfigProps = {
   raw: string;
@@ -53,8 +53,8 @@ const TAG_SEARCH_PRESETS = [
   "advanced",
 ] as const;
 
-// SVG Icons for sidebar (Lucide-style)
-const sidebarIcons = {
+// SVG Icons (Lucide-style)
+const configIcons = {
   all: html`
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <rect x="3" y="3" width="7" height="7"></rect>
@@ -152,7 +152,6 @@ const sidebarIcons = {
       <path d="M12.2 6.2 11 5"></path>
     </svg>
   `,
-  // Additional sections
   meta: html`
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M12 20h9"></path>
@@ -307,7 +306,7 @@ type SubsectionEntry = {
 const ALL_SUBSECTION = "__all__";
 
 function getSectionIcon(key: string) {
-  return sidebarIcons[key as keyof typeof sidebarIcons] ?? sidebarIcons.default;
+  return configIcons[key as keyof typeof configIcons] ?? configIcons.default;
 }
 
 function resolveSectionMeta(
@@ -463,7 +462,6 @@ export function renderConfig(props: ConfigProps) {
   const hasChanges = props.formMode === "form" ? diff.length > 0 : hasRawChanges;
 
   // Save/apply buttons require actual changes to be enabled.
-  // Note: formUnsafe warns about unsupported schema paths but shouldn't block saving.
   const canSaveForm = Boolean(props.formValue) && !props.loading && Boolean(analysis.schema);
   const canSave =
     props.connected &&
@@ -477,19 +475,102 @@ export function renderConfig(props: ConfigProps) {
     hasChanges &&
     (props.formMode === "raw" ? true : canSaveForm);
   const canUpdate = props.connected && !props.applying && !props.updating;
+
   const selectedTags = new Set(getTagFilters(props.searchQuery));
 
   return html`
-    <div class="config-layout">
-      <!-- Sidebar -->
-      <aside class="config-sidebar">
-        <div class="config-sidebar__header">
-          <div class="config-sidebar__header-info">
-            <div class="config-sidebar__title">Config</div>
-            <div class="config-sidebar__path">~/.openclaw/openclaw.json</div>
+    <div class="config-page">
+      <!-- ===== TOP SEARCH BAR ===== -->
+      <div class="config-topbar">
+        <div class="config-topbar__search-wrap">
+          <div class="config-topbar__search">
+            <svg
+              class="config-topbar__search-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="M21 21l-4.35-4.35"></path>
+            </svg>
+            <input
+              type="text"
+              class="config-topbar__search-input"
+              placeholder="Search settings…"
+              .value=${props.searchQuery
+                .replace(/(^|\s)tag:[^\s]+/gi, " ")
+                .replace(/\s+/g, " ")
+                .trim()}
+              @input=${(e: Event) => {
+                // Combine new text with existing tag filters
+                const newText = (e.target as HTMLInputElement).value;
+                const tagPart = props.searchQuery.match(/((?:^|\s)tag:[^\s]+)+/gi)?.join(" ") ?? "";
+                const combined = [newText.trim(), tagPart.trim()].filter(Boolean).join(" ");
+                props.onSearchChange(combined);
+              }}
+            />
+            <!-- Active tag chips inside search bar -->
+            ${
+              selectedTags.size > 0
+                ? html`
+                    <div class="config-topbar__active-tags">
+                      ${Array.from(selectedTags).map(
+                        (tag) => html`
+                          <span class="config-topbar__tag-chip">
+                            <span class="config-topbar__tag-chip-label">tag:${tag}</span>
+                            <button
+                              class="config-topbar__tag-chip-remove"
+                              type="button"
+                              aria-label="Remove tag filter: ${tag}"
+                              @click=${() => {
+                                props.onSearchChange(toggleTagFilter(props.searchQuery, tag));
+                              }}
+                            >×</button>
+                          </span>
+                        `,
+                      )}
+                    </div>
+                  `
+                : nothing
+            }
+            ${
+              props.searchQuery
+                ? html`
+                    <button
+                      class="config-topbar__search-clear"
+                      type="button"
+                      aria-label="Clear search"
+                      @click=${() => props.onSearchChange("")}
+                    >×</button>
+                  `
+                : nothing
+            }
           </div>
+          <!-- Suggested tag chips shown below search bar -->
+          <div class="config-topbar__tag-presets" aria-label="Suggested tag filters">
+            ${TAG_SEARCH_PRESETS.map((tag) => {
+              const active = selectedTags.has(tag);
+              return html`
+                <button
+                  type="button"
+                  class="config-topbar__tag-preset ${active ? "active" : ""}"
+                  aria-pressed=${active ? "true" : "false"}
+                  @click=${() => {
+                    props.onSearchChange(toggleTagFilter(props.searchQuery, tag));
+                  }}
+                >
+                  ${tag}
+                </button>
+              `;
+            })}
+          </div>
+        </div>
+
+        <!-- Connection status + config path (right side of topbar) -->
+        <div class="config-topbar__meta">
           <span
-            class="pill pill--sm ${
+            class="config-topbar__validity pill pill--sm ${
               validity === "valid"
                 ? "pill--ok"
                 : validity === "invalid"
@@ -511,312 +592,61 @@ export function renderConfig(props: ConfigProps) {
                     `
             }
           </span>
+          <span class="config-topbar__path">~/.openclaw/openclaw.json</span>
         </div>
+      </div>
 
-        <!-- Search -->
-        <div class="config-search">
-          <div class="config-search__input-row">
-            <svg
-              class="config-search__icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="M21 21l-4.35-4.35"></path>
-            </svg>
-            <input
-              type="text"
-              class="config-search__input"
-              placeholder="Search settings..."
-              .value=${props.searchQuery}
-              @input=${(e: Event) => props.onSearchChange((e.target as HTMLInputElement).value)}
-            />
-            ${
-              props.searchQuery
-                ? html`
-                  <button
-                    class="config-search__clear"
-                    @click=${() => props.onSearchChange("")}
-                  >
-                    ×
-                  </button>
-                `
-                : nothing
-            }
-          </div>
-          <div class="config-search__hint">
-            <span class="config-search__hint-label" id="config-tag-filter-label">Tag filters:</span>
-            <details class="config-search__tag-picker">
-              <summary class="config-search__tag-trigger" aria-labelledby="config-tag-filter-label">
-                ${
-                  selectedTags.size === 0
-                    ? html`
-                        <span class="config-search__tag-placeholder">Add tags</span>
-                      `
-                    : html`
-                        <div class="config-search__tag-chips">
-                          ${Array.from(selectedTags)
-                            .slice(0, 2)
-                            .map(
-                              (tag) =>
-                                html`<span class="config-search__tag-chip">tag:${tag}</span>`,
-                            )}
-                          ${
-                            selectedTags.size > 2
-                              ? html`
-                                  <span class="config-search__tag-chip config-search__tag-chip--count"
-                                    >+${selectedTags.size - 2}</span
-                                  >
-                                `
-                              : nothing
-                          }
-                        </div>
-                      `
-                }
-                <span class="config-search__tag-caret" aria-hidden="true">▾</span>
-              </summary>
-              <div class="config-search__tag-menu">
-                ${TAG_SEARCH_PRESETS.map((tag) => {
-                  const active = selectedTags.has(tag);
-                  return html`
-                    <button
-                      type="button"
-                      class="config-search__tag-option ${active ? "active" : ""}"
-                      data-tag="${tag}"
-                      aria-pressed=${active ? "true" : "false"}
-                      @click=${() => {
-                        const nextTags = active
-                          ? Array.from(selectedTags).filter((value) => value !== tag)
-                          : [...selectedTags, tag];
-                        props.onSearchChange(replaceTagFilters(props.searchQuery, nextTags));
-                      }}
-                    >
-                      tag:${tag}
-                    </button>
-                  `;
-                })}
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Section nav -->
-        <nav class="config-nav">
+      <!-- ===== SECTION TAB BAR ===== -->
+      <nav class="config-tabs" aria-label="Config sections">
+        <!-- Wide viewport: scrollable button tabs -->
+        <div class="config-tabs__bar">
           <button
-            class="config-nav__item ${props.activeSection === null ? "active" : ""}"
+            class="config-tab ${props.activeSection === null ? "active" : ""}"
             @click=${() => props.onSectionChange(null)}
+            aria-selected=${props.activeSection === null ? "true" : "false"}
+            role="tab"
           >
-            <span class="config-nav__icon">${sidebarIcons.all}</span>
-            <span class="config-nav__label">All Settings</span>
+            <span class="config-tab__icon">${configIcons.all}</span>
+            <span class="config-tab__label">All</span>
           </button>
           ${allSections.map(
             (section) => html`
               <button
-                class="config-nav__item ${props.activeSection === section.key ? "active" : ""}"
+                class="config-tab ${props.activeSection === section.key ? "active" : ""}"
                 @click=${() => props.onSectionChange(section.key)}
+                aria-selected=${props.activeSection === section.key ? "true" : "false"}
+                role="tab"
               >
-                <span class="config-nav__icon"
-                  >${getSectionIcon(section.key)}</span
-                >
-                <span class="config-nav__label">${section.label}</span>
+                <span class="config-tab__icon">${getSectionIcon(section.key)}</span>
+                <span class="config-tab__label">${section.label}</span>
               </button>
             `,
           )}
-        </nav>
-
-        <!-- Mode toggle at bottom -->
-        <div class="config-sidebar__footer">
-          <div class="config-mode-toggle">
-            <button
-              class="config-mode-toggle__btn ${props.formMode === "form" ? "active" : ""}"
-              ?disabled=${props.schemaLoading || !props.schema}
-              @click=${() => props.onFormModeChange("form")}
-            >
-              Form
-            </button>
-            <button
-              class="config-mode-toggle__btn ${props.formMode === "raw" ? "active" : ""}"
-              @click=${() => props.onFormModeChange("raw")}
-            >
-              Raw
-            </button>
-          </div>
         </div>
-      </aside>
+        <!-- Narrow viewport: dropdown select -->
+        <select
+          class="config-tabs__select"
+          aria-label="Select config section"
+          @change=${(e: Event) => {
+            const val = (e.target as HTMLSelectElement).value;
+            props.onSectionChange(val === "" ? null : val);
+          }}
+        >
+          <option value="" ?selected=${props.activeSection === null}>All Settings</option>
+          ${allSections.map(
+            (section) => html`
+              <option value="${section.key}" ?selected=${props.activeSection === section.key}>
+                ${section.label}
+              </option>
+            `,
+          )}
+        </select>
+      </nav>
 
-      <!-- Main content -->
-      <main class="config-main">
-        <!-- Action bar -->
-        <div class="config-actions">
-          <div class="config-actions__left">
-            ${
-              hasChanges
-                ? html`
-                  <span class="config-changes-badge config-changes-badge--pulse"
-                    >${
-                      props.formMode === "raw"
-                        ? "Unsaved changes"
-                        : `${diff.length} change${diff.length !== 1 ? "s" : ""} pending`
-                    }</span
-                  >
-                `
-                : html`
-                    <span class="config-saved-badge">✓ All saved</span>
-                  `
-            }
-            <span class="config-status">
-              <span
-                class="config-status-dot ${
-                  props.connected
-                    ? "config-status-dot--connected"
-                    : "config-status-dot--disconnected"
-                }"
-              ></span>
-              ${props.connected ? "Connected" : "Disconnected"}
-            </span>
-            <!-- Inline mode toggle for mobile (sidebar footer is hidden) -->
-            <div class="config-mode-toggle config-mode-toggle--inline">
-              <button
-                class="config-mode-toggle__btn ${props.formMode === "form" ? "active" : ""}"
-                ?disabled=${props.schemaLoading || !props.schema}
-                @click=${() => props.onFormModeChange("form")}
-              >
-                Form
-              </button>
-              <button
-                class="config-mode-toggle__btn ${props.formMode === "raw" ? "active" : ""}"
-                @click=${() => props.onFormModeChange("raw")}
-              >
-                Raw
-              </button>
-            </div>
-          </div>
-          <div class="config-actions__right">
-            <button
-              class="btn btn--sm"
-              ?disabled=${props.loading}
-              @click=${props.onReload}
-            >
-              ${props.loading ? "Loading…" : "Reload"}
-            </button>
-            <!-- Save + Apply grouped (related: save to disk vs apply live) -->
-            <div class="config-actions__btn-group">
-              <button
-                class="btn btn--sm primary"
-                ?disabled=${!canSave}
-                @click=${props.onSave}
-              >
-                ${props.saving ? "Saving…" : "Save"}
-              </button>
-              <button
-                class="btn btn--sm"
-                ?disabled=${!canApply}
-                @click=${props.onApply}
-              >
-                ${props.applying ? "Applying…" : "Apply"}
-              </button>
-            </div>
-            <button
-              class="btn btn--sm"
-              ?disabled=${!canUpdate}
-              @click=${props.onUpdate}
-            >
-              ${props.updating ? "Updating…" : "Update"}
-            </button>
-          </div>
-        </div>
-
-        <!-- Diff panel (form mode only - raw mode doesn't have granular diff) -->
-        ${
-          hasChanges && props.formMode === "form"
-            ? html`
-              <details class="config-diff">
-                <summary class="config-diff__summary">
-                  <span>${(() => {
-                    const added = diff.filter((d) => d.type === "added").length;
-                    const removed = diff.filter((d) => d.type === "removed").length;
-                    const modified = diff.filter((d) => d.type === "modified").length;
-                    const parts: string[] = [];
-                    if (added) {
-                      parts.push(`${added} added`);
-                    }
-                    if (removed) {
-                      parts.push(`${removed} removed`);
-                    }
-                    if (modified) {
-                      parts.push(`${modified} modified`);
-                    }
-                    return `${diff.length} change${diff.length !== 1 ? "s" : ""} (${parts.join(", ")})`;
-                  })()}</span>
-                  <svg
-                    class="config-diff__chevron"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                </summary>
-                <div class="config-diff__content">
-                  ${diff.map(
-                    (change) => html`
-                      <div class="config-diff__item config-diff__item--${change.type}">
-                        <span class="config-diff__type-icon" aria-hidden="true">${
-                          change.type === "added" ? "+" : change.type === "removed" ? "−" : "~"
-                        }</span>
-                        <div class="config-diff__body">
-                          <div class="config-diff__path">${change.path}</div>
-                          <div class="config-diff__values">
-                            ${
-                              change.type !== "added"
-                                ? html`<span class="config-diff__from">${truncateValue(change.from)}</span>
-                                <span class="config-diff__arrow">→</span>`
-                                : nothing
-                            }
-                            ${
-                              change.type !== "removed"
-                                ? html`<span class="config-diff__to">${truncateValue(change.to)}</span>`
-                                : nothing
-                            }
-                          </div>
-                        </div>
-                      </div>
-                    `,
-                  )}
-                </div>
-              </details>
-            `
-            : nothing
-        }
-        ${
-          activeSectionMeta && props.formMode === "form"
-            ? html`
-              <div class="config-section-hero">
-                <div class="config-section-hero__icon">
-                  ${getSectionIcon(props.activeSection ?? "")}
-                </div>
-                <div class="config-section-hero__text">
-                  <div class="config-section-hero__title">
-                    ${activeSectionMeta.label}
-                  </div>
-                  ${
-                    activeSectionMeta.description
-                      ? html`<div class="config-section-hero__desc">
-                        ${activeSectionMeta.description}
-                      </div>`
-                      : nothing
-                  }
-                </div>
-              </div>
-            `
-            : nothing
-        }
-        ${
-          allowSubnav
-            ? html`
+      <!-- ===== SUBSECTION NAV (secondary row, only when in a section) ===== -->
+      ${
+        allowSubnav
+          ? html`
               <div class="config-subnav">
                 <button
                   class="config-subnav__item ${effectiveSubsection === null ? "active" : ""}"
@@ -839,6 +669,161 @@ export function renderConfig(props: ConfigProps) {
                 )}
               </div>
             `
+          : nothing
+      }
+
+      <!-- ===== ACTION BAR ===== -->
+      <div class="config-actions">
+        <div class="config-actions__left">
+          <!-- Connection status -->
+          <span class="config-status">
+            <span
+              class="config-status-dot ${
+                props.connected ? "config-status-dot--connected" : "config-status-dot--disconnected"
+              }"
+            ></span>
+            ${props.connected ? "Connected" : "Disconnected"}
+          </span>
+          <!-- Changes indicator -->
+          ${
+            hasChanges
+              ? html`
+                  <span class="config-changes-badge config-changes-badge--pulse">
+                    ${
+                      props.formMode === "raw"
+                        ? "Unsaved changes"
+                        : `${diff.length} change${diff.length !== 1 ? "s" : ""}`
+                    }
+                  </span>
+                `
+              : html`
+                  <span class="config-saved-badge">✓ All saved</span>
+                `
+          }
+        </div>
+        <div class="config-actions__right">
+          <!-- Form/Raw mode toggle (segmented control) -->
+          <div class="config-mode-toggle" role="group" aria-label="Edit mode">
+            <button
+              class="config-mode-toggle__btn ${props.formMode === "form" ? "active" : ""}"
+              ?disabled=${props.schemaLoading || !props.schema}
+              @click=${() => props.onFormModeChange("form")}
+            >
+              Form
+            </button>
+            <button
+              class="config-mode-toggle__btn ${props.formMode === "raw" ? "active" : ""}"
+              @click=${() => props.onFormModeChange("raw")}
+            >
+              Raw
+            </button>
+          </div>
+          <!-- Reload -->
+          <button class="btn btn--sm" ?disabled=${props.loading} @click=${props.onReload}>
+            ${props.loading ? "Loading…" : "Reload"}
+          </button>
+          <!-- Save + Apply grouped -->
+          <div class="config-actions__btn-group">
+            <button class="btn btn--sm primary" ?disabled=${!canSave} @click=${props.onSave}>
+              ${props.saving ? "Saving…" : "Save"}
+            </button>
+            <button class="btn btn--sm" ?disabled=${!canApply} @click=${props.onApply}>
+              ${props.applying ? "Applying…" : "Apply"}
+            </button>
+          </div>
+          <!-- Update (less prominent) -->
+          <button class="btn btn--sm btn--ghost" ?disabled=${!canUpdate} @click=${props.onUpdate}>
+            ${props.updating ? "Updating…" : "Update"}
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== SCROLLABLE MAIN CONTENT ===== -->
+      <main class="config-main">
+        <!-- Diff panel (form mode only) -->
+        ${
+          hasChanges && props.formMode === "form"
+            ? html`
+                <details class="config-diff">
+                  <summary class="config-diff__summary">
+                    <span>${(() => {
+                      const added = diff.filter((d) => d.type === "added").length;
+                      const removed = diff.filter((d) => d.type === "removed").length;
+                      const modified = diff.filter((d) => d.type === "modified").length;
+                      const parts: string[] = [];
+                      if (added) {
+                        parts.push(`${added} added`);
+                      }
+                      if (removed) {
+                        parts.push(`${removed} removed`);
+                      }
+                      if (modified) {
+                        parts.push(`${modified} modified`);
+                      }
+                      return `${diff.length} change${diff.length !== 1 ? "s" : ""} (${parts.join(", ")})`;
+                    })()}</span>
+                    <svg
+                      class="config-diff__chevron"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </summary>
+                  <div class="config-diff__content">
+                    ${diff.map(
+                      (change) => html`
+                        <div class="config-diff__item config-diff__item--${change.type}">
+                          <span class="config-diff__type-icon" aria-hidden="true">${
+                            change.type === "added" ? "+" : change.type === "removed" ? "−" : "~"
+                          }</span>
+                          <div class="config-diff__body">
+                            <div class="config-diff__path">${change.path}</div>
+                            <div class="config-diff__values">
+                              ${
+                                change.type !== "added"
+                                  ? html`<span class="config-diff__from">${truncateValue(change.from)}</span>
+                                      <span class="config-diff__arrow">→</span>`
+                                  : nothing
+                              }
+                              ${
+                                change.type !== "removed"
+                                  ? html`<span class="config-diff__to">${truncateValue(change.to)}</span>`
+                                  : nothing
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      `,
+                    )}
+                  </div>
+                </details>
+              `
+            : nothing
+        }
+
+        <!-- Section hero (active section in form mode) -->
+        ${
+          activeSectionMeta && props.formMode === "form"
+            ? html`
+                <div class="config-section-hero">
+                  <div class="config-section-hero__icon">
+                    ${getSectionIcon(props.activeSection ?? "")}
+                  </div>
+                  <div class="config-section-hero__text">
+                    <div class="config-section-hero__title">${activeSectionMeta.label}</div>
+                    ${
+                      activeSectionMeta.description
+                        ? html`<div class="config-section-hero__desc">
+                            ${activeSectionMeta.description}
+                          </div>`
+                        : nothing
+                    }
+                  </div>
+                </div>
+              `
             : nothing
         }
 
@@ -847,93 +832,95 @@ export function renderConfig(props: ConfigProps) {
           ${
             props.formMode === "form" && !props.activeSection && !props.searchQuery
               ? html`
-                <div class="config-all-hero">
-                  <div class="config-all-hero__icon-wrap">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="3" y="3" width="7" height="7"></rect>
-                      <rect x="14" y="3" width="7" height="7"></rect>
-                      <rect x="14" y="14" width="7" height="7"></rect>
-                      <rect x="3" y="14" width="7" height="7"></rect>
-                    </svg>
+                  <div class="config-all-hero">
+                    <div class="config-all-hero__icon-wrap">
+                      ${configIcons.all}
+                    </div>
+                    <div class="config-all-hero__text">
+                      <div class="config-all-hero__title">All Settings</div>
+                      <div class="config-all-hero__subtitle">
+                        ${allSections.length} section${allSections.length !== 1 ? "s" : ""} available
+                      </div>
+                    </div>
                   </div>
-                  <div class="config-all-hero__text">
-                    <div class="config-all-hero__title">All Settings</div>
-                    <div class="config-all-hero__subtitle">${allSections.length} section${allSections.length !== 1 ? "s" : ""} available</div>
-                  </div>
-                </div>
-              `
+                `
               : nothing
           }
           ${
             props.formMode === "form"
               ? html`
-                ${
-                  props.schemaLoading
-                    ? html`
-                        <div class="config-loading">
-                          <div class="config-loading__spinner"></div>
-                          <span>Loading schema…</span>
-                        </div>
-                      `
-                    : renderConfigForm({
-                        schema: analysis.schema,
-                        uiHints: props.uiHints,
-                        value: props.formValue,
-                        disabled: props.loading || !props.formValue,
-                        unsupportedPaths: analysis.unsupportedPaths,
-                        onPatch: props.onFormPatch,
-                        searchQuery: props.searchQuery,
-                        activeSection: props.activeSection,
-                        activeSubsection: effectiveSubsection,
-                      })
-                }
-                ${
-                  formUnsafe
-                    ? html`
-                        <div class="callout danger config-callout--spaced">
-                          Form view can't safely edit some fields. Use Raw to avoid losing config entries.
-                        </div>
-                      `
-                    : nothing
-                }
-              `
+                  ${
+                    props.schemaLoading
+                      ? html`
+                          <div class="config-loading">
+                            <div class="config-loading__spinner"></div>
+                            <span>Loading settings schema…</span>
+                          </div>
+                        `
+                      : !props.connected && !analysis.schema
+                        ? html`
+                            <div class="config-empty">
+                              <div class="config-empty__icon">⚡</div>
+                              <div class="config-empty__text">Connect to your gateway to edit settings</div>
+                            </div>
+                          `
+                        : renderConfigForm({
+                            schema: analysis.schema,
+                            uiHints: props.uiHints,
+                            value: props.formValue,
+                            disabled: props.loading || !props.formValue,
+                            unsupportedPaths: analysis.unsupportedPaths,
+                            onPatch: props.onFormPatch,
+                            searchQuery: props.searchQuery,
+                            activeSection: props.activeSection,
+                            activeSubsection: effectiveSubsection,
+                          })
+                  }
+                  ${
+                    formUnsafe
+                      ? html`
+                          <div class="callout danger config-callout--spaced">
+                            Form view can't safely edit some fields. Use Raw to avoid losing config entries.
+                          </div>
+                        `
+                      : nothing
+                  }
+                `
               : html`
-                <div class="config-raw-editor">
-                  <div class="config-raw-editor__header">
-                    <span class="config-raw-editor__title">Raw JSON5</span>
-                    <span class="config-raw-editor__badge">json5</span>
-                    <button
-                      class="config-raw-editor__copy"
-                      type="button"
-                      @click=${() => {
-                        navigator.clipboard.writeText(props.raw).catch(() => {});
-                      }}
-                    >
-                      Copy
-                    </button>
+                  <div class="config-raw-editor">
+                    <div class="config-raw-editor__header">
+                      <span class="config-raw-editor__title">Raw JSON5</span>
+                      <span class="config-raw-editor__badge">json5</span>
+                      <button
+                        class="config-raw-editor__copy"
+                        type="button"
+                        @click=${() => {
+                          navigator.clipboard.writeText(props.raw).catch(() => {});
+                        }}
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <textarea
+                      class="config-raw-editor__textarea"
+                      .value=${props.raw}
+                      @input=${(e: Event) =>
+                        props.onRawChange((e.target as HTMLTextAreaElement).value)}
+                    ></textarea>
+                    <div class="config-raw-editor__footer">
+                      <span>${props.raw.split("\n").length} lines</span>
+                      <span>${props.raw.length} chars</span>
+                    </div>
                   </div>
-                  <textarea
-                    class="config-raw-editor__textarea"
-                    .value=${props.raw}
-                    @input=${(e: Event) =>
-                      props.onRawChange((e.target as HTMLTextAreaElement).value)}
-                  ></textarea>
-                  <div class="config-raw-editor__footer">
-                    <span>${props.raw.split("\n").length} lines</span>
-                    <span>${props.raw.length} chars</span>
-                  </div>
-                </div>
-              `
+                `
           }
         </div>
 
         ${
           props.issues.length > 0
             ? html`<div class="callout danger config-callout--spaced">
-              <pre class="code-block">
-${JSON.stringify(props.issues, null, 2)}</pre
-              >
-            </div>`
+                <pre class="code-block">${JSON.stringify(props.issues, null, 2)}</pre>
+              </div>`
             : nothing
         }
       </main>

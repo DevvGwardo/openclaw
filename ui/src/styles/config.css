@@ -2,11 +2,13 @@
    Config Page — Tauri Desktop Design System
    =========================================== */
 
-/* Layout Container */
-.config-layout {
-  display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 0;
+/* ===========================================
+   Page Container (single-column layout)
+   =========================================== */
+
+.config-page {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
   background: var(--color-bg, #0f0f0f);
@@ -16,9 +18,309 @@
 }
 
 /* ===========================================
-   Sidebar
+   Top Search Bar
    =========================================== */
 
+.config-topbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px 8px;
+  background: var(--color-surface, #161616);
+  border-bottom: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  flex-shrink: 0;
+}
+
+/* Left side: search input + suggested tags */
+.config-topbar__search-wrap {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+/* Search input row with inline active-tag chips */
+.config-topbar__search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px 0 0;
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised, #1c1c1e);
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+.config-topbar__search:focus-within {
+  border-color: var(--color-accent, #4f8ef7);
+  box-shadow:
+    0 0 0 2px var(--color-bg, #0f0f0f),
+    0 0 0 4px var(--color-accent, #4f8ef7);
+}
+
+.config-topbar__search-icon {
+  flex-shrink: 0;
+  margin-left: 12px;
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted, #888);
+  pointer-events: none;
+}
+
+.config-topbar__search-input {
+  flex: 1;
+  min-width: 80px;
+  padding: 10px 6px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--color-text, #e8e8e8);
+  outline: none;
+}
+
+.config-topbar__search-input::placeholder {
+  color: var(--color-text-muted, #888);
+}
+
+/* Active tag chips shown inline in the search bar */
+.config-topbar__active-tags {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.config-topbar__tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid var(--color-accent, #4f8ef7);
+  border-radius: var(--radius-full);
+  padding: 2px 3px 2px 8px;
+  background: var(--color-accent-subtle, rgba(79 142 247 / 0.12));
+  white-space: nowrap;
+}
+
+.config-topbar__tag-chip-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-accent, #4f8ef7);
+}
+
+.config-topbar__tag-chip-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-accent, #4f8ef7);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity var(--duration-fast) ease;
+  padding: 0;
+}
+
+.config-topbar__tag-chip-remove:hover {
+  opacity: 1;
+}
+
+.config-topbar__search-clear {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-hover, rgba(255 255 255 / 0.05));
+  color: var(--color-text-muted, #888);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.config-topbar__search-clear:hover {
+  background: rgba(255 255 255 / 0.14);
+  color: var(--color-text, #e8e8e8);
+}
+
+/* Suggested tag preset chips row */
+.config-topbar__tag-presets {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.config-topbar__tag-preset {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted, #888);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+  white-space: nowrap;
+}
+
+.config-topbar__tag-preset:hover {
+  background: var(--color-surface-hover, rgba(255 255 255 / 0.05));
+  color: var(--color-text, #e8e8e8);
+}
+
+.config-topbar__tag-preset.active {
+  background: var(--color-accent-subtle, rgba(79 142 247 / 0.12));
+  border-color: rgba(79 142 247 / 0.4);
+  color: var(--color-accent, #4f8ef7);
+}
+
+/* Right side: validity pill + config path */
+.config-topbar__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.config-topbar__path {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted, #888);
+  opacity: 0.65;
+  white-space: nowrap;
+}
+
+/* ===========================================
+   Section Tab Bar
+   =========================================== */
+
+.config-tabs {
+  flex-shrink: 0;
+  background: var(--color-surface, #161616);
+  border-bottom: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+}
+
+/* Horizontally scrollable tab row */
+.config-tabs__bar {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  padding: 6px 10px;
+  scrollbar-width: none;
+}
+
+.config-tabs__bar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual tab button */
+.config-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted, #888);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    background var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.config-tab:hover {
+  background: var(--color-surface-hover, rgba(255 255 255 / 0.05));
+  color: var(--color-text, #e8e8e8);
+}
+
+.config-tab.active {
+  background: var(--color-accent-subtle, rgba(79 142 247 / 0.12));
+  color: var(--color-accent, #4f8ef7);
+}
+
+.config-tab__icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.config-tab__icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+}
+
+.config-tab:hover .config-tab__icon,
+.config-tab.active .config-tab__icon {
+  opacity: 1;
+}
+
+/* Narrow viewport: hide tab bar, show select */
+.config-tabs__select {
+  display: none;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  background-color: var(--color-surface, #161616);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text, #e8e8e8);
+  cursor: pointer;
+  appearance: none;
+  outline: none;
+}
+
+/* ===========================================
+   Deprecated: Sidebar styles (kept for safety, no longer in DOM)
+   =========================================== */
+
+/* Legacy layout alias (backward compat) */
+.config-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--color-bg, #0f0f0f);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  overflow: hidden;
+}
+
+/* Old sidebar (unused — kept to avoid breakage if referenced elsewhere) */
 .config-sidebar {
   display: flex;
   flex-direction: column;
@@ -43,7 +345,6 @@
   color: var(--color-text, #e8e8e8);
 }
 
-/* Config file path hint below the title */
 .config-sidebar__path {
   font-size: 11px;
   font-family: var(--font-mono);
@@ -52,7 +353,6 @@
   opacity: 0.7;
 }
 
-/* Header left grouping for title + path */
 .config-sidebar__header-info {
   display: grid;
   gap: 1px;
@@ -65,7 +365,7 @@
   border-top: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
 }
 
-/* Search */
+/* Old sidebar search (unused) */
 .config-search {
   display: grid;
   gap: 6px;
@@ -383,12 +683,13 @@
 }
 
 /* ===========================================
-   Main Content
+   Main Content (scrollable area)
    =========================================== */
 
 .config-main {
   display: flex;
   flex-direction: column;
+  flex: 1;
   min-height: 0;
   min-width: 0;
   background: var(--color-bg, #0f0f0f);
@@ -1728,7 +2029,20 @@
   margin-top: 12px;
 }
 
-/* Inline mode toggle (shown in action bar on mobile when sidebar footer is hidden) */
+/* Ghost button variant — low-prominence secondary action */
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-text-muted, #888);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--color-surface-hover, rgba(255 255 255 / 0.05));
+  color: var(--color-text, #e8e8e8);
+  border-color: var(--color-border, rgba(255 255 255 / 0.08));
+}
+
+/* Inline mode toggle — no longer needed (mode toggle is always in action bar) */
 .config-mode-toggle--inline {
   display: none;
 }
@@ -1788,61 +2102,41 @@
    =========================================== */
 
 @media (max-width: 768px) {
-  .config-layout {
-    grid-template-columns: 1fr;
+  /* Topbar: stack search and meta vertically */
+  .config-topbar {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .config-sidebar {
-    border-right: none;
-    border-bottom: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  .config-topbar__meta {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 8px;
   }
 
-  .config-sidebar__header {
-    padding: 14px 16px;
-  }
-
-  .config-nav {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 6px;
-    padding: 10px 14px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .config-nav__item {
-    flex: 0 0 auto;
-    padding: 9px 14px;
-    white-space: nowrap;
-  }
-
-  .config-nav__label {
-    display: inline;
-  }
-
-  .config-sidebar__footer {
+  /* Hide tab bar buttons, show select dropdown on narrow screens */
+  .config-tabs__bar {
     display: none;
+  }
+
+  .config-tabs__select {
+    display: block;
   }
 
   .config-actions {
     flex-wrap: wrap;
-    padding: 14px 16px;
-    /* Sticky so save/apply are always accessible on mobile */
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: var(--color-surface, #161616);
+    padding: 10px 14px;
+    gap: 8px;
   }
 
   .config-actions__left,
   .config-actions__right {
     width: 100%;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
-  /* Show inline mode toggle in action bar when sidebar footer is hidden */
-  .config-actions .config-mode-toggle--inline {
-    display: flex;
+  .config-actions__right {
+    flex-wrap: wrap;
   }
 
   .config-section-hero {
@@ -1881,17 +2175,19 @@
   .cfg-map__item-remove {
     justify-self: end;
   }
+
+  /* Collapse tag presets on mobile to avoid excess wrapping */
+  .config-topbar__tag-presets {
+    max-height: 54px;
+    overflow: hidden;
+  }
 }
 
 @media (max-width: 480px) {
-  .config-nav__icon {
-    width: 26px;
-    height: 26px;
-    font-size: 17px;
-  }
-
-  .config-nav__label {
-    display: none;
+  /* On very small screens, collapse mode toggle text to icon only */
+  .config-mode-toggle__btn {
+    padding: 8px 10px;
+    font-size: 11px;
   }
 
   .config-section-card__icon {
