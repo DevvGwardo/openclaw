@@ -8,6 +8,7 @@ import type {
 import type { ExecApprovalsFile, ExecApprovalsSnapshot } from "../controllers/exec-approvals.ts";
 import { formatRelativeTimestamp, formatList } from "../format.ts";
 import { renderExecApprovals, resolveExecApprovalsState } from "./nodes-exec-approvals.ts";
+import { surfaceHero, surfaceMain, surfacePage } from "./surface-page.ts";
 export type NodesProps = {
   loading: boolean;
   nodes: Array<Record<string, unknown>>;
@@ -48,31 +49,43 @@ export type NodesProps = {
 export function renderNodes(props: NodesProps) {
   const bindingState = resolveBindingsState(props);
   const approvalsState = resolveExecApprovalsState(props);
-  return html`
-    ${renderExecApprovals(approvalsState)}
-    ${renderBindings(bindingState)}
-    ${renderDevices(props)}
-    <section class="card">
-      <div class="row" style="justify-content: space-between;">
-        <div>
-          <div class="card-title">Nodes</div>
-          <div class="card-sub">Paired devices and live links.</div>
-        </div>
+  const list = props.devicesList ?? { pending: [], paired: [] };
+  const pendingCount = Array.isArray(list.pending) ? list.pending.length : 0;
+  const pairedCount = Array.isArray(list.paired) ? list.paired.length : 0;
+
+  return surfacePage("nodes", {
+    hero: surfaceHero({
+      title: "Nodes",
+      subtitle: "Devices, exec approvals, and node bindings.",
+      stats: [
+        { label: "Nodes", value: props.nodes.length },
+        { label: "Paired", value: pairedCount },
+        ...(pendingCount > 0 ? [{ label: "Pending", value: pendingCount }] : []),
+      ],
+      actions: html`
         <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
           ${props.loading ? "Loading…" : "Refresh"}
         </button>
-      </div>
-      <div class="list" style="margin-top: 16px;">
-        ${
-          props.nodes.length === 0
-            ? html`
-                <div class="muted">No nodes found.</div>
-              `
-            : props.nodes.map((n) => renderNode(n))
-        }
-      </div>
-    </section>
-  `;
+      `,
+    }),
+    main: surfaceMain(html`
+      ${renderExecApprovals(approvalsState)}
+      ${renderBindings(bindingState)}
+      ${renderDevices(props)}
+      <section class="card">
+        <div class="card-title">Live nodes</div>
+        <div class="list" style="margin-top: 16px;">
+          ${
+            props.nodes.length === 0
+              ? html`
+                  <div class="muted">No nodes found.</div>
+                `
+              : props.nodes.map((n) => renderNode(n))
+          }
+        </div>
+      </section>
+    `),
+  });
 }
 
 function renderDevices(props: NodesProps) {

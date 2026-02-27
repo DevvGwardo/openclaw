@@ -28,6 +28,7 @@ import {
   resolveModelLabel,
   resolveModelPrimary,
 } from "./agents-utils.ts";
+import { surfaceHero, surfaceMain, surfacePage } from "./surface-page.ts";
 
 export type AgentsPanel = "overview" | "files" | "tools" | "skills" | "channels" | "cron";
 
@@ -107,19 +108,21 @@ export function renderAgents(props: AgentsProps) {
     ? (agents.find((agent) => agent.id === selectedId) ?? null)
     : null;
 
-  return html`
+  return surfacePage("agents", {
+    hero: surfaceHero({
+      title: "Agents",
+      subtitle: "Configure and inspect agent workspaces.",
+      stats: [{ label: "Configured", value: agents.length }],
+      actions: html`
+        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
+          ${props.loading ? "Loading…" : "Refresh"}
+        </button>
+      `,
+    }),
+    main: surfaceMain(html`
     <div class="agents-layout">
       <section class="card agents-sidebar">
-        <div class="row row--between">
-          <div>
-            <div class="card-title">Agents</div>
-            <div class="card-sub">${agents.length} configured.</div>
-          </div>
-          <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
-            ${props.loading ? "Loading…" : "Refresh"}
-          </button>
-        </div>
-        ${props.error ? html`<div class="callout danger mt-3">${props.error}</div>` : nothing}
+        ${props.error ? html`<div class="callout danger" style="margin-bottom: 12px;">${props.error}</div>` : nothing}
         <div class="agent-list">
           ${
             agents.length === 0
@@ -285,7 +288,8 @@ export function renderAgents(props: AgentsProps) {
         }
       </section>
     </div>
-  `;
+    `),
+  });
 }
 
 function renderAgentHeader(
