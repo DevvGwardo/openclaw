@@ -3386,72 +3386,7 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   font-size: 14px;
 }
 
-/* === Channels Redesign === */
-
-/* ----- Channels Hero Banner ----- */
-
-.channels-hero {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--accent) 6%, var(--card)) 0%,
-    var(--card) 60%
-  );
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  animation: rise 0.35s var(--ease-out) backwards;
-  margin-bottom: 20px;
-}
-
-.channels-hero__title {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text-strong);
-}
-
-.channels-hero__sub {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 2px;
-}
-
-.channels-hero__stats {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.channels-hero__stat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-align: right;
-}
-
-.channels-hero__stat-label {
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-}
-
-.channels-hero__stat-value {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: -0.01em;
-}
-
-.channels-hero__divider {
-  width: 1px;
-  height: 32px;
-  background: var(--border);
-}
+/* === Channels Page === */
 
 /* ----- Channel Card Header with Status Dot + Badge ----- */
 
@@ -3580,7 +3515,6 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
 /* ----- Channel Health Section ----- */
 
 .channels-health {
-  margin-top: 18px;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -3622,20 +3556,16 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   border-top: 1px solid var(--border);
 }
 
-@media (max-width: 640px) {
-  .channels-hero {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
+/* ----- surface-page--channels: grid responsive overrides ----- */
+/* Channels uses a 2-column card grid; keep 2 cols down to ~900px content width
+   then drop to 1 column at the Tauri minimum window width (800px). */
+.surface-page--channels .grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 
-  .channels-hero__stats {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .channels-hero__stat {
-    text-align: left;
+@media (max-width: 860px) {
+  .surface-page--channels .grid-cols-2 {
+    grid-template-columns: 1fr;
   }
 }
 
