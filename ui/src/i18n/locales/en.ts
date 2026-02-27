@@ -105,6 +105,12 @@ export const en: TranslationMap = {
       hint: "This page is HTTP, so the browser blocks device identity. Use HTTPS (Tailscale Serve) or open {url} on the gateway host.",
       stayHttp: "If you must stay on HTTP, set {config} (token-only).",
     },
+    quickActions: {
+      channels: "Channels",
+      sessions: "Sessions",
+      config: "Config",
+      docs: "Docs",
+    },
   },
   chat: {
     disconnected: "Disconnected from gateway.",
