@@ -6,8 +6,8 @@
   "build": {
     "frontendDist": "./dist-ui",
     "devUrl": "http://localhost:5175",
-    "beforeDevCommand": "",
-    "beforeBuildCommand": ""
+    "beforeDevCommand": "cd ../../ui && vite --config vite.config.tauri.ts",
+    "beforeBuildCommand": "cd ../../ui && vite build --config vite.config.tauri.ts"
   },
   "app": {
     "withGlobalTauri": true,
