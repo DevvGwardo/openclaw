@@ -128,7 +128,7 @@ export function renderNostrBody(params: {
     const hasAnyProfileData = name || displayName || about || picture || nip05;
 
     return html`
-      <div style="margin-top: 16px; padding: 12px; background: var(--bg-elevated); border-radius: var(--radius-md);">
+      <div class="channel-card__status-list" style="padding: 12px; background: var(--bg-elevated); border-radius: var(--radius-md);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <div style="font-weight: 500;">Profile</div>
           ${
@@ -199,7 +199,7 @@ export function renderNostrBody(params: {
           </div>
         `
         : html`
-          <div class="status-list" style="margin-top: 16px;">
+          <div class="status-list channel-card__status-list">
             <div>
               <span class="label">Configured</span>
               <span class="${summaryConfigured ? "status-value--yes" : "status-value--no"}">
@@ -230,7 +230,7 @@ export function renderNostrBody(params: {
 
     ${
       summaryLastError
-        ? html`<div class="callout danger" style="margin-top: 12px;">${summaryLastError}</div>`
+        ? html`<div class="callout danger channel-card__callout">${summaryLastError}</div>`
         : nothing
     }
 

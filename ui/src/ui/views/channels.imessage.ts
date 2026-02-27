@@ -15,7 +15,7 @@ export function renderIMessageBody(params: {
   return html`
     ${accountCountLabel}
 
-    <div class="status-list" style="margin-top: 16px;">
+    <div class="status-list channel-card__status-list">
       <div>
         <span class="label">Configured</span>
         <span class="${imessage?.configured ? "status-value--yes" : "status-value--no"}">
@@ -44,7 +44,7 @@ export function renderIMessageBody(params: {
 
     ${
       imessage?.lastError
-        ? html`<div class="callout danger" style="margin-top: 12px;">
+        ? html`<div class="callout danger channel-card__callout">
             ${imessage.lastError}
           </div>`
         : nothing
@@ -52,7 +52,7 @@ export function renderIMessageBody(params: {
 
     ${
       imessage?.probe
-        ? html`<div class="callout" style="margin-top: 12px;">
+        ? html`<div class="callout channel-card__callout">
             Probe ${imessage.probe.ok ? "ok" : "failed"} ·
             ${imessage.probe.error ?? ""}
           </div>`
