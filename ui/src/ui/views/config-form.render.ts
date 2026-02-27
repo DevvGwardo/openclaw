@@ -319,14 +319,59 @@ function matchesSearch(params: {
 export function renderConfigForm(props: ConfigFormProps) {
   if (!props.schema) {
     return html`
-      <div class="muted">Schema unavailable.</div>
+      <div class="config-empty">
+        <div class="config-empty__icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            style="width: 48px; height: 48px; opacity: 0.3"
+          >
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            <line x1="2" y1="2" x2="22" y2="22" stroke-width="2"></line>
+          </svg>
+        </div>
+        <div class="config-empty__text">Connect to your gateway to edit settings</div>
+        <div
+          style="
+            font-size: 12px;
+            color: var(--color-text-muted, #888);
+            margin-top: -8px;
+            max-width: 280px;
+            text-align: center;
+            line-height: 1.5;
+          "
+        >
+          The settings schema is loaded from your gateway. Start or connect to a gateway to begin editing.
+        </div>
+      </div>
     `;
   }
   const schema = props.schema;
   const value = props.value ?? {};
   if (schemaType(schema) !== "object" || !schema.properties) {
     return html`
-      <div class="callout danger">Unsupported schema. Use Raw.</div>
+      <div class="config-empty">
+        <div class="config-empty__icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            style="width: 48px; height: 48px; opacity: 0.3"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div class="config-empty__text">Unsupported schema format</div>
+        <div style="font-size: 12px; color: var(--color-text-muted, #888); margin-top: -8px">
+          Use Raw mode to edit directly.
+        </div>
+      </div>
     `;
   }
   const unsupported = new Set(props.unsupportedPaths ?? []);
@@ -389,6 +434,24 @@ export function renderConfigForm(props: ConfigFormProps) {
         <div class="config-empty__text">
           ${searchQuery ? `No settings match "${searchQuery}"` : "No settings in this section"}
         </div>
+        ${
+          searchQuery
+            ? html`
+                <div
+                  style="
+                    font-size: 12px;
+                    color: var(--color-text-muted, #888);
+                    margin-top: -8px;
+                    max-width: 260px;
+                    text-align: center;
+                    line-height: 1.5;
+                  "
+                >
+                  Try a different search term or clear your filters to see all settings.
+                </div>
+              `
+            : nothing
+        }
       </div>
     `;
   }
