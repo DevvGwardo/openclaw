@@ -29,7 +29,7 @@ export function renderWhatsAppBody(params: {
   return html`
     ${accountCountLabel}
 
-    <div class="status-list" style="margin-top: 16px;">
+    <div class="status-list channel-card__status-list">
       <div>
         <span class="label">Configured</span>
         <span class="${whatsapp?.configured ? "status-value--yes" : "status-value--no"}">
@@ -76,7 +76,7 @@ export function renderWhatsAppBody(params: {
 
     ${
       whatsapp?.lastError
-        ? html`<div class="callout danger" style="margin-top: 12px;">
+        ? html`<div class="callout danger channel-card__callout">
             ${whatsapp.lastError}
           </div>`
         : nothing
@@ -84,7 +84,7 @@ export function renderWhatsAppBody(params: {
 
     ${
       props.whatsappMessage
-        ? html`<div class="callout" style="margin-top: 12px;">
+        ? html`<div class="callout channel-card__callout">
             ${props.whatsappMessage}
           </div>`
         : nothing
@@ -98,7 +98,7 @@ export function renderWhatsAppBody(params: {
         : nothing
     }
 
-    <div class="row" style="margin-top: 14px; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+    <div class="row channel-card__actions" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
       <div class="row" style="gap: 6px; flex-wrap: wrap;">
         <button
           class="btn btn--sm primary"

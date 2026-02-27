@@ -15,7 +15,7 @@ export function renderSlackBody(params: {
   return html`
     ${accountCountLabel}
 
-    <div class="status-list" style="margin-top: 16px;">
+    <div class="status-list channel-card__status-list">
       <div>
         <span class="label">Configured</span>
         <span class="${slack?.configured ? "status-value--yes" : "status-value--no"}">
@@ -44,7 +44,7 @@ export function renderSlackBody(params: {
 
     ${
       slack?.lastError
-        ? html`<div class="callout danger" style="margin-top: 12px;">
+        ? html`<div class="callout danger channel-card__callout">
             ${slack.lastError}
           </div>`
         : nothing
@@ -52,7 +52,7 @@ export function renderSlackBody(params: {
 
     ${
       slack?.probe
-        ? html`<div class="callout" style="margin-top: 12px;">
+        ? html`<div class="callout channel-card__callout">
             Probe ${slack.probe.ok ? "ok" : "failed"} ·
             ${slack.probe.status ?? ""} ${slack.probe.error ?? ""}
           </div>`

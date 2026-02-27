@@ -15,7 +15,7 @@ export function renderDiscordBody(params: {
   return html`
     ${accountCountLabel}
 
-    <div class="status-list" style="margin-top: 16px;">
+    <div class="status-list channel-card__status-list">
       <div>
         <span class="label">Configured</span>
         <span class="${discord?.configured ? "status-value--yes" : "status-value--no"}">
@@ -44,7 +44,7 @@ export function renderDiscordBody(params: {
 
     ${
       discord?.lastError
-        ? html`<div class="callout danger" style="margin-top: 12px;">
+        ? html`<div class="callout danger channel-card__callout">
             ${discord.lastError}
           </div>`
         : nothing
@@ -52,7 +52,7 @@ export function renderDiscordBody(params: {
 
     ${
       discord?.probe
-        ? html`<div class="callout" style="margin-top: 12px;">
+        ? html`<div class="callout channel-card__callout">
             Probe ${discord.probe.ok ? "ok" : "failed"} ·
             ${discord.probe.status ?? ""} ${discord.probe.error ?? ""}
           </div>`
