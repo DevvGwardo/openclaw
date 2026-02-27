@@ -29,6 +29,7 @@ import { renderSlackCard } from "./channels.slack.ts";
 import { renderTelegramCard } from "./channels.telegram.ts";
 import type { ChannelKey, ChannelsChannelData, ChannelsProps } from "./channels.types.ts";
 import { renderWhatsAppCard } from "./channels.whatsapp.ts";
+import { surfaceHero, surfaceMain, surfacePage } from "./surface-page.ts";
 
 export function renderChannels(props: ChannelsProps) {
   const channels = props.snapshot?.channels as Record<string, unknown> | null;
@@ -62,32 +63,20 @@ export function renderChannels(props: ChannelsProps) {
     return typeof st?.connected === "boolean" && st.connected;
   }).length;
 
-  return html`
-    <div class="channels-hero">
-      <div>
-        <div class="channels-hero__title">Channels</div>
-        <div class="channels-hero__sub">Manage channels and settings.</div>
-      </div>
-      <div class="channels-hero__stats">
-        <div class="channels-hero__stat">
-          <span class="channels-hero__stat-label">Active</span>
-          <span class="channels-hero__stat-value">${activeCount} of ${totalCount}</span>
-        </div>
-        <div class="channels-hero__divider"></div>
-        <div class="channels-hero__stat">
-          <span class="channels-hero__stat-label">Connected</span>
-          <span class="channels-hero__stat-value">${connectedCount}</span>
-        </div>
-        <div class="channels-hero__divider"></div>
-        <div class="channels-hero__stat">
-          <span class="channels-hero__stat-label">Last refresh</span>
-          <span class="channels-hero__stat-value">
-            ${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a"}
-          </span>
-        </div>
-      </div>
-    </div>
+  const hero = surfaceHero({
+    title: "Channels",
+    subtitle: "Manage channels and settings.",
+    stats: [
+      { label: "Active", value: html`${activeCount} of ${totalCount}` },
+      { label: "Connected", value: connectedCount },
+      {
+        label: "Last refresh",
+        value: props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a",
+      },
+    ],
+  });
 
+  const main = surfaceMain(html`
     <section class="grid grid-cols-2">
       ${orderedChannels.map((channel, idx) => {
         const animDelay = (idx + 1) * 50 + 50; // 100ms, 150ms, 200ms …
@@ -130,7 +119,9 @@ ${props.snapshot ? JSON.stringify(props.snapshot, null, 2) : "No snapshot yet."}
         </pre>
       </div>
     </details>
-  `;
+  `);
+
+  return surfacePage("channels", { hero, main });
 }
 
 function resolveChannelOrder(snapshot: ChannelsStatusSnapshot | null): ChannelKey[] {

@@ -3,6 +3,7 @@ import type { ConfigUiHints } from "../types.ts";
 import { hintForPath, humanize, schemaType, type JsonSchema } from "./config-form.shared.ts";
 import { analyzeConfigSchema, renderConfigForm, SECTION_META } from "./config-form.ts";
 import { getTagFilters, toggleTagFilter } from "./config-search.ts";
+import { surfaceHero, surfaceMain, surfacePage } from "./surface-page.ts";
 
 export type ConfigProps = {
   raw: string;
@@ -503,7 +504,14 @@ export function renderConfig(props: ConfigProps) {
 
   const selectedTags = new Set(getTagFilters(props.searchQuery));
 
-  return html`
+  const hero = surfaceHero({
+    title: "Configuration",
+    subtitle: "Manage gateway configuration settings.",
+  });
+
+  return surfacePage("config", {
+    hero,
+    main: surfaceMain(html`
     <div class="config-page">
       <!-- ===== TOP SEARCH BAR ===== -->
       <div class="config-topbar">
@@ -969,5 +977,6 @@ export function renderConfig(props: ConfigProps) {
         }
       </main>
     </div>
-  `;
+  `),
+  });
 }
