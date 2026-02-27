@@ -12,6 +12,7 @@ export type OverviewProps = {
   connected: boolean;
   hello: GatewayHelloOk | null;
   settings: UiSettings;
+  privacyMode?: boolean;
   password: string;
   lastError: string | null;
   lastErrorCode: string | null;
@@ -27,6 +28,15 @@ export type OverviewProps = {
   onRefresh: () => void;
 };
 
+const _CREDENTIAL_QUERY_PATTERN = /(token|password|secret|key)=/i;
+
+function maskCredential(value: string): string {
+  if (!value.trim()) {
+    return value;
+  }
+  return "••••••••";
+}
+
 export function renderOverview(props: OverviewProps) {
   const snapshot = props.hello?.snapshot as
     | {
@@ -41,6 +51,11 @@ export function renderOverview(props: OverviewProps) {
     : t("common.na");
   const authMode = snapshot?.authMode;
   const isTrustedProxy = authMode === "trusted-proxy";
+  const privacyMode = props.privacyMode ?? false;
+  const showGatewayUrl = privacyMode
+    ? maskCredential(props.settings.gatewayUrl)
+    : props.settings.gatewayUrl;
+  const sensitiveInputType = privacyMode ? "password" : "text";
 
   const pairingHint = (() => {
     if (!shouldShowPairingHint(props.connected, props.lastError, props.lastErrorCode)) {
@@ -323,7 +338,7 @@ export function renderOverview(props: OverviewProps) {
       <summary class="overview-connection__summary">
         <div class="overview-connection__header">
           <span class="overview-connection__title">${t("overview.access.title")}</span>
-          <span class="overview-connection__url mono">${props.settings.gatewayUrl}</span>
+          <span class="overview-connection__url mono">${showGatewayUrl}</span>
         </div>
         <div class="overview-connection__actions">
           <button
@@ -352,6 +367,7 @@ export function renderOverview(props: OverviewProps) {
           <label class="field">
             <span>${t("overview.access.wsUrl")}</span>
             <input
+              type=${sensitiveInputType}
               .value=${props.settings.gatewayUrl}
               @input=${(e: Event) => {
                 const v = (e.target as HTMLInputElement).value;
@@ -367,6 +383,7 @@ export function renderOverview(props: OverviewProps) {
                 <label class="field">
                   <span>${t("overview.access.token")}</span>
                   <input
+                    type=${sensitiveInputType}
                     .value=${props.settings.token}
                     @input=${(e: Event) => {
                       const v = (e.target as HTMLInputElement).value;
@@ -392,6 +409,7 @@ export function renderOverview(props: OverviewProps) {
           <label class="field">
             <span>${t("overview.access.sessionKey")}</span>
             <input
+              type=${sensitiveInputType}
               .value=${props.settings.sessionKey}
               @input=${(e: Event) => {
                 const v = (e.target as HTMLInputElement).value;
