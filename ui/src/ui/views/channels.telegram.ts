@@ -2,10 +2,10 @@ import { html, nothing } from "lit";
 import { formatRelativeTimestamp } from "../format.ts";
 import type { ChannelAccountSnapshot, TelegramStatus } from "../types.ts";
 import { renderChannelConfigSection } from "./channels.config.ts";
-import { deriveChannelStatus } from "./channels.shared.ts";
 import type { ChannelsProps } from "./channels.types.ts";
 
-export function renderTelegramCard(params: {
+/** Body content for the Telegram channel card (inside channel-card-v2__body). */
+export function renderTelegramBody(params: {
   props: ChannelsProps;
   telegram?: TelegramStatus;
   telegramAccounts: ChannelAccountSnapshot[];
@@ -13,11 +13,6 @@ export function renderTelegramCard(params: {
 }) {
   const { props, telegram, telegramAccounts, accountCountLabel } = params;
   const hasMultipleAccounts = telegramAccounts.length > 1;
-  const channelStatus = deriveChannelStatus({
-    configured: telegram?.configured,
-    running: telegram?.running,
-    lastError: telegram?.lastError,
-  });
 
   const renderAccountCard = (account: ChannelAccountSnapshot) => {
     const probe = account.probe as { bot?: { username?: string } } | undefined;
@@ -65,88 +60,70 @@ export function renderTelegramCard(params: {
   };
 
   return html`
-    <div class="card card--static">
-      <div class="channel-card__header">
-        <div class="channel-card__title-row">
-          <span class="channel-card__dot channel-card__dot--${channelStatus.dot}"></span>
-          <div class="card-title">Telegram</div>
-        </div>
-        <span class="channel-card__badge channel-card__badge--${channelStatus.badgeVariant}">
-          ${channelStatus.badge}
-        </span>
-      </div>
-      <div class="card-sub">Bot status and channel configuration.</div>
-      ${accountCountLabel}
+    ${accountCountLabel}
 
-      ${
-        hasMultipleAccounts
-          ? html`
-            <div class="account-card-list">
-              ${telegramAccounts.map((account) => renderAccountCard(account))}
+    ${
+      hasMultipleAccounts
+        ? html`
+          <div class="account-card-list">
+            ${telegramAccounts.map((account) => renderAccountCard(account))}
+          </div>
+        `
+        : html`
+          <div class="status-list" style="margin-top: 16px;">
+            <div>
+              <span class="label">Configured</span>
+              <span class="${telegram?.configured ? "status-value--yes" : "status-value--no"}">
+                ${telegram?.configured ? "Yes" : "No"}
+              </span>
             </div>
-          `
-          : html`
-            <div class="status-list" style="margin-top: 16px;">
-              <div>
-                <span class="label">Configured</span>
-                <span class="${telegram?.configured ? "status-value--yes" : "status-value--no"}">
-                  ${telegram?.configured ? "Yes" : "No"}
-                </span>
-              </div>
-              <div>
-                <span class="label">Running</span>
-                <span class="${telegram?.running ? "status-value--yes" : "status-value--no"}">
-                  ${telegram?.running ? "Yes" : "No"}
-                </span>
-              </div>
-              <div>
-                <span class="label">Mode</span>
-                <span class="status-value--no">${telegram?.mode ?? "n/a"}</span>
-              </div>
-              <div>
-                <span class="label">Last start</span>
-                <span class="status-value--no">
-                  ${telegram?.lastStartAt ? formatRelativeTimestamp(telegram.lastStartAt) : "n/a"}
-                </span>
-              </div>
-              <div>
-                <span class="label">Last probe</span>
-                <span class="status-value--no">
-                  ${telegram?.lastProbeAt ? formatRelativeTimestamp(telegram.lastProbeAt) : "n/a"}
-                </span>
-              </div>
+            <div>
+              <span class="label">Running</span>
+              <span class="${telegram?.running ? "status-value--yes" : "status-value--no"}">
+                ${telegram?.running ? "Yes" : "No"}
+              </span>
             </div>
-          `
-      }
+            <div>
+              <span class="label">Mode</span>
+              <span class="status-value--no">${telegram?.mode ?? "n/a"}</span>
+            </div>
+            <div>
+              <span class="label">Last start</span>
+              <span class="status-value--no">
+                ${telegram?.lastStartAt ? formatRelativeTimestamp(telegram.lastStartAt) : "n/a"}
+              </span>
+            </div>
+            <div>
+              <span class="label">Last probe</span>
+              <span class="status-value--no">
+                ${telegram?.lastProbeAt ? formatRelativeTimestamp(telegram.lastProbeAt) : "n/a"}
+              </span>
+            </div>
+          </div>
+        `
+    }
 
-      ${
-        telegram?.lastError
-          ? html`<div class="callout danger" style="margin-top: 12px;">
+    ${
+      telegram?.lastError
+        ? html`<div class="callout danger" style="margin-top: 12px;">
             ${telegram.lastError}
           </div>`
-          : nothing
-      }
+        : nothing
+    }
 
-      ${
-        telegram?.probe
-          ? html`<div class="callout" style="margin-top: 12px;">
+    ${
+      telegram?.probe
+        ? html`<div class="callout" style="margin-top: 12px;">
             Probe ${telegram.probe.ok ? "ok" : "failed"} ·
             ${telegram.probe.status ?? ""} ${telegram.probe.error ?? ""}
           </div>`
-          : nothing
-      }
+        : nothing
+    }
 
-      ${renderChannelConfigSection({
-        channelId: "telegram",
-        props,
-        isConfigured: telegram?.configured ?? false,
-      })}
-
-      <div class="row" style="margin-top: 12px;">
-        <button class="btn btn--sm" @click=${() => props.onRefresh(true)}>
-          Probe
-        </button>
-      </div>
-    </div>
+    ${renderChannelConfigSection({
+      channelId: "telegram",
+      props,
+      isConfigured: telegram?.configured ?? false,
+    })}
   `;
 }
