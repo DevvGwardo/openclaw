@@ -92,6 +92,50 @@ const icons = {
       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
     </svg>
   `,
+  // Eye icon for showing sensitive values
+  eye: html`
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+      <circle cx="12" cy="12" r="3"></circle>
+    </svg>
+  `,
+  // Eye-off icon for hiding sensitive values
+  eyeOff: html`
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path
+        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+      ></path>
+      <line x1="1" y1="1" x2="23" y2="23"></line>
+    </svg>
+  `,
+  // Undo/reset icon for resetting to default
+  undo: html`
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M3 7v6h6"></path>
+      <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+    </svg>
+  `,
 };
 
 type FieldMeta = {
@@ -322,6 +366,89 @@ function renderTags(tags: string[]): TemplateResult | typeof nothing {
   `;
 }
 
+// Inline info icon for help text — 12px, muted, no external CSS needed
+const helpInfoIcon = html`
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    style="width: 12px; height: 12px; flex-shrink: 0; margin-top: 2px; opacity: 0.55"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="12" y1="16" x2="12" y2="12"></line>
+    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+  </svg>
+`;
+
+// Renders help text with an info icon prefix.
+// For long descriptions (>120 chars), wraps in an expandable <details>.
+function renderHelpText(help: string | undefined): TemplateResult | typeof nothing {
+  if (!help) {
+    return nothing;
+  }
+
+  const LONG_THRESHOLD = 120;
+  if (help.length > LONG_THRESHOLD) {
+    // Truncate at word boundary or character limit for the summary
+    const truncated = help.slice(0, 80).replace(/\s+\S*$/, "") + "…";
+    return html`
+      <details style="margin:0;">
+        <summary
+          class="cfg-field__help"
+          style="display:flex;align-items:flex-start;gap:5px;cursor:pointer;list-style:none;user-select:none;"
+        >
+          ${helpInfoIcon}
+          <span>${truncated}</span>
+          <span
+            style="color:var(--color-accent,#4f8ef7);font-size:11px;white-space:nowrap;margin-left:auto;padding-left:8px;"
+            >more</span
+          >
+        </summary>
+        <div
+          class="cfg-field__help"
+          style="margin-top:4px;padding-left:17px;border-left:2px solid var(--color-border,rgba(255 255 255/.08));"
+        >
+          ${help}
+        </div>
+      </details>
+    `;
+  }
+
+  return html`
+    <div class="cfg-field__help" style="display:flex;align-items:flex-start;gap:5px;">
+      ${helpInfoIcon}
+      <span>${help}</span>
+    </div>
+  `;
+}
+
+// Group header for field groups within an object section
+function renderGroupHeader(groupName: string): TemplateResult {
+  return html`
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        gap:8px;
+        padding:4px 0 6px;
+        margin-top:6px;
+        font-size:10px;
+        font-weight:700;
+        letter-spacing:0.08em;
+        text-transform:uppercase;
+        color:var(--color-text-muted,#888);
+        border-bottom:1px solid var(--color-border,rgba(255 255 255/.08));
+      "
+    >
+      ${groupName}
+    </div>
+  `;
+}
+
 export function renderNode(params: {
   schema: JsonSchema;
   value: unknown;
@@ -384,7 +511,7 @@ export function renderNode(params: {
       return html`
         <div class="cfg-field">
           ${showLabel ? html`<label class="cfg-field__label">${label}</label>` : nothing}
-          ${help ? html`<div class="cfg-field__help">${help}</div>` : nothing}
+          ${renderHelpText(help)}
           ${renderTags(tags)}
           <div class="cfg-segmented">
             ${literals.map(
@@ -450,7 +577,7 @@ export function renderNode(params: {
       return html`
         <div class="cfg-field">
           ${showLabel ? html`<label class="cfg-field__label">${label}</label>` : nothing}
-          ${help ? html`<div class="cfg-field__help">${help}</div>` : nothing}
+          ${renderHelpText(help)}
           ${renderTags(tags)}
           <div class="cfg-segmented">
             ${options.map(
@@ -556,10 +683,31 @@ function renderTextInput(params: {
         : "");
   const displayValue = value ?? "";
 
+  // Handler to toggle sensitive field visibility
+  const handleSensitiveToggle = (e: Event) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const wrap = btn.closest(".cfg-input-wrap") as HTMLElement;
+    const input = wrap?.querySelector("input.cfg-input") as HTMLInputElement;
+    const showEl = btn.querySelector("[data-eye='show']") as HTMLElement;
+    const hideEl = btn.querySelector("[data-eye='hide']") as HTMLElement;
+    if (!input) {
+      return;
+    }
+    const isHidden = input.type === "password";
+    input.type = isHidden ? "text" : "password";
+    if (showEl) {
+      showEl.hidden = !isHidden;
+    }
+    if (hideEl) {
+      hideEl.hidden = isHidden;
+    }
+    btn.title = isHidden ? "Hide value" : "Show value";
+  };
+
   return html`
     <div class="cfg-field">
       ${showLabel ? html`<label class="cfg-field__label">${label}</label>` : nothing}
-      ${help ? html`<div class="cfg-field__help">${help}</div>` : nothing}
+      ${renderHelpText(help)}
       ${renderTags(tags)}
       <div class="cfg-input-wrap">
         <input
@@ -590,15 +738,35 @@ function renderTextInput(params: {
           }}
         />
         ${
+          isSensitive
+            ? html`
+          <button
+            type="button"
+            class="cfg-input__reset"
+            title="Show value"
+            style="display:flex;align-items:center;justify-content:center;gap:0;padding:9px 10px;"
+            ?disabled=${disabled}
+            @click=${handleSensitiveToggle}
+          >
+            <span data-eye="show" style="display:flex;width:16px;height:16px;">${icons.eye}</span>
+            <span data-eye="hide" hidden style="display:flex;width:16px;height:16px;">${icons.eyeOff}</span>
+          </button>
+        `
+            : nothing
+        }
+        ${
           schema.default !== undefined
             ? html`
           <button
             type="button"
             class="cfg-input__reset"
-            title="Reset to default"
+            title="Reset to default: ${String(schema.default)}"
+            style="display:flex;align-items:center;justify-content:center;gap:0;padding:9px 10px;"
             ?disabled=${disabled}
             @click=${() => onPatch(path, schema.default)}
-          >↺</button>
+          >
+            <span style="display:flex;width:16px;height:16px;">${icons.undo}</span>
+          </button>
         `
             : nothing
         }
@@ -622,36 +790,55 @@ function renderNumberInput(params: {
   const { label, help, tags } = resolveFieldMeta(path, schema, hints);
   const displayValue = value ?? schema.default ?? "";
   const numValue = typeof displayValue === "number" ? displayValue : 0;
+  const hasDefault = schema.default !== undefined;
 
   return html`
     <div class="cfg-field">
       ${showLabel ? html`<label class="cfg-field__label">${label}</label>` : nothing}
-      ${help ? html`<div class="cfg-field__help">${help}</div>` : nothing}
+      ${renderHelpText(help)}
       ${renderTags(tags)}
-      <div class="cfg-number">
-        <button
-          type="button"
-          class="cfg-number__btn"
-          ?disabled=${disabled}
-          @click=${() => onPatch(path, numValue - 1)}
-        >−</button>
-        <input
-          type="number"
-          class="cfg-number__input"
-          .value=${displayValue == null ? "" : String(displayValue)}
-          ?disabled=${disabled}
-          @input=${(e: Event) => {
-            const raw = (e.target as HTMLInputElement).value;
-            const parsed = raw === "" ? undefined : Number(raw);
-            onPatch(path, parsed);
-          }}
-        />
-        <button
-          type="button"
-          class="cfg-number__btn"
-          ?disabled=${disabled}
-          @click=${() => onPatch(path, numValue + 1)}
-        >+</button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="cfg-number">
+          <button
+            type="button"
+            class="cfg-number__btn"
+            ?disabled=${disabled}
+            @click=${() => onPatch(path, numValue - 1)}
+          >−</button>
+          <input
+            type="number"
+            class="cfg-number__input"
+            .value=${displayValue == null ? "" : String(displayValue)}
+            ?disabled=${disabled}
+            @input=${(e: Event) => {
+              const raw = (e.target as HTMLInputElement).value;
+              const parsed = raw === "" ? undefined : Number(raw);
+              onPatch(path, parsed);
+            }}
+          />
+          <button
+            type="button"
+            class="cfg-number__btn"
+            ?disabled=${disabled}
+            @click=${() => onPatch(path, numValue + 1)}
+          >+</button>
+        </div>
+        ${
+          hasDefault
+            ? html`
+          <button
+            type="button"
+            class="cfg-input__reset"
+            title="Reset to default: ${String(schema.default)}"
+            style="display:flex;align-items:center;justify-content:center;gap:0;padding:9px 10px;"
+            ?disabled=${disabled}
+            @click=${() => onPatch(path, schema.default)}
+          >
+            <span style="display:flex;width:16px;height:16px;">${icons.undo}</span>
+          </button>
+        `
+            : nothing
+        }
       </div>
     </div>
   `;
@@ -680,7 +867,7 @@ function renderSelect(params: {
   return html`
     <div class="cfg-field">
       ${showLabel ? html`<label class="cfg-field__label">${label}</label>` : nothing}
-      ${help ? html`<div class="cfg-field__help">${help}</div>` : nothing}
+      ${renderHelpText(help)}
       ${renderTags(tags)}
       <select
         class="cfg-select"
@@ -744,9 +931,17 @@ function renderObject(params: {
   const additional = schema.additionalProperties;
   const allowExtra = Boolean(additional) && typeof additional === "object";
 
+  // Build field list with optional group headers between groups
+  let _lastGroup: string | undefined;
   const fields = html`
-    ${sorted.map(([propKey, node]) =>
-      renderNode({
+    ${sorted.map(([propKey, node]) => {
+      const groupLabel = hintForPath([...path, propKey], hints)?.group;
+      const showHeader = groupLabel !== _lastGroup;
+      if (showHeader) {
+        _lastGroup = groupLabel;
+      }
+      const header = showHeader && groupLabel ? renderGroupHeader(groupLabel) : nothing;
+      return html`${header}${renderNode({
         schema: node,
         value: obj[propKey],
         path: [...path, propKey],
@@ -755,8 +950,8 @@ function renderObject(params: {
         disabled,
         searchCriteria: childSearchCriteria,
         onPatch,
-      }),
-    )}
+      })}`;
+    })}
     ${
       allowExtra
         ? renderMapField({
