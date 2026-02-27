@@ -94,8 +94,7 @@ export function renderLogs(props: LogsProps) {
         <input
           type="checkbox"
           .checked=${props.autoFollow}
-          @change=${(e: Event) =>
-            props.onToggleAutoFollow((e.target as HTMLInputElement).checked)}
+          @change=${(e: Event) => props.onToggleAutoFollow((e.target as HTMLInputElement).checked)}
         />
       </label>
     </div>

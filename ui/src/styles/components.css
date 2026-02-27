@@ -160,7 +160,6 @@
   transition: border-color var(--duration-fast) ease;
 }
 
-
 .account-card-header {
   display: flex;
   justify-content: space-between;
@@ -3481,8 +3480,6 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
 .channel-card__callout-bottom {
   margin-bottom: 12px;
 }
-
-
 
 /* ----- Status list value coloring ----- */
 
