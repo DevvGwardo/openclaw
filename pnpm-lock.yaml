@@ -473,6 +473,9 @@ importers:
       '@tauri-apps/api':
         specifier: ^2.10.1
         version: 2.10.1
+      '@tauri-apps/plugin-deep-link':
+        specifier: ^2
+        version: 2.4.7
       dompurify:
         specifier: ^3.3.1
         version: 3.3.1
@@ -3133,6 +3136,9 @@ packages:
 
   '@tauri-apps/api@2.10.1':
     resolution: {integrity: sha512-hKL/jWf293UDSUN09rR69hrToyIXBb8CjGaWC7gfinvnQrBVvnLr08FeFi38gxtugAVyVcTa5/FD/Xnkb1siBw==}
+
+  '@tauri-apps/plugin-deep-link@2.4.7':
+    resolution: {integrity: sha512-K0FQlLM6BoV7Ws2xfkh+Tnwi5VZVdkI4Vw/3AGLSf0Xvu2y86AMBzd9w/SpzKhw9ai2B6ES8di/OoGDCExkOzg==}
 
   '@thi.ng/bitstream@2.4.41':
     resolution: {integrity: sha512-treRzw3+7I1YCuilFtznwT3SGtceS9spUXhyBqeuKNTm4nIfMuvg4fNqx4GgpuS6cGPQNPMUJm0OyzKnSe2Emw==}
@@ -9507,6 +9513,10 @@ snapshots:
       tslib: 2.8.1
 
   '@tauri-apps/api@2.10.1': {}
+
+  '@tauri-apps/plugin-deep-link@2.4.7':
+    dependencies:
+      '@tauri-apps/api': 2.10.1
 
   '@thi.ng/bitstream@2.4.41':
     dependencies:

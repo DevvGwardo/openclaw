@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "build:tauri": "vite build --config vite.config.tauri.ts",
     "dev": "vite",
     "preview": "vite preview",
     "test": "vitest run --config vitest.config.ts"
@@ -13,6 +14,7 @@
     "@lit/context": "^1.1.6",
     "@noble/ed25519": "3.0.0",
     "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/plugin-deep-link": "^2",
     "dompurify": "^3.3.1",
     "lit": "^3.3.2",
     "marked": "^17.0.3",
