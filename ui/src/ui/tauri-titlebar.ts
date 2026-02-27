@@ -23,8 +23,6 @@ export class TauriTitlebar extends LitElement {
   @property({ type: String }) title = "OpenClaw";
   // Optional breadcrumb: current tab name
   @property({ type: String, attribute: "current-tab" }) currentTab = "";
-  // Whether the app is connected to the gateway
-  @property({ type: Boolean }) connected = false;
 
   @state() private maximized = false;
 

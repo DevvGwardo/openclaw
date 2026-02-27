@@ -110,30 +110,6 @@ tauri-shell {
   background: var(--color-bg);
   padding: var(--space-6);
   padding-top: 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-border, rgba(255 255 255 / 0.12)) transparent;
-}
-
-.tauri-shell__content::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.tauri-shell__content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.tauri-shell__content::-webkit-scrollbar-thumb {
-  background: var(--color-border, rgba(255 255 255 / 0.15));
-  border-radius: 3px;
-}
-
-/* ── Inner content wrapper ── */
-.tauri-shell__inner {
-  max-width: var(--content-max-width);
-  margin: 0 auto;
-  padding: var(--space-4);
-  min-height: 100%;
 }
 
 /* ── Footer ── */
@@ -211,13 +187,6 @@ html::-webkit-scrollbar-thumb,
 .panel {
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0 0 0 / 0.3);
-}
-
-/* ── Smooth sidebar transitions ── */
-.tauri-sidebar {
-  transition:
-    width 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-    min-width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ── Hide browser topbar/nav — replaced by titlebar + sidebar in Tauri context ── */

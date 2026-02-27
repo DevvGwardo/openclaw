@@ -39,7 +39,7 @@ export class TauriSidebar extends LitElement {
 
   // Arrow up/down to navigate between nav items; wraps around at edges
   private _handleKeyDown = (event: KeyboardEvent) => {
-    const items = Array.from(this.querySelectorAll(".tauri-sidebar__item"));
+    const items = Array.from(this.querySelectorAll<HTMLElement>(".tauri-sidebar__item"));
     const currentIndex = items.indexOf(event.target as HTMLElement);
     if (currentIndex === -1) {
       return;

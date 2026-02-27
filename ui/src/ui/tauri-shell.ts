@@ -67,7 +67,6 @@ export class TauriShell extends OpenClawApp {
       <tauri-titlebar
         title="OpenClaw"
         current-tab=${currentTabTitle}
-        ?connected=${this.connected}
       ></tauri-titlebar>
 
       <div class="tauri-shell__body">
