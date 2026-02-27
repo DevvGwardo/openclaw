@@ -21,8 +21,8 @@ import { renderIMessageBody } from "./channels.imessage.ts";
 import { renderNostrBody } from "./channels.nostr.ts";
 import {
   channelEnabled,
-  channelPrimaryAction,
   deriveChannelStatus,
+  getChannelIcon,
   renderChannelAccountCount,
   shouldAutoExpand,
 } from "./channels.shared.ts";
@@ -31,7 +31,7 @@ import { renderSlackBody } from "./channels.slack.ts";
 import { renderTelegramBody } from "./channels.telegram.ts";
 import type { ChannelKey, ChannelsChannelData, ChannelsProps } from "./channels.types.ts";
 import { renderWhatsAppBody, whatsappPrimaryAction } from "./channels.whatsapp.ts";
-import { surfaceHero, surfaceMain, surfacePage } from "./surface-page.ts";
+import { surfaceMain, surfacePage } from "./surface-page.ts";
 
 export function renderChannels(props: ChannelsProps) {
   const channels = props.snapshot?.channels as Record<string, unknown> | null;
@@ -58,24 +58,11 @@ export function renderChannels(props: ChannelsProps) {
     });
 
   const activeCount = orderedChannels.filter((c) => c.enabled).length;
-  const totalCount = orderedChannels.length;
   // Count channels with an explicit connected=true in their status
   const connectedCount = orderedChannels.filter((c) => {
     const st = channels?.[c.key] as Record<string, unknown> | undefined;
     return typeof st?.connected === "boolean" && st.connected;
   }).length;
-
-  // Slim hero — no title/subtitle (the sidebar tab already labels this page)
-  const hero = surfaceHero({
-    stats: [
-      { label: "Active", value: html`${activeCount} of ${totalCount}` },
-      { label: "Connected", value: connectedCount },
-      {
-        label: "Last refresh",
-        value: props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a",
-      },
-    ],
-  });
 
   const data: ChannelsChannelData = {
     whatsapp,
@@ -89,59 +76,98 @@ export function renderChannels(props: ChannelsProps) {
     channelAccounts: props.snapshot?.channelAccounts ?? null,
   };
 
-  const main = surfaceMain(html`
-    <section class="grid-channels">
-      ${orderedChannels.map((channel, idx) => {
-        const animDelay = (idx + 1) * 50 + 50; // 100ms, 150ms, 200ms …
-        const channelLabel = resolveChannelLabel(props.snapshot, channel.key);
-        const stParams = getChannelStatusParams(channel.key, channels);
-        const isExpanded = shouldAutoExpand(stParams);
-        const status = deriveChannelStatus(stParams);
-        const primaryAction = getPrimaryAction(channel.key, props);
+  const metaMap = resolveChannelMetaMap(props.snapshot);
+  const activeChannels = orderedChannels.filter((c) => c.enabled);
+  const inactiveChannels = orderedChannels.filter((c) => !c.enabled);
 
-        return html`
-          <details
-            class="channel-card-v2${channel.enabled ? "" : " channel-card-v2--disabled"}"
-            ?open=${isExpanded}
-            style="animation: rise 0.3s var(--ease-out) ${animDelay}ms backwards;"
-          >
-            <summary class="channel-card-v2__summary">
-              <span class="channel-card__dot channel-card__dot--${status.dot}"></span>
-              <span class="channel-card-v2__name">${channelLabel}</span>
-              <span class="channel-card__badge channel-card__badge--${status.badgeVariant}">${status.badge}</span>
-              <span class="channel-card-v2__spacer"></span>
-              ${primaryAction}
-              <span class="channel-card-v2__chevron">▸</span>
-            </summary>
-            <div class="channel-card-v2__body">
-              ${renderChannelBody(channel.key, props, data)}
-            </div>
-          </details>
-        `;
-      })}
+  const header = html`
+    <div class="channels-header">
+      <h2 class="channels-header__title">Channels</h2>
+      <button
+        class="btn btn--sm"
+        @click=${() => props.onRefresh(true)}
+      >
+        Refresh All
+      </button>
+    </div>
+    <div class="channels-header__stats">
+      <span>${activeCount} active</span>
+      <span class="channels-header__stat-dot"></span>
+      <span>${connectedCount} connected</span>
+      <span class="channels-header__stat-dot"></span>
+      <span>Updated ${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "never"}</span>
+    </div>
+  `;
+
+  const main = surfaceMain(html`
+    ${header}
+
+    <section class="grid-channels">
+      ${activeChannels.map((channel, idx) =>
+        renderChannelCard(channel, idx, props, data, channels, metaMap),
+      )}
     </section>
 
-    <details class="channels-health">
-      <summary class="channels-health__summary">
-        <span class="channels-health__title">Channel health</span>
-        <span class="channels-health__timestamp">
-          ${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a"}
-        </span>
-      </summary>
-      <div class="channels-health__body">
-        ${
-          props.lastError
-            ? html`<div class="callout danger channel-card__callout-bottom">${props.lastError}</div>`
-            : nothing
-        }
-        <pre class="code-block">
-${props.snapshot ? JSON.stringify(props.snapshot, null, 2) : "No snapshot yet."}
-        </pre>
-      </div>
-    </details>
+    ${
+      activeChannels.length > 0 && inactiveChannels.length > 0
+        ? html`
+            <div class="channels-divider">Not configured</div>
+          `
+        : nothing
+    }
+
+    ${
+      inactiveChannels.length > 0
+        ? html`
+        <section class="grid-channels grid-channels--inactive">
+          ${inactiveChannels.map((channel, idx) =>
+            renderChannelCard(channel, idx + activeChannels.length, props, data, channels, metaMap),
+          )}
+        </section>
+      `
+        : nothing
+    }
   `);
 
-  return surfacePage("channels", { hero, main });
+  return surfacePage("channels", { hero: nothing, main });
+}
+
+function renderChannelCard(
+  channel: { key: ChannelKey; enabled: boolean },
+  idx: number,
+  props: ChannelsProps,
+  data: ChannelsChannelData,
+  channels: Record<string, unknown> | null,
+  metaMap: Record<string, ChannelUiMetaEntry>,
+) {
+  const animDelay = (idx + 1) * 50 + 50; // 100ms, 150ms, 200ms …
+  const channelLabel = resolveChannelLabel(props.snapshot, channel.key);
+  const stParams = getChannelStatusParams(channel.key, channels);
+  const isExpanded = shouldAutoExpand(stParams);
+  const status = deriveChannelStatus(stParams);
+  const primaryAction = getPrimaryAction(channel.key, props);
+  const icon = getChannelIcon(channel.key, metaMap[channel.key]);
+
+  return html`
+    <details
+      class="channel-card-v2${channel.enabled ? "" : " channel-card-v2--disabled"}"
+      ?open=${isExpanded}
+      style="animation: rise 0.3s var(--ease-out) ${animDelay}ms backwards;"
+    >
+      <summary class="channel-card-v2__summary">
+        <span class="channel-card-v2__icon">${icon}</span>
+        <span class="channel-card__dot channel-card__dot--${status.dot}"></span>
+        <span class="channel-card-v2__name">${channelLabel}</span>
+        <span class="channel-card__badge channel-card__badge--${status.badgeVariant}">${status.badge}</span>
+        <span class="channel-card-v2__spacer"></span>
+        ${primaryAction}
+        <span class="channel-card-v2__chevron">▸</span>
+      </summary>
+      <div class="channel-card-v2__body">
+        ${renderChannelBody(channel.key, props, data)}
+      </div>
+    </details>
+  `;
 }
 
 function resolveChannelOrder(snapshot: ChannelsStatusSnapshot | null): ChannelKey[] {
@@ -170,7 +196,8 @@ function getPrimaryAction(key: ChannelKey, props: ChannelsProps) {
   if (key === "whatsapp") {
     return whatsappPrimaryAction(props);
   }
-  return channelPrimaryAction(props);
+  // No per-row Probe — "Refresh All" in header handles this
+  return nothing;
 }
 
 function renderChannelBody(key: ChannelKey, props: ChannelsProps, data: ChannelsChannelData) {
