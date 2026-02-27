@@ -3380,3 +3380,258 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
 .overview-action-pill__icon {
   font-size: 14px;
 }
+
+/* === Channels Redesign === */
+
+/* ----- Channels Hero Banner ----- */
+
+.channels-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 6%, var(--card)) 0%,
+    var(--card) 60%
+  );
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  animation: rise 0.35s var(--ease-out) backwards;
+  margin-bottom: 20px;
+}
+
+.channels-hero__title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-strong);
+}
+
+.channels-hero__sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.channels-hero__stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.channels-hero__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: right;
+}
+
+.channels-hero__stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.channels-hero__stat-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.channels-hero__divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+}
+
+/* ----- Channel Card Header with Status Dot + Badge ----- */
+
+.channel-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.channel-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.channel-card__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.channel-card__dot--ok {
+  background: var(--ok);
+  box-shadow: 0 0 8px var(--ok-muted);
+  animation: pulse-glow 2s infinite;
+}
+
+.channel-card__dot--warn {
+  background: var(--warn);
+}
+
+.channel-card__dot--error {
+  background: var(--danger);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--danger) 40%, transparent);
+}
+
+.channel-card__dot--off {
+  background: var(--border-strong);
+}
+
+.channel-card__badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.channel-card__badge--ok {
+  background: color-mix(in srgb, var(--ok) 12%, transparent);
+  color: var(--ok);
+}
+
+.channel-card__badge--warn {
+  background: color-mix(in srgb, var(--warn) 12%, transparent);
+  color: var(--warn);
+}
+
+.channel-card__badge--error {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+.channel-card__badge--off {
+  background: color-mix(in srgb, var(--muted) 12%, transparent);
+  color: var(--muted);
+}
+
+/* ----- Disabled Channel Cards ----- */
+
+.channel-card--disabled {
+  opacity: 0.6;
+  transition: opacity 150ms;
+}
+
+.channel-card--disabled:hover {
+  opacity: 1;
+}
+
+/* ----- Status list value coloring ----- */
+
+.status-value--yes {
+  color: var(--ok);
+  font-weight: 500;
+}
+
+.status-value--no {
+  color: var(--muted);
+}
+
+/* ----- Collapsible Config Section ----- */
+
+.channels-config-details {
+  margin-top: 16px;
+}
+
+.channels-config-details > summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  padding: 6px 0;
+  user-select: none;
+  outline: none;
+}
+
+.channels-config-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.channels-config-details > summary:hover {
+  color: var(--text);
+}
+
+.channels-config-details > summary::before {
+  content: "▶ ";
+  font-size: 10px;
+}
+
+.channels-config-details[open] > summary::before {
+  content: "▼ ";
+}
+
+/* ----- Channel Health Section ----- */
+
+.channels-health {
+  margin-top: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.channels-health__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  cursor: pointer;
+  list-style: none;
+  background: var(--card);
+  user-select: none;
+  outline: none;
+}
+
+.channels-health__summary::-webkit-details-marker {
+  display: none;
+}
+
+.channels-health__summary:hover {
+  background: var(--bg-hover);
+}
+
+.channels-health__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.channels-health__timestamp {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.channels-health__body {
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+  .channels-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .channels-hero__stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .channels-hero__stat {
+    text-align: left;
+  }
+}

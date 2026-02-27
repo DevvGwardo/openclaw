@@ -2,6 +2,41 @@ import { html, nothing } from "lit";
 import type { ChannelAccountSnapshot } from "../types.ts";
 import type { ChannelKey, ChannelsProps } from "./channels.types.ts";
 
+export type ChannelStatusInfo = {
+  dot: "ok" | "warn" | "error" | "off";
+  badge: string;
+  badgeVariant: "ok" | "warn" | "error" | "off";
+};
+
+/**
+ * Derive status dot + badge from channel health fields.
+ * Pass the channel-specific configured/running/connected/lastError values.
+ */
+export function deriveChannelStatus(params: {
+  configured?: boolean;
+  running?: boolean;
+  connected?: boolean | null;
+  lastError?: string | null;
+}): ChannelStatusInfo {
+  const { configured, running, connected, lastError } = params;
+
+  if (lastError) {
+    return { dot: "error", badge: "Error", badgeVariant: "error" };
+  }
+  if (!configured) {
+    return { dot: "off", badge: "Offline", badgeVariant: "off" };
+  }
+  if (running) {
+    // connected=null/undefined means the channel doesn't track connection state
+    if (connected === false) {
+      return { dot: "warn", badge: "Running", badgeVariant: "warn" };
+    }
+    return { dot: "ok", badge: "Running", badgeVariant: "ok" };
+  }
+  // configured but not running
+  return { dot: "warn", badge: "Stopped", badgeVariant: "warn" };
+}
+
 export function channelEnabled(key: ChannelKey, props: ChannelsProps) {
   const snapshot = props.snapshot;
   const channels = snapshot?.channels as Record<string, unknown> | null;
