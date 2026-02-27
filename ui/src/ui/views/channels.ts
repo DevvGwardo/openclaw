@@ -24,7 +24,6 @@ import {
   deriveChannelStatus,
   getChannelIcon,
   renderChannelAccountCount,
-  shouldAutoExpand,
 } from "./channels.shared.ts";
 import { renderSignalBody } from "./channels.signal.ts";
 import { renderSlackBody } from "./channels.slack.ts";
@@ -143,30 +142,26 @@ function renderChannelCard(
   const animDelay = (idx + 1) * 50 + 50; // 100ms, 150ms, 200ms …
   const channelLabel = resolveChannelLabel(props.snapshot, channel.key);
   const stParams = getChannelStatusParams(channel.key, channels);
-  const isExpanded = shouldAutoExpand(stParams);
   const status = deriveChannelStatus(stParams);
   const primaryAction = getPrimaryAction(channel.key, props);
   const icon = getChannelIcon(channel.key, metaMap[channel.key]);
+  const disabled = !channel.enabled;
 
   return html`
-    <details
-      class="channel-card-v2${channel.enabled ? "" : " channel-card-v2--disabled"}"
-      ?open=${isExpanded}
+    <div
+      class="channel-card-v3${disabled ? " channel-card-v3--disabled" : ""}"
       style="animation: rise 0.3s var(--ease-out) ${animDelay}ms backwards;"
     >
-      <summary class="channel-card-v2__summary">
-        <span class="channel-card-v2__icon">${icon}</span>
+      <div class="channel-card-v3__header">
+        <span class="channel-card-v3__icon">${icon}</span>
         <span class="channel-card__dot channel-card__dot--${status.dot}"></span>
-        <span class="channel-card-v2__name">${channelLabel}</span>
+        <span class="channel-card-v3__name">${channelLabel}</span>
         <span class="channel-card__badge channel-card__badge--${status.badgeVariant}">${status.badge}</span>
-        <span class="channel-card-v2__spacer"></span>
+        <span class="channel-card-v3__spacer"></span>
         ${primaryAction}
-        <span class="channel-card-v2__chevron">▸</span>
-      </summary>
-      <div class="channel-card-v2__body">
-        ${renderChannelBody(channel.key, props, data)}
       </div>
-    </details>
+      ${channel.enabled ? renderChannelBody(channel.key, props, data) : nothing}
+    </div>
   `;
 }
 
@@ -302,20 +297,20 @@ function renderGenericChannelBody(
           </div>
         `
         : html`
-          <div class="status-list channel-card__status-list">
-            <div>
+          <div class="channel-card-v3__status-grid">
+            <div class="channel-card-v3__status-item">
               <span class="label">Configured</span>
               <span class="${configured ? "status-value--yes" : "status-value--no"}">
                 ${configured == null ? "n/a" : configured ? "Yes" : "No"}
               </span>
             </div>
-            <div>
+            <div class="channel-card-v3__status-item">
               <span class="label">Running</span>
               <span class="${running ? "status-value--yes" : "status-value--no"}">
                 ${running == null ? "n/a" : running ? "Yes" : "No"}
               </span>
             </div>
-            <div>
+            <div class="channel-card-v3__status-item">
               <span class="label">Connected</span>
               <span class="${connected ? "status-value--yes" : "status-value--no"}">
                 ${connected == null ? "n/a" : connected ? "Yes" : "No"}

@@ -4,7 +4,7 @@ import type { DiscordStatus } from "../types.ts";
 import { renderChannelConfigSection } from "./channels.config.ts";
 import type { ChannelsProps } from "./channels.types.ts";
 
-/** Body content for the Discord channel card (inside channel-card-v2__body). */
+/** Body content for the Discord channel card. */
 export function renderDiscordBody(params: {
   props: ChannelsProps;
   discord?: DiscordStatus | null;
@@ -15,30 +15,26 @@ export function renderDiscordBody(params: {
   return html`
     ${accountCountLabel}
 
-    <div class="status-list channel-card__status-list">
-      <div>
+    <div class="channel-card-v3__status-grid">
+      <div class="channel-card-v3__status-item">
         <span class="label">Configured</span>
         <span class="${discord?.configured ? "status-value--yes" : "status-value--no"}">
           ${discord?.configured ? "Yes" : "No"}
         </span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Running</span>
         <span class="${discord?.running ? "status-value--yes" : "status-value--no"}">
           ${discord?.running ? "Yes" : "No"}
         </span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Last start</span>
-        <span class="status-value--no">
-          ${discord?.lastStartAt ? formatRelativeTimestamp(discord.lastStartAt) : "n/a"}
-        </span>
+        <span>${discord?.lastStartAt ? formatRelativeTimestamp(discord.lastStartAt) : "n/a"}</span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Last probe</span>
-        <span class="status-value--no">
-          ${discord?.lastProbeAt ? formatRelativeTimestamp(discord.lastProbeAt) : "n/a"}
-        </span>
+        <span>${discord?.lastProbeAt ? formatRelativeTimestamp(discord.lastProbeAt) : "n/a"}</span>
       </div>
     </div>
 

@@ -4,7 +4,7 @@ import type { GoogleChatStatus } from "../types.ts";
 import { renderChannelConfigSection } from "./channels.config.ts";
 import type { ChannelsProps } from "./channels.types.ts";
 
-/** Body content for the Google Chat channel card (inside channel-card-v2__body). */
+/** Body content for the Google Chat channel card. */
 export function renderGoogleChatBody(params: {
   props: ChannelsProps;
   googleChat?: GoogleChatStatus | null;
@@ -15,26 +15,26 @@ export function renderGoogleChatBody(params: {
   return html`
     ${accountCountLabel}
 
-    <div class="status-list channel-card__status-list">
-      <div>
+    <div class="channel-card-v3__status-grid">
+      <div class="channel-card-v3__status-item">
         <span class="label">Configured</span>
         <span class="${googleChat?.configured ? "status-value--yes" : "status-value--no"}">
           ${googleChat ? (googleChat.configured ? "Yes" : "No") : "n/a"}
         </span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Running</span>
         <span class="${googleChat?.running ? "status-value--yes" : "status-value--no"}">
           ${googleChat ? (googleChat.running ? "Yes" : "No") : "n/a"}
         </span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Credential</span>
-        <span class="status-value--no">${googleChat?.credentialSource ?? "n/a"}</span>
+        <span>${googleChat?.credentialSource ?? "n/a"}</span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Audience</span>
-        <span class="status-value--no">
+        <span>
           ${
             googleChat?.audienceType
               ? `${googleChat.audienceType}${googleChat.audience ? ` · ${googleChat.audience}` : ""}`
@@ -42,17 +42,13 @@ export function renderGoogleChatBody(params: {
           }
         </span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Last start</span>
-        <span class="status-value--no">
-          ${googleChat?.lastStartAt ? formatRelativeTimestamp(googleChat.lastStartAt) : "n/a"}
-        </span>
+        <span>${googleChat?.lastStartAt ? formatRelativeTimestamp(googleChat.lastStartAt) : "n/a"}</span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Last probe</span>
-        <span class="status-value--no">
-          ${googleChat?.lastProbeAt ? formatRelativeTimestamp(googleChat.lastProbeAt) : "n/a"}
-        </span>
+        <span>${googleChat?.lastProbeAt ? formatRelativeTimestamp(googleChat.lastProbeAt) : "n/a"}</span>
       </div>
     </div>
 

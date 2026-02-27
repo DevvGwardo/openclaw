@@ -22,7 +22,7 @@ function truncatePubkey(pubkey: string | null | undefined): string {
   return `${pubkey.slice(0, 8)}...${pubkey.slice(-8)}`;
 }
 
-/** Body content for the Nostr channel card (inside channel-card-v2__body). */
+/** Body content for the Nostr channel card. */
 export function renderNostrBody(params: {
   props: ChannelsProps;
   nostr?: NostrStatus | null;
@@ -128,7 +128,7 @@ export function renderNostrBody(params: {
     const hasAnyProfileData = name || displayName || about || picture || nip05;
 
     return html`
-      <div class="channel-card__status-list" style="padding: 12px; background: var(--bg-elevated); border-radius: var(--radius-md);">
+      <div class="channel-card-v3__status-grid" style="padding: 12px; background: var(--bg-elevated); border-radius: var(--radius-md);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <div style="font-weight: 500;">Profile</div>
           ${
@@ -199,30 +199,28 @@ export function renderNostrBody(params: {
           </div>
         `
         : html`
-          <div class="status-list channel-card__status-list">
-            <div>
+          <div class="channel-card-v3__status-grid">
+            <div class="channel-card-v3__status-item">
               <span class="label">Configured</span>
               <span class="${summaryConfigured ? "status-value--yes" : "status-value--no"}">
                 ${summaryConfigured ? "Yes" : "No"}
               </span>
             </div>
-            <div>
+            <div class="channel-card-v3__status-item">
               <span class="label">Running</span>
               <span class="${summaryRunning ? "status-value--yes" : "status-value--no"}">
                 ${summaryRunning ? "Yes" : "No"}
               </span>
             </div>
-            <div>
+            <div class="channel-card-v3__status-item">
               <span class="label">Public Key</span>
-              <span class="mono status-value--no" title="${summaryPublicKey ?? ""}">
+              <span class="mono" title="${summaryPublicKey ?? ""}">
                 ${truncatePubkey(summaryPublicKey)}
               </span>
             </div>
-            <div>
+            <div class="channel-card-v3__status-item">
               <span class="label">Last start</span>
-              <span class="status-value--no">
-                ${summaryLastStartAt ? formatRelativeTimestamp(summaryLastStartAt) : "n/a"}
-              </span>
+              <span>${summaryLastStartAt ? formatRelativeTimestamp(summaryLastStartAt) : "n/a"}</span>
             </div>
           </div>
         `

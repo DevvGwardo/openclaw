@@ -3668,6 +3668,102 @@ openclaw-app:has(.shell--chat-focus) ~ #cron-modal-portal .cron-modal-backdrop {
   opacity: 0.8;
 }
 
+/* ── Channel Card V3 (flat tile, always-visible) ── */
+.channel-card-v3 {
+  background: var(--surface-raised);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.15s ease;
+}
+.channel-card-v3:hover {
+  border-color: color-mix(in srgb, var(--card-border) 60%, var(--text-muted));
+}
+
+/* Header row — icon + name + spacer + badge */
+.channel-card-v3__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Channel icon (emoji or image) */
+.channel-card-v3__icon {
+  font-size: 20px;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Channel name */
+.channel-card-v3__name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-strong);
+}
+
+/* Spacer pushes trailing items to the right */
+.channel-card-v3__spacer {
+  flex: 1;
+}
+
+/* 2-column mini-grid for status fields */
+.channel-card-v3__status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+  font-size: 13px;
+}
+
+/* Each status field — label (muted) + value on one row */
+.channel-card-v3__status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.channel-card-v3__status-item .label {
+  color: var(--text-muted);
+}
+
+/* Action buttons row — pushed to bottom of card */
+.channel-card-v3__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+/* Inline error banner (compact callout) */
+.channel-card-v3__error {
+  border: 1px solid rgba(248 81 73 / 0.15);
+  background: rgba(248 81 73 / 0.05);
+  color: var(--color-error, #f85149);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Disabled state — inactive / unconfigured channels */
+.channel-card-v3--disabled {
+  opacity: 0.55;
+  padding: 10px 14px;
+  transition: opacity 0.15s ease;
+}
+.channel-card-v3--disabled:hover {
+  opacity: 0.8;
+}
+
+/* Hide status / actions in disabled cards — only header visible */
+.channel-card-v3--disabled .channel-card-v3__status-grid,
+.channel-card-v3--disabled .channel-card-v3__actions,
+.channel-card-v3--disabled .channel-card-v3__error {
+  display: none;
+}
+
 /* Divider between active and inactive channel tiers */
 .channels-divider {
   display: flex;

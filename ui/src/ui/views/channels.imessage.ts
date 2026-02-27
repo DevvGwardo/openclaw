@@ -4,7 +4,7 @@ import type { IMessageStatus } from "../types.ts";
 import { renderChannelConfigSection } from "./channels.config.ts";
 import type { ChannelsProps } from "./channels.types.ts";
 
-/** Body content for the iMessage channel card (inside channel-card-v2__body). */
+/** Body content for the iMessage channel card. */
 export function renderIMessageBody(params: {
   props: ChannelsProps;
   imessage?: IMessageStatus | null;
@@ -15,30 +15,26 @@ export function renderIMessageBody(params: {
   return html`
     ${accountCountLabel}
 
-    <div class="status-list channel-card__status-list">
-      <div>
+    <div class="channel-card-v3__status-grid">
+      <div class="channel-card-v3__status-item">
         <span class="label">Configured</span>
         <span class="${imessage?.configured ? "status-value--yes" : "status-value--no"}">
           ${imessage?.configured ? "Yes" : "No"}
         </span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Running</span>
         <span class="${imessage?.running ? "status-value--yes" : "status-value--no"}">
           ${imessage?.running ? "Yes" : "No"}
         </span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Last start</span>
-        <span class="status-value--no">
-          ${imessage?.lastStartAt ? formatRelativeTimestamp(imessage.lastStartAt) : "n/a"}
-        </span>
+        <span>${imessage?.lastStartAt ? formatRelativeTimestamp(imessage.lastStartAt) : "n/a"}</span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Last probe</span>
-        <span class="status-value--no">
-          ${imessage?.lastProbeAt ? formatRelativeTimestamp(imessage.lastProbeAt) : "n/a"}
-        </span>
+        <span>${imessage?.lastProbeAt ? formatRelativeTimestamp(imessage.lastProbeAt) : "n/a"}</span>
       </div>
     </div>
 

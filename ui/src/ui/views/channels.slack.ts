@@ -4,7 +4,7 @@ import type { SlackStatus } from "../types.ts";
 import { renderChannelConfigSection } from "./channels.config.ts";
 import type { ChannelsProps } from "./channels.types.ts";
 
-/** Body content for the Slack channel card (inside channel-card-v2__body). */
+/** Body content for the Slack channel card. */
 export function renderSlackBody(params: {
   props: ChannelsProps;
   slack?: SlackStatus | null;
@@ -15,30 +15,26 @@ export function renderSlackBody(params: {
   return html`
     ${accountCountLabel}
 
-    <div class="status-list channel-card__status-list">
-      <div>
+    <div class="channel-card-v3__status-grid">
+      <div class="channel-card-v3__status-item">
         <span class="label">Configured</span>
         <span class="${slack?.configured ? "status-value--yes" : "status-value--no"}">
           ${slack?.configured ? "Yes" : "No"}
         </span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Running</span>
         <span class="${slack?.running ? "status-value--yes" : "status-value--no"}">
           ${slack?.running ? "Yes" : "No"}
         </span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Last start</span>
-        <span class="status-value--no">
-          ${slack?.lastStartAt ? formatRelativeTimestamp(slack.lastStartAt) : "n/a"}
-        </span>
+        <span>${slack?.lastStartAt ? formatRelativeTimestamp(slack.lastStartAt) : "n/a"}</span>
       </div>
-      <div>
+      <div class="channel-card-v3__status-item">
         <span class="label">Last probe</span>
-        <span class="status-value--no">
-          ${slack?.lastProbeAt ? formatRelativeTimestamp(slack.lastProbeAt) : "n/a"}
-        </span>
+        <span>${slack?.lastProbeAt ? formatRelativeTimestamp(slack.lastProbeAt) : "n/a"}</span>
       </div>
     </div>
 
