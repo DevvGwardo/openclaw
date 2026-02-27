@@ -198,11 +198,157 @@ export function renderOverview(props: OverviewProps) {
   const currentLocale = i18n.getLocale();
 
   return html`
-    <section class="grid grid-cols-2">
-      <div class="card">
-        <div class="card-title">${t("overview.access.title")}</div>
-        <div class="card-sub">${t("overview.access.subtitle")}</div>
-        <div class="form-grid" style="margin-top: 16px;">
+    <!-- 1. Hero Status Banner -->
+    <div class="overview-hero">
+      <div class="overview-hero__status">
+        <span
+          class="overview-hero__dot overview-hero__dot--${props.connected ? "ok" : "offline"}"
+        ></span>
+        <span class="overview-hero__label">
+          ${props.connected ? t("common.ok") : t("common.offline")}
+        </span>
+      </div>
+      <div class="overview-hero__stats">
+        <div class="overview-hero__stat">
+          <span class="overview-hero__stat-label">${t("overview.snapshot.uptime")}</span>
+          <span class="overview-hero__stat-value">${uptime}</span>
+        </div>
+        <div class="overview-hero__divider"></div>
+        <div class="overview-hero__stat">
+          <span class="overview-hero__stat-label">${t("overview.snapshot.tickInterval")}</span>
+          <span class="overview-hero__stat-value">${tick}</span>
+        </div>
+        <div class="overview-hero__divider"></div>
+        <div class="overview-hero__stat">
+          <span class="overview-hero__stat-label"
+            >${t("overview.snapshot.lastChannelsRefresh")}</span
+          >
+          <span class="overview-hero__stat-value">
+            ${
+              props.lastChannelsRefresh
+                ? formatRelativeTimestamp(props.lastChannelsRefresh)
+                : t("common.na")
+            }
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Error/Hint Banner — only renders when there's a lastError -->
+    ${
+      props.lastError
+        ? html`
+          <div class="overview-alert overview-alert--danger">
+            <div class="overview-alert__icon">!</div>
+            <div class="overview-alert__content">
+              <div class="overview-alert__message">${props.lastError}</div>
+              ${pairingHint ?? ""} ${authHint ?? ""} ${insecureContextHint ?? ""}
+            </div>
+          </div>
+        `
+        : ""
+    }
+
+    <!-- 3. Dashboard Stat Grid -->
+    <section class="overview-dashboard">
+      <div class="overview-dash-card" style="animation-delay: 100ms;">
+        <div class="overview-dash-card__icon overview-dash-card__icon--teal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </div>
+        <div class="overview-dash-card__content">
+          <div class="overview-dash-card__value">${props.presenceCount}</div>
+          <div class="overview-dash-card__label">${t("overview.stats.instances")}</div>
+          <div class="overview-dash-card__sub">${t("overview.stats.instancesHint")}</div>
+        </div>
+      </div>
+      <div class="overview-dash-card" style="animation-delay: 150ms;">
+        <div class="overview-dash-card__icon overview-dash-card__icon--blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="overview-dash-card__content">
+          <div class="overview-dash-card__value">${props.sessionsCount ?? t("common.na")}</div>
+          <div class="overview-dash-card__label">${t("overview.stats.sessions")}</div>
+          <div class="overview-dash-card__sub">${t("overview.stats.sessionsHint")}</div>
+        </div>
+      </div>
+      <div class="overview-dash-card" style="animation-delay: 200ms;">
+        <div class="overview-dash-card__icon overview-dash-card__icon--amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="overview-dash-card__content">
+          <div class="overview-dash-card__value">
+            ${
+              props.cronEnabled == null
+                ? t("common.na")
+                : props.cronEnabled
+                  ? t("common.enabled")
+                  : t("common.disabled")
+            }
+          </div>
+          <div class="overview-dash-card__label">${t("overview.stats.cron")}</div>
+          <div class="overview-dash-card__sub">
+            ${t("overview.stats.cronNext", { time: formatNextRun(props.cronNext) })}
+          </div>
+        </div>
+      </div>
+      <div class="overview-dash-card" style="animation-delay: 250ms;">
+        <div class="overview-dash-card__icon overview-dash-card__icon--green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+        <div class="overview-dash-card__content">
+          <div class="overview-dash-card__value">
+            ${
+              props.lastChannelsRefresh
+                ? formatRelativeTimestamp(props.lastChannelsRefresh)
+                : t("common.na")
+            }
+          </div>
+          <div class="overview-dash-card__label">${t("overview.snapshot.lastChannelsRefresh")}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Collapsible Connection Form -->
+    <details class="overview-connection" ?open=${!props.connected}>
+      <summary class="overview-connection__summary">
+        <div class="overview-connection__header">
+          <span class="overview-connection__title">${t("overview.access.title")}</span>
+          <span class="overview-connection__url mono">${props.settings.gatewayUrl}</span>
+        </div>
+        <div class="overview-connection__actions">
+          <button
+            class="btn btn--sm"
+            @click=${(e: Event) => {
+              e.preventDefault();
+              props.onConnect();
+            }}
+          >
+            ${t("common.connect")}
+          </button>
+          <button
+            class="btn btn--sm"
+            @click=${(e: Event) => {
+              e.preventDefault();
+              props.onRefresh();
+            }}
+          >
+            ${t("common.refresh")}
+          </button>
+          <span class="overview-connection__chevron">&#9662;</span>
+        </div>
+      </summary>
+      <div class="overview-connection__body">
+        <div class="form-grid" style="margin-top: 14px;">
           <label class="field">
             <span>${t("overview.access.wsUrl")}</span>
             <input
@@ -271,95 +417,36 @@ export function renderOverview(props: OverviewProps) {
           </label>
         </div>
         <div class="row" style="margin-top: 14px;">
-          <button class="btn" @click=${() => props.onConnect()}>${t("common.connect")}</button>
-          <button class="btn" @click=${() => props.onRefresh()}>${t("common.refresh")}</button>
-          <span class="muted">${
-            isTrustedProxy ? t("overview.access.trustedProxy") : t("overview.access.connectHint")
-          }</span>
+          <span class="muted">
+            ${isTrustedProxy ? t("overview.access.trustedProxy") : t("overview.access.connectHint")}
+          </span>
         </div>
       </div>
+    </details>
 
-      <div class="card">
-        <div class="card-title">${t("overview.snapshot.title")}</div>
-        <div class="card-sub">${t("overview.snapshot.subtitle")}</div>
-        <div class="stat-grid" style="margin-top: 16px;">
-          <div class="stat">
-            <div class="stat-label">${t("overview.snapshot.status")}</div>
-            <div class="stat-value ${props.connected ? "ok" : "warn"}">
-              ${props.connected ? t("common.ok") : t("common.offline")}
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">${t("overview.snapshot.uptime")}</div>
-            <div class="stat-value">${uptime}</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">${t("overview.snapshot.tickInterval")}</div>
-            <div class="stat-value">${tick}</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">${t("overview.snapshot.lastChannelsRefresh")}</div>
-            <div class="stat-value">
-              ${props.lastChannelsRefresh ? formatRelativeTimestamp(props.lastChannelsRefresh) : t("common.na")}
-            </div>
-          </div>
-        </div>
-        ${
-          props.lastError
-            ? html`<div class="callout danger" style="margin-top: 14px;">
-              <div>${props.lastError}</div>
-              ${pairingHint ?? ""}
-              ${authHint ?? ""}
-              ${insecureContextHint ?? ""}
-            </div>`
-            : html`
-                <div class="callout" style="margin-top: 14px">
-                  ${t("overview.snapshot.channelsHint")}
-                </div>
-              `
-        }
-      </div>
-    </section>
-
-    <section class="grid grid-cols-3">
-      <div class="card stat-card">
-        <div class="stat-label">${t("overview.stats.instances")}</div>
-        <div class="stat-value">${props.presenceCount}</div>
-        <div class="muted">${t("overview.stats.instancesHint")}</div>
-      </div>
-      <div class="card stat-card">
-        <div class="stat-label">${t("overview.stats.sessions")}</div>
-        <div class="stat-value">${props.sessionsCount ?? t("common.na")}</div>
-        <div class="muted">${t("overview.stats.sessionsHint")}</div>
-      </div>
-      <div class="card stat-card">
-        <div class="stat-label">${t("overview.stats.cron")}</div>
-        <div class="stat-value">
-          ${props.cronEnabled == null ? t("common.na") : props.cronEnabled ? t("common.enabled") : t("common.disabled")}
-        </div>
-        <div class="muted">${t("overview.stats.cronNext", { time: formatNextRun(props.cronNext) })}</div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="card-title">${t("overview.notes.title")}</div>
-      <div class="card-sub">${t("overview.notes.subtitle")}</div>
-      <div class="note-grid" style="margin-top: 14px;">
-        <div>
-          <div class="note-title">${t("overview.notes.tailscaleTitle")}</div>
-          <div class="muted">
-            ${t("overview.notes.tailscaleText")}
-          </div>
-        </div>
-        <div>
-          <div class="note-title">${t("overview.notes.sessionTitle")}</div>
-          <div class="muted">${t("overview.notes.sessionText")}</div>
-        </div>
-        <div>
-          <div class="note-title">${t("overview.notes.cronTitle")}</div>
-          <div class="muted">${t("overview.notes.cronText")}</div>
-        </div>
-      </div>
+    <!-- 5. Quick Actions — replaces the Notes section -->
+    <section class="overview-actions">
+      <a class="overview-action-pill" href="#/channels">
+        <span class="overview-action-pill__icon">&#9889;</span>
+        ${t("overview.quickActions.channels")}
+      </a>
+      <a class="overview-action-pill" href="#/sessions">
+        <span class="overview-action-pill__icon">&#128172;</span>
+        ${t("overview.quickActions.sessions")}
+      </a>
+      <a class="overview-action-pill" href="#/config">
+        <span class="overview-action-pill__icon">&#9881;</span>
+        ${t("overview.quickActions.config")}
+      </a>
+      <a
+        class="overview-action-pill"
+        href="https://docs.openclaw.ai/web/control-ui"
+        target=${EXTERNAL_LINK_TARGET}
+        rel=${buildExternalLinkRel()}
+      >
+        <span class="overview-action-pill__icon">&#128214;</span>
+        ${t("overview.quickActions.docs")}
+      </a>
     </section>
   `;
 }
