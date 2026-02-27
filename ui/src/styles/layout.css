@@ -613,4 +613,9 @@
   .list-item {
     grid-template-columns: 1fr;
   }
+
+  /* Surface page: stack sections vertically on narrow screens */
+  .surface-page {
+    gap: 14px;
+  }
 }
