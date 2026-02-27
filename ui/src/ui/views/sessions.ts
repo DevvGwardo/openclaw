@@ -111,104 +111,111 @@ function resolveThinkLevelPatchValue(value: string, isBinary: boolean): string |
 export function renderSessions(props: SessionsProps) {
   const rows = props.result?.sessions ?? [];
 
-  const hero = surfaceHero({
-    title: "Sessions",
-    subtitle: "Active session keys and per-session overrides.",
-    stats: [{ label: "Sessions", value: rows.length }],
-    actions: html`
-      <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
-        ${props.loading ? "Loading…" : "Refresh"}
-      </button>
-    `,
+  return surfacePage("sessions", {
+    hero: surfaceHero({
+      title: "Sessions",
+      subtitle: "Active session keys and per-session overrides.",
+      stats: [{ label: "Sessions", value: rows.length }],
+      actions: html`
+        <button class="btn btn--pill primary" ?disabled=${props.loading} @click=${props.onRefresh}>
+          ${props.loading ? "Loading…" : "Refresh"}
+        </button>
+      `,
+    }),
+    main: surfaceMain(html`
+      <section class="card">
+        <div class="filters">
+          <label class="field">
+            <span>Active within (minutes)</span>
+            <input
+              .value=${props.activeMinutes}
+              @input=${(e: Event) =>
+                props.onFiltersChange({
+                  activeMinutes: (e.target as HTMLInputElement).value,
+                  limit: props.limit,
+                  includeGlobal: props.includeGlobal,
+                  includeUnknown: props.includeUnknown,
+                })}
+            />
+          </label>
+          <label class="field">
+            <span>Limit</span>
+            <input
+              .value=${props.limit}
+              @input=${(e: Event) =>
+                props.onFiltersChange({
+                  activeMinutes: props.activeMinutes,
+                  limit: (e.target as HTMLInputElement).value,
+                  includeGlobal: props.includeGlobal,
+                  includeUnknown: props.includeUnknown,
+                })}
+            />
+          </label>
+          <label class="field checkbox">
+            <span>Include global</span>
+            <input
+              type="checkbox"
+              .checked=${props.includeGlobal}
+              @change=${(e: Event) =>
+                props.onFiltersChange({
+                  activeMinutes: props.activeMinutes,
+                  limit: props.limit,
+                  includeGlobal: (e.target as HTMLInputElement).checked,
+                  includeUnknown: props.includeUnknown,
+                })}
+            />
+          </label>
+          <label class="field checkbox">
+            <span>Include unknown</span>
+            <input
+              type="checkbox"
+              .checked=${props.includeUnknown}
+              @change=${(e: Event) =>
+                props.onFiltersChange({
+                  activeMinutes: props.activeMinutes,
+                  limit: props.limit,
+                  includeGlobal: props.includeGlobal,
+                  includeUnknown: (e.target as HTMLInputElement).checked,
+                })}
+            />
+          </label>
+        </div>
+
+        ${
+          props.error
+            ? html`<div class="callout danger" style="margin-top: 12px;">${props.error}</div>`
+            : nothing
+        }
+
+        <div class="muted" style="margin-top: 12px;">
+          ${props.result ? `Store: ${props.result.path}` : ""}
+        </div>
+
+        <div class="table" style="margin-top: 16px;">
+          <div class="table-head">
+            <div>Key</div>
+            <div>Label</div>
+            <div>Kind</div>
+            <div>Updated</div>
+            <div>Tokens</div>
+            <div>Thinking</div>
+            <div>Verbose</div>
+            <div>Reasoning</div>
+            <div>Actions</div>
+          </div>
+          ${
+            rows.length === 0
+              ? html`
+                  <div class="muted">No sessions found.</div>
+                `
+              : rows.map((row) =>
+                  renderRow(row, props.basePath, props.onPatch, props.onDelete, props.loading),
+                )
+          }
+        </div>
+      </section>
+    `),
   });
-
-  const main = surfaceMain(html`
-    <div class="filters">
-      <label class="field">
-        <span>Active within (minutes)</span>
-        <input
-          .value=${props.activeMinutes}
-          @input=${(e: Event) =>
-            props.onFiltersChange({
-              activeMinutes: (e.target as HTMLInputElement).value,
-              limit: props.limit,
-              includeGlobal: props.includeGlobal,
-              includeUnknown: props.includeUnknown,
-            })}
-        />
-      </label>
-      <label class="field">
-        <span>Limit</span>
-        <input
-          .value=${props.limit}
-          @input=${(e: Event) =>
-            props.onFiltersChange({
-              activeMinutes: props.activeMinutes,
-              limit: (e.target as HTMLInputElement).value,
-              includeGlobal: props.includeGlobal,
-              includeUnknown: props.includeUnknown,
-            })}
-        />
-      </label>
-      <label class="field checkbox">
-        <span>Include global</span>
-        <input
-          type="checkbox"
-          .checked=${props.includeGlobal}
-          @change=${(e: Event) =>
-            props.onFiltersChange({
-              activeMinutes: props.activeMinutes,
-              limit: props.limit,
-              includeGlobal: (e.target as HTMLInputElement).checked,
-              includeUnknown: props.includeUnknown,
-            })}
-        />
-      </label>
-      <label class="field checkbox">
-        <span>Include unknown</span>
-        <input
-          type="checkbox"
-          .checked=${props.includeUnknown}
-          @change=${(e: Event) =>
-            props.onFiltersChange({
-              activeMinutes: props.activeMinutes,
-              limit: props.limit,
-              includeGlobal: props.includeGlobal,
-              includeUnknown: (e.target as HTMLInputElement).checked,
-            })}
-        />
-      </label>
-    </div>
-
-    ${props.error ? html`<div class="callout danger">${props.error}</div>` : nothing}
-
-    ${props.result ? html`<div class="muted">Store: ${props.result.path}</div>` : nothing}
-
-    <div class="table">
-      <div class="table-head">
-        <div>Key</div>
-        <div>Label</div>
-        <div>Kind</div>
-        <div>Updated</div>
-        <div>Tokens</div>
-        <div>Thinking</div>
-        <div>Verbose</div>
-        <div>Reasoning</div>
-        <div>Actions</div>
-      </div>
-      ${
-        rows.length === 0
-          ? html`
-              <div class="muted">No sessions found.</div>
-            `
-          : rows.map((row) =>
-              renderRow(row, props.basePath, props.onPatch, props.onDelete, props.loading),
-            )
-      }
-    </div>
-  `);
-
-  return surfacePage("sessions", { hero, main });
 }
 
 function renderRow(
